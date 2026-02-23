@@ -399,9 +399,9 @@ function addSectionBundleDrivers() {
     addLogic("BUNDLE_2_SC_1_END_CAPS_SPNUM", function () {
         let end_caps = getState("EndCaps");
         let door_model = getState("DOOR_MODEL");
-        let BUNDLE2_SC1_HEIGHT = getState("BUNDLE2_SC1_HEIGHT");
+        let bundle2_sc1_height = getState("BUNDLE2_SC1_HEIGHT"); 
         
-        this.value = getEndCapsPartNum(BUNDLE2_SC1_HEIGHT, door_model, end_caps);
+        this.value = getEndCapsPartNum(bundle2_sc1_height, door_model, end_caps);
 
     }, ["BUNDLE2_SC1_HEIGHT", "DOOR_MODEL", "EndCaps"])
 
