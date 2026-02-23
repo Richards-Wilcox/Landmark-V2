@@ -376,7 +376,7 @@ function addSectionBundleDrivers() {
     }, ["BUNDLE_5"])
 
     addLogic("BUNDLE_1_SC_1_END_CAPS_SPNUM", function () {
-        let end_caps = getState("EndCaps"); //find the end caps value
+        let end_caps = getState("EndCaps"); 
         let door_model = getState("DOOR_MODEL");
         let BUNDLE1_SC1_HEIGHT = getState("BUNDLE1_SC1_HEIGHT");
 
@@ -399,11 +399,20 @@ function addSectionBundleDrivers() {
     addLogic("BUNDLE_2_SC_1_END_CAPS_SPNUM", function () {
         let end_caps = getState("EndCaps");
         let door_model = getState("DOOR_MODEL");
-        let bundle2_sc1_height = getState("BUNDLE2_SC1_HEIGHT"); 
-        
+        let bundle2_sc1_height = getState("BUNDLE2_SC1_HEIGHT");
+
         this.value = getEndCapsPartNum(bundle2_sc1_height, door_model, end_caps);
 
     }, ["BUNDLE2_SC1_HEIGHT", "DOOR_MODEL", "EndCaps"])
+
+    addLogic("BUNDLE_2_SC_2_END_CAPS_SPNUM", function () {
+        let end_caps = getState("EndCaps");
+        let door_model = getState("DOOR_MODEL");
+        let bundle2_sc2_height = getState("BUNDLE2_SC2_HEIGHT");
+
+        this.value = getEndCapsPartNum(bundle2_sc2_height, door_model, end_caps);
+
+    }, ["BUNDLE2_SC2_HEIGHT", "DOOR_MODEL", "EndCaps"])
 
 
     addLogic("BUNDLE_1_PACKAGE", function () {
