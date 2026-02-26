@@ -125,6 +125,7 @@ function addSectionBundleDrivers() {
     }, ["DOOR_MODEL"])
 
      addLogic("BUNDLE2_SC2_DESC", function () {
+        
         let doorWidthFeet = getState("DOOR_WIDTH_FEET");
         doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
         let doorWidthInches = getState("DOOR_WIDTH_INCHES");
@@ -391,7 +392,7 @@ function addSectionBundleDrivers() {
     }, ["BUNDLE_5"])
 
     addLogic("BUNDLE_1_SC_1_END_CAPS_SPNUM", function () {
-        let end_caps = getState("EndCaps"); 
+        let end_caps = getState("EndCaps");
         let door_model = getState("DOOR_MODEL");
         let BUNDLE1_SC1_HEIGHT = getState("BUNDLE1_SC1_HEIGHT");
 
@@ -624,7 +625,7 @@ function calculateRawPanelWeight(sectionHeightInInches) {
 function calculateEndCaps(sectionHeightInInches) {
     let getEndCaps = getState("EndCaps");
     let sectionHeightInFeet = sectionHeightInInches / 12;
-    let weightPerFoot;;
+    let weightPerFoot;
 
     if (getEndCaps === "N") { //case single
         weightPerFoot = getState("DOOR_MODEL") === "A" ? 1.02 : 1.14;
