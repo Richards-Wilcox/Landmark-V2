@@ -119,6 +119,21 @@ function addSectionBundleDrivers() {
         this.value = `SC ${doorWidthFeet}-${doorWidthInches}x${bundle2_sc1_height} ${doorModelDesc} ${color} ${panelStyle}`;
     }, ["DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "BUNDLE2_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE"])
 
+    addLogic("BUNDLE2_SC2_SPNUM", function () {
+        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        this.value = `SC${doorModelId}02`
+    }, ["DOOR_MODEL"])
+
+     addLogic("BUNDLE2_SC2_DESC", function () {
+        let doorWidthFeet = getState("DOOR_WIDTH_FEET");
+        doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
+        let doorWidthInches = getState("DOOR_WIDTH_INCHES");
+        let doorModelDesc = getNode("DOOR_MODEL").getAttribute("desc")
+        let color = getState("COLOR").desc;
+        let panelStyle = getNode("FACE").getAttribute("desc");
+        let bundle2_sc1_height = getState("BUNDLE2_SC2_HEIGHT");
+        this.value = `SC ${doorWidthFeet}-${doorWidthInches}x${bundle2_sc1_height} ${doorModelDesc} ${color} ${panelStyle}`;
+    }, ["DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "BUNDLE2_SC2_HEIGHT", "DOOR_MODEL", "COLOR", "FACE"])
 
     addLogic("BTM_SECTION", function () {
         let sections = getSectionBundle();
@@ -376,7 +391,7 @@ function addSectionBundleDrivers() {
     }, ["BUNDLE_5"])
 
     addLogic("BUNDLE_1_SC_1_END_CAPS_SPNUM", function () {
-        let end_caps = getState("EndCaps"); 
+        let end_caps = getState("EndCaps");
         let door_model = getState("DOOR_MODEL");
         let BUNDLE1_SC1_HEIGHT = getState("BUNDLE1_SC1_HEIGHT");
 
