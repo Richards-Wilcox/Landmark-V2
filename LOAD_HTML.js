@@ -1176,7 +1176,7 @@ function loadForm() {
 
   //$('#accordion9757245').hide(); //hide the inputs from section bundle page
   $('#accordion935516314').hide(); // hide load_html page
-  // accordion935516314
+  $('#accordion991246024').hide(); //weight controller
   //Hides the outputs
   $('#accordion1406547076').hide()
   //Hides the global data for JDE
