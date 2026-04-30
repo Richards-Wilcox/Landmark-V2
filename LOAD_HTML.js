@@ -39,23 +39,23 @@ function loadForm() {
 		   <div class="postion-container" style="display:none;" id="window_position_container">
 			   <div style="text-align: center; padding-bottom: 5px;" class="config-option-title-style">Window Position</div>
 			   <div class="window-position-container">
-				 <div class="rw-button">
+				 <div class="rw-button" tabindex="0">
 				   <label for="WINDOW_POSITION_TOP">Top</label>
 				   <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_TOP"  name="WINDOW_POSITION" desc="Top" value="top" code="top" >
 				 </div>
-				 <div class="rw-button">
+				 <div class="rw-button" tabindex="0">
 				   <label for="WINDOW_POSITION_LEFT">Left</label>
 				   <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_LEFT"  name="WINDOW_POSITION" desc="Left" value="left" code="left" >
 				 </div>
-				 <div class="rw-button">
+				 <div class="rw-button" tabindex="0">
 				   <label for="WINDOW_POSITION_CENTER">Center</label>
 				   <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_CENTER" name="WINDOW_POSITION" desc="Center" value="center" code="right">
 				 </div>
-				 <div class="rw-button">
+				 <div class="rw-button" tabindex="0">
 				   <label for="WINDOW_POSITION_RIGHT">Right</label>
 				   <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_RIGHT"  name="WINDOW_POSITION" desc="Right" value="right" code="center" >
 				 </div>
-				 <div class="rw-button">
+				 <div class="rw-button" tabindex="0">
 				   <label for="WINDOW_POSITION_BOTH">Both</label>
 				   <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_BOTH"  name="WINDOW_POSITION" desc="Both" code="both" value="both" >
 				 </div>
@@ -91,14 +91,14 @@ function loadForm() {
                     <div class="dropdown-item">
                         <h3>Door Model</h3>
                         <div class="dimension-layout">
-                            <div class="rw-button">
-                                <input type="radio" id="L138" name="DOOR_MODEL" value="A" desc="Cls" checked>
+                            <div class="rw-button" tabindex="0">
                                 <label for="L138">Classic L138</label>
+                                <input type="radio" id="L138" name="DOOR_MODEL" value="A" desc="Cls" checked>
                             </div>
 
-                            <div class="rw-button">
-                                <input type="radio" id="L200" name="DOOR_MODEL" value="D" desc="Prem">
+                            <div class="rw-button" tabindex="0">
                                 <label for="L200">Premium L200</label>
+                                <input type="radio" id="L200" name="DOOR_MODEL" value="D" desc="Prem">
                             </div>
                         </div>
                     </div>
@@ -107,28 +107,28 @@ function loadForm() {
                     <div class="dropdown-item" id="DIMENSION">
                         <h3> Door Size (4 Sections) </h3>
                         <div class="dimension-layout">
-                            <div class="rw-button">
+                            <div class="rw-button" tabindex="0">
                                 <label for="DIMENSIONS_0">8x7</label>
                                 <input type="radio" id="DIMENSIONS_0" name="SIZE" value="0" width="8" height="7">
                             </div>
-                            <div class="rw-button">
+                            <div class="rw-button" tabindex="0">
                                 <label for="DIMENSIONS_1">9x7</label>
                                 <input type="radio" id="DIMENSIONS_1" name="SIZE" value="1" width="9" height="7">
                             </div>
-                            <div class="rw-button">
+                            <div class="rw-button" tabindex="0">
                                 <label for="DIMENSIONS_2">16x7</label>
                                 <input type="radio" id="DIMENSIONS_2" name="SIZE" value="2" width="16" height="7"
                                     checked>
                             </div>
-                            <div class="rw-button">
+                            <div class="rw-button" tabindex="0">
                                 <label for="DIMENSIONS_3">8x8</label>
                                 <input type="radio" id="DIMENSIONS_3" name="SIZE" value="3" width="8" height="8">
                             </div>
-                            <div class="rw-button">
+                            <div class="rw-button" tabindex="0">
                                 <label for="DIMENSIONS_4">9x8</label>
                                 <input type="radio" id="DIMENSIONS_4" name="SIZE" value="4" width="9" height="8">
                             </div>
-                            <div class="rw-button">
+                            <div class="rw-button" tabindex="0">
                                 <label for="DIMENSIONS_5">16x8</label>
                                 <input type="radio" id="DIMENSIONS_5" name="SIZE" value="5" width="16" height="8">
                             </div>
@@ -195,15 +195,15 @@ function loadForm() {
                     <div class="dropdown-item">
                         <h3> Panel Style </h3>
                         <div class="panel-layout">
-                            <div class="rw-button panel-button">
+                            <div class="rw-button panel-button" tabindex="0">
                                 <label for="RANCH">Raised Ranch</label>
                                 <input type="radio" id="RANCH" name="FACE" value="R" desc="Rnc">
                             </div>
-                            <div class="rw-button panel-button">
+                            <div class="rw-button panel-button" tabindex="0">
                                 <label for="FLUSH">Flush</label>
                                 <input type="radio" id="FLUSH" name="FACE" value="F" desc="Fls">
                             </div>
-                            <div class="rw-button panel-button">
+                            <div class="rw-button panel-button" tabindex="0">
                                 <label for="COLONIAL">Raised Colonial</label>
                                 <input type="radio" id="COLONIAL" name="FACE" value="C" checked desc="Col">
                             </div>
@@ -221,24 +221,24 @@ function loadForm() {
 
                     <div class="dropdown-item custom-panel-item-container">
                         <div class="panel-layout">
-                            <div class="rw-button panel-button">
+                            <div class="rw-button panel-button" tabindex="0">
                                 <label for="GROOVED_RANCH">Recessed grooved Ranch</label>
                                 <input type="radio" id="GROOVED_RANCH" name="FACE" value="S" desc="RncGc">
                             </div>
-                            <div class="rw-button panel-button">
+                            <div class="rw-button panel-button" tabindex="0">
                                 <label for="GROOVED_COLONIAL">Recessed grooved Colonial</label>
                                 <input type="radio" id="GROOVED_COLONIAL" name="FACE" value="B" desc="ColGc">
                             </div>
-                            <div class="rw-button panel-button">
+                            <div class="rw-button panel-button" tabindex="0">
                                 <label for="SMOOTH_RANCH">Recessed smooth Ranch</label>
                                 <input type="radio" id="SMOOTH_RANCH" name="FACE" value="T" desc="RncSc">
                             </div>
 
-                            <div class="rw-button panel-button">
+                            <div class="rw-button panel-button" tabindex="0">
                                 <label for="PLANK">Plank</label>
                                 <input type="radio" id="PLANK" name="FACE" value="V" desc="Plk">
                             </div>
-                            <div class="rw-button panel-button mixed-panel" style="display:none">
+                            <div class="rw-button panel-button mixed-panel" tabindex="0" style="display:none">
                                 <label for="MIXED">Mixed</label>
                                 <input type="radio" id="MIXED" name="FACE" value="M">
                             </div>
@@ -255,7 +255,7 @@ function loadForm() {
                                         <div aria-labelledby="colors" tabindex="0" id="availableStackColors"
                                             class="colorsFieldset"></div>
                                         <div class="tooltip">
-                                            <p>View Available Colors</p>
+                                            <p>View Most Selling Colors</p>
                                         </div>
                                     </div>
                                     <div class='colorContainer'></div>
@@ -268,7 +268,7 @@ function loadForm() {
                                         <div aria-labelledby="colors" tabindex="0" id="optionalStackColors"
                                             class="colorsFieldset"></div>
                                         <div class="tooltip">
-                                            <p>View Optional Colors</p>
+                                            <p>View Other Colors</p>
                                         </div>
                                     </div>
 
@@ -283,11 +283,11 @@ function loadForm() {
                         <div class="finish-container">
                             <h3>Finish</h3>
                             <div class="finish-layout">
-                                <div class="rw-button btn-checked finish-layout-btn">
+                                <div class="rw-button btn-checked finish-layout-btn" tabindex="0">
                                     <label for="WOODGRAIN">Woodgrain</label>
                                     <input type="radio" id="WOODGRAIN" name="FINISH" value="W" checked>
                                 </div>
-                                <div class="rw-button finish-stucco finish-layout-btn" style="display:none"
+                                <div class="rw-button finish-stucco finish-layout-btn" tabindex="0" style="display:none"
                                     id="finishStucco">
                                     <label for="STUCCO">Stucco</label>
                                     <input type="radio" id="STUCCO" name="FINISH" value="S">
@@ -308,17 +308,17 @@ function loadForm() {
 		<div class = "dropdown-item">
 			<h3>Glass Shape</h3>
 			<div class="panel-layout">
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_SHAPE_COLONIAL">Colonial</label>
-					<input type="radio" id="GLASS_SHAPE_COLONIAL" name="GLASS_SHAPE" value="colonial" checked>
+					<input type="radio" id="GLASS_SHAPE_COLONIAL" name="GLASS_SHAPE" value="colonial">
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_SHAPE_RANCH">Ranch</label>
 					<input type="radio" id="GLASS_SHAPE_RANCH" name="GLASS_SHAPE" value="ranch" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_SHAPE_3">Slim Single</label>
 					<input type="radio" id="GLASS_SHAPE_3" name="GLASS_SHAPE" value="slim_single" >
 				</div>
@@ -335,47 +335,47 @@ function loadForm() {
 
 		<div class="dropdown-item custom-panel-item-container" id="more_glass_shapes_container">
 			<div class="panel-layout">
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_SHAPE_MORE_0">Slim Double</label>
 					<input type="radio" id="GLASS_SHAPE_MORE_0" name="GLASS_SHAPE" value="slim_double" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_SHAPE_MORE_17">Grand Wrought Iron - Rectangle</label>
 					<input type="radio" id="GLASS_SHAPE_MORE_17" name="GLASS_SHAPE" value="grand_wrought_iron_rectangle" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_SHAPE_MORE_18">Grand Wrought Iron - Double Arched</label>
 					<input type="radio" id="GLASS_SHAPE_MORE_18" name="GLASS_SHAPE" value="grand_wrought_iron_double_arched" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_SHAPE_MORE_19">Grand 4/4 - Rectangle</label>
 					<input type="radio" id="GLASS_SHAPE_MORE_19" name="GLASS_SHAPE" value="grand_44_rectangle" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_SHAPE_MORE_20">Grand 4/4 - Double Arched</label>
 					<input type="radio" id="GLASS_SHAPE_MORE_20" name="GLASS_SHAPE" value="grand_44_double_arched" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_SHAPE_MORE_21">Grand 4 Pane - Rectangle</label>
 					<input type="radio" id="GLASS_SHAPE_MORE_21" name="GLASS_SHAPE" value="grand_4_pane_rectangle" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_SHAPE_MORE_22">Grand 4 Pane - Double Arched</label>
 					<input type="radio" id="GLASS_SHAPE_MORE_22" name="GLASS_SHAPE" value="grand_4_pane_double_arched" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_SHAPE_MORE_23">Grand Clear - Rectangle</label>
 					<input type="radio" id="GLASS_SHAPE_MORE_23" name="GLASS_SHAPE" value="grand_clear_rectangle" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_SHAPE_MORE_24">Grand Clear - Double Arched</label>
 					<input type="radio" id="GLASS_SHAPE_MORE_24" name="GLASS_SHAPE" value="grand_clear_double_arched" >
 				</div>
@@ -387,17 +387,17 @@ function loadForm() {
 		<div class = "dropdown-item">
 			<h3>Glass Type</h3>
 			<div class="panel-layout">
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_TYPE_0">Clear Glass</label>
 					<input type="radio" class="rw-button-toggle" id="GLASS_TYPE_0" name="GLASS_TYPE" value="clear_glass" checked>
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_TYPE_1">Clear Glass Single</label>
 					<input type="radio" class="rw-button-toggle" id="GLASS_TYPE_1" name="GLASS_TYPE" value="clear_glass_single" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_TYPE_2">Satin</label>
 					<input type="radio" class="rw-button-toggle" id="GLASS_TYPE_2" name="GLASS_TYPE" value="satin" >
 				</div>
@@ -414,7 +414,7 @@ function loadForm() {
 
 		<div class="dropdown-item custom-panel-item-container" id="more_glass_types_container">
 			<div class="panel-layout">
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_TYPE_MORE_0">Pinhead</label>
 					<input type="radio" id="GLASS_TYPE_MORE_0" name="GLASS_TYPE" value="pinhead" checked>
 				</div>
@@ -426,22 +426,22 @@ function loadForm() {
 		<div class = "dropdown-item">
 			<h3>Glass Insert</h3>
 			<div class="panel-layout">
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_1">Stockton</label>
 					<input type="radio" class="rw-button-toggle" id="GLASS_INSERT_1" name="GLASS_INSERT" value="stockton_colonial" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_2">Waterton</label>
 					<input type="radio" class="rw-button-toggle" id="GLASS_INSERT_2" name="GLASS_INSERT" value="waterton_colonial" checked>
 				</div>
 
-				<div class="rw-button panel-button" style="display:none;">
+				<div class="rw-button panel-button" tabindex="0" style="display:none;">
 					<label for="GLASS_INSERT_1">Stockton</label>
 					<input type="radio" class="rw-button-toggle" id="GLASS_INSERT_1" name="GLASS_INSERT" value="stockton_ranch" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_3">Waterton</label>
 					<input type="radio" class="rw-button-toggle" id="GLASS_INSERT_3" name="GLASS_INSERT" value="waterton_ranch" checked>
 				</div>
@@ -458,112 +458,112 @@ function loadForm() {
 
 		<div class="dropdown-item custom-panel-item-container" id="more_glass_inserts_container">
 			<div class="panel-layout">
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_0">Prairie</label>
 					<input type="radio" id="GLASS_INSERT_MORE_0" name="GLASS_INSERT" value="prairie" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_1">Cascade</label>
 					<input type="radio" id="GLASS_INSERT_MORE_1" name="GLASS_INSERT" value="cascade_colonial" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_25">Cascade</label>
 					<input type="radio" id="GLASS_INSERT_MORE_25" name="GLASS_INSERT" value="cascade_ranch" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_2">Arched Stockton</label>
 					<input type="radio" id="GLASS_INSERT_MORE_2" name="GLASS_INSERT" value="arched_stockton" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_3">Stockbridge</label>
 					<input type="radio" id="GLASS_INSERT_MORE_3" name="GLASS_INSERT" value="stockbridge" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_4">Arched Stockbridge</label>
 					<input type="radio" id="GLASS_INSERT_MORE_4" name="GLASS_INSERT" value="arched_stockbridge" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_5">Aluminum Grid - Stockton 4</label>
 					<input type="radio" id="GLASS_INSERT_MORE_5" name="GLASS_INSERT" value="alum_stockton_4" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_6">Aluminum Grid - Stockton 6</label>
 					<input type="radio" id="GLASS_INSERT_MORE_6" name="GLASS_INSERT" value="alum_stockton_6" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_7">Aluminum Grid - Prairie</label>
 					<input type="radio" id="GLASS_INSERT_MORE_7" name="GLASS_INSERT" value="alum_prairie" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_8">Aluminum Grid - Stockton 10</label>
 					<input type="radio" id="GLASS_INSERT_MORE_8" name="GLASS_INSERT" value="alum_stockton_10" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_9">Square Bar - Stockton 4</label>
 					<input type="radio" id="GLASS_INSERT_MORE_9" name="GLASS_INSERT" value="square_bar_stockton_4" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_10">Square Bar - Stockton 6</label>
 					<input type="radio" id="GLASS_INSERT_MORE_10" name="GLASS_INSERT" value="square_bar_stockton_6" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_11">Square Bar - Prairie</label>
 					<input type="radio" id="GLASS_INSERT_MORE_11" name="GLASS_INSERT" value="square_bar_prairie" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_12">Round Bar - Stockton 4</label>
 					<input type="radio" id="GLASS_INSERT_MORE_12" name="GLASS_INSERT" value="round_bar_stockton_4" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_13">Round Bar - Stockton 6</label>
 					<input type="radio" id="GLASS_INSERT_MORE_13" name="GLASS_INSERT" value="round_bar_stockton_6" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_14">Round Bar - Prairie</label>
 					<input type="radio" id="GLASS_INSERT_MORE_14" name="GLASS_INSERT" value="round_bar_prairie" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_15">Square Bar - Stockton 10</label>
 					<input type="radio" id="GLASS_INSERT_MORE_15" name="GLASS_INSERT" value="square_bar_stockton_10" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_16">Round Bar - Stockton 10</label>
 					<input type="radio" id="GLASS_INSERT_MORE_16" name="GLASS_INSERT" value="round_bar_stockton_10" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_17">Arched Stockton 3pc Set</label>
 					<input type="radio" id="GLASS_INSERT_MORE_17" name="GLASS_INSERT" value="arched_stockton_3" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_18">Arched Stockbridge 3pc Set</label>
 					<input type="radio" id="GLASS_INSERT_MORE_18" name="GLASS_INSERT" value="arched_stockbridge_3" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_19">Berkshire</label>
 					<input type="radio" id="GLASS_INSERT_MORE_19" name="GLASS_INSERT" value="arched_stockton_4" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_INSERT_MORE_20">Breckenridge</label>
 					<input type="radio" id="GLASS_INSERT_MORE_20" name="GLASS_INSERT" value="arched_stockbridge_4" >
 				</div>
@@ -581,7 +581,7 @@ function loadForm() {
 							<div aria-labelledby="colors" tabindex="0" id="availableStackFrameColors"
 								class="colorsFieldset"></div>
 							<div class="tooltip">
-								<p>View Available Colors</p>
+								<p>View Most Selling Colors</p>
 							</div>
 						</div>
 						<div class='colorContainer'></div>
@@ -594,7 +594,7 @@ function loadForm() {
 							<div aria-labelledby="colors" tabindex="0" id="optionalStackFrameColors"
 								class="colorsFieldset"></div>
 							<div class="tooltip">
-								<p>View Optional Colors</p>
+								<p>View Other Colors</p>
 							</div>
 						</div>
 
@@ -614,7 +614,7 @@ function loadForm() {
 							<div aria-labelledby="colors" tabindex="0" id="availableStackInsertColors"
 								class="colorsFieldset"></div>
 							<div class="tooltip">
-								<p>View Available Colors</p>
+								<p>View Most Selling Colors</p>
 							</div>
 						</div>
 						<div class='colorContainer'></div>
@@ -627,7 +627,7 @@ function loadForm() {
 							<div aria-labelledby="colors" tabindex="0" id="optionalStackInsertColors"
 								class="colorsFieldset"></div>
 							<div class="tooltip">
-								<p>View Optional Colors</p>
+								<p>View Other Colors</p>
 							</div>
 						</div>
 
@@ -641,17 +641,17 @@ function loadForm() {
 		<div class = "dropdown-item">
 			<h3>Tempered Glass</h3>
 			<div class="panel-layout">
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_TEMPERED_0">All</label>
 					<input type="radio" class="rw-button-toggle" id="GLASS_TEMPERED_0" name="GLASS_TEMPERED" value="all" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_TEMPERED_1">Bottom</label>
 					<input type="radio" class="rw-button-toggle" id="GLASS_TEMPERED_1" name="GLASS_TEMPERED" value="bottom_1" >
 				</div>
 
-				<div class="rw-button panel-button">
+				<div class="rw-button panel-button" tabindex="0">
 					<label for="GLASS_TEMPERED_2">Bottom 2</label>
 					<input type="radio" class="rw-button-toggle" id="GLASS_TEMPERED_2" name="GLASS_TEMPERED" value="bottom_2" >
 				</div>
@@ -667,17 +667,17 @@ function loadForm() {
                     <div class="dropdown-item">
                         <h3>Hardware Set</h3>
                         <div class="dimension-layout">
-                            <div class="rw-button">
+                            <div class="rw-button" tabindex="0">
                                 <input type="radio" id="STANDARD" name="HARDWARE_SET" value="A" checked>
                                 <label for="STANDARD">Standard</label>
                             </div>
 
-                            <div class="rw-button">
+                            <div class="rw-button" tabindex="0">
                                 <input type="radio" id="STANDARD_PLUS" name="HARDWARE_SET" value="Y">
                                 <label for="STANDARD_PLUS">Standard Plus</label>
                             </div>
 
-                            <div class="rw-button">
+                            <div class="rw-button" tabindex="0">
                                 <input type="radio" id="COMMERCIAL" name="HARDWARE_SET" value="C">
                                 <label for="COMMERCIAL">Commercial</label>
                             </div>
@@ -728,39 +728,39 @@ function loadForm() {
                     <div class="dropdown-item">
                         <h3 for="LIFT_TYPE" class="">Lift Type</h3>
                         <div class="panel-layout">
-                            <div class="rw-button panel-button lift-option" id="opt-STD12">
+                            <div class="rw-button panel-button lift-option" tabindex="0" id="opt-STD12">
                                 <input type="radio" id="STD12" name="LIFT_TYPE" value="STD12" checked>
                                 <label for="STD12">Standard 12"R</label>
                             </div>
-                            <div class="rw-button panel-button lift-option" id="opt-STD15">
+                            <div class="rw-button panel-button lift-option" tabindex="0" id="opt-STD15">
                                 <input type="radio" id="STD15" name="LIFT_TYPE" value="STD15">
                                 <label for="STD15">Standard 15"R</label>
                             </div>
-                            <div class="rw-button panel-button lift-option" id="opt-32R">
+                            <div class="rw-button panel-button lift-option" tabindex="0" id="opt-32R">
                                 <input type="radio" id="32R" name="LIFT_TYPE" value="32R">
                                 <label for="32R">Standard 32"R</label>
                             </div>
-                            <div class="rw-button panel-button lift-option" id="opt-LHF">
+                            <div class="rw-button panel-button lift-option" tabindex="0" id="opt-LHF">
                                 <input type="radio" id="LHF" name="LIFT_TYPE" value="LHF">
                                 <label for="LHF">Low Headroom Front</label>
                             </div>
-                            <div class="rw-button panel-button lift-option" id="opt-LHROUT">
+                            <div class="rw-button panel-button lift-option" tabindex="0" id="opt-LHROUT">
                                 <input type="radio" id="LHROUT" name="LIFT_TYPE" value="LHROUT">
                                 <label for="LHROUT">Low Headroom Rear</label>
                             </div>
-                            <div class="rw-button panel-button lift-option" id="opt-LHREXT">
+                            <div class="rw-button panel-button lift-option" tabindex="0" id="opt-LHREXT">
                                 <input type="radio" id="LHREXT" name="LIFT_TYPE" value="LHREXT">
                                 <label for="LHREXT">Low Headroom Ext.</label>
                             </div>
-                            <div class="rw-button panel-button lift-option" id="opt-HL">
+                            <div class="rw-button panel-button lift-option" tabindex="0" id="opt-HL">
                                 <input type="radio" id="HL" name="LIFT_TYPE" value="HL">
                                 <label for="HL">High Lift</label>
                             </div>
-                            <div class="rw-button panel-button lift-option" id="opt-VL">
+                            <div class="rw-button panel-button lift-option" tabindex="0" id="opt-VL">
                                 <input type="radio" id="VL" name="LIFT_TYPE" value="VL">
                                 <label for="VL">Vertical Lift</label>
                             </div>
-                            <div class="rw-button panel-button lift-option" id="opt-VL">
+                            <div class="rw-button panel-button lift-option" tabindex="0" id="opt-VL">
                                 <input type="radio" id="LHR_VL" name="LIFT_TYPE" value="LHR_VL">
                                 <label for="LHR_VL">Vertical Lift Low Headroom</label>
                             </div>
@@ -996,17 +996,17 @@ function loadForm() {
                     <div class="dropdown-item">
                         <h3>Door Options</h3>
                         <div class="dimension-layout">
-                            <div class="rw-button">
+                            <div class="rw-button" tabindex="0">
                                 <input type="radio" id="DOORFACE" name="DOOROPT" value="DOORFACE">
                                 <label for="DOORFACE">Door Face Only</label>
                             </div>
 
-                            <div class="rw-button">
+                            <div class="rw-button" tabindex="0">
                                 <input type="radio" id="HARDWAREONLY" name="DOOROPT" value="HARDWAREONLY">
                                 <label for="HARDWAREONLY">Hardware Only</label>
                             </div>
 
-                            <div class="rw-button">
+                            <div class="rw-button" tabindex="0">
                                 <input type="radio" id="COMPLETEDOOR" name="DOOROPT" value="COMPLETEDOOR" checked>
                                 <label for="COMPLETEDOOR">Complete Door</label>
                             </div>
@@ -1093,25 +1093,6 @@ function loadForm() {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="dropdown-item" style="flex-direction:row;">
-                        <div class="dimension-layout">
-                            <h3 for="JAMB_SEAL_COLOR">Frame Colour</h3>
-                            <select id="JAMB_SEAL_COLOR" name="JAMB_SEAL_COLOR">
-                                <option value="W" jambscrews="215-302W-050" selected="selected">White</option>
-                                <option value="T" jambscrews="215-302T-050">SandStone</option>
-                                <option value="A" jambscrews="215-302A-050">Almond</option>
-                                <option value="C" jambscrews="215-302C-050">Slate Grey</option>
-                                <option value="Z" jambscrews="215-302Z-050">Bronze</option>
-                                <option value="K" jambscrews="215-302K-050">Black</option>
-                                <option value="B" jambscrews="215-302B-050">Brown</option>
-                                <option value="F" jambscrews="215-302F-050">Cafe</option>
-                                <option value="E" jambscrews="215-302E-050">Desert Tan</option>
-                                <option value="V" jambscrews="215-302C-050">Iron Ore</option>
-                                <option value="NONE">None</option>
-                            </select>
                         </div>
                     </div>
                 </div>
@@ -1619,8 +1600,14 @@ function loadUI() {
 
   appendDrpData();
   toggleSwitch();
-  appendAvailableColors();
+
+  // appendAvailableColors();
+  // appendAvailableFrameColors();
+  appendAvailableColorsTo("#AvaialbleColorsSection");
+  appendAvailableColorsTo("#AvailableFrameColorsSection");
+
   appendOptionalColors();
+
   appendOverlappingColors();
   toggleStackColors();
   registerColorEvents();
@@ -1656,25 +1643,25 @@ function clickHandler() {
     });
 
   $("input[type='radio'].rw-button-toggle")
-	.off()
-    .on("click", function(e) {
+    .off()
+    .on("click", function (e) {
       const group = e.target.name;
-	  const checked = $(this).data('wasChecked');
+      const checked = $(this).data('wasChecked');
 
       // Remove active class + unchecked
       $(`input[name='${group}']`)
         .prop("checked", false)
-		.removeAttr("checked")
-		.data('wasChecked', false)
+        .removeAttr("checked")
+        .data('wasChecked', false)
         .parent().removeClass("btn-checked");
 
       $(this)
-		.prop("checked", !checked)
-		.data("wasChecked", !checked)
-		.parent().toggleClass("btn-checked", !checked);
-		if (checked) {
-			rw(getNode(group));
-		}
+        .prop("checked", !checked)
+        .data("wasChecked", !checked)
+        .parent().toggleClass("btn-checked", !checked);
+      if (checked) {
+        rw(getNode(group));
+      }
     });
 
   // Initial check styling
@@ -1683,6 +1670,21 @@ function clickHandler() {
     .each(function () {
       $(this).parent().addClass("btn-checked");
     });
+
+
+  //select and deselect the inputs on glazing tab
+  $('input[name="GLASS_SHAPE"]').on('click', function () {
+
+    if ($(this).data('checked')) {
+      $(this).prop('checked', false);
+      $(this).data('checked', false);
+    } else {
+      $('input[name="GLASS_SHAPE"]').data('checked', false);
+      $(this).data('checked', true);
+      $(this).prop('checked', true);
+    }
+
+  });
 
 }
 
@@ -1747,25 +1749,29 @@ function appendOverlappingColors() {
   });
 }
 
-function appendAvailableColors() {
-  const $container = $("#AvaialbleColorsSection .colorContainer");
-  $container.html("");
-  // if (!$container.length) return;
+function appendAvailableColorsTo(containerSelector) {
+  const $container = $(containerSelector + " .colorContainer");
+  $container.empty();
 
   AvailableColorImages.forEach((imgSrc, index) => {
-    let isChecked = index === 0 ? "checked" : "";
+
+    const isChecked = index === 0 ? "checked" : "";
+    const isSelected = index === 0 ? "selected" : "";
+
     const html = `
-            <div class="color-button-container ${index === 0 ? "selected" : ""}">
-                <div class="color-button color-tooltip" data-tooltip = "${imgSrc.colorName}">
-                    <img src="${src_path + imgSrc.url}" alt="Color ${index + 1}" class="color-image" />
+            <div class="color-button-container ${isSelected}">
+                <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
+                    <img src="${src_path + imgSrc.url}"
+                         alt="Color ${index + 1}"
+                         class="color-image" />
                     <input
                         type="radio"
                         name="COLOR"
                         value="${imgSrc.value}"
-                         ${isChecked}
-                         hex="${imgSrc.hex}"
-                         desc="${imgSrc.desc}"
-                         colorName="${imgSrc.colorName}"
+                        ${isChecked}
+                        hex="${imgSrc.hex}"
+                        desc="${imgSrc.desc}"
+                        colorName="${imgSrc.colorName}"
                         style="display:none"/>
                 </div>
             </div>
@@ -1774,44 +1780,147 @@ function appendAvailableColors() {
     $container.append(html);
   });
 
-  // ✅ Add selected class and checked radio AFTER all elements are appended
   selectFirstColor($container);
   registerColorEvents();
 }
 
-function appendOptionalColors(panel_style) {
-  const $container = $("#OptionalColorsSection .colorContainer");
-  //if ($container.length === 0) return;
-  $container.html("");
+// function appendAvailableColors() {
+//   const $container = $("#AvaialbleColorsSection .colorContainer");
+//   $container.html("");
+//   // if (!$container.length) return;
 
-  //remove these two colors when flush or Recessed smooth Ranch panel is selected
-  const filtered = OptionalColorImages.filter(item => {
-    if ((panel_style === "F" || panel_style === "T") &&
-      ["Cocoa Hickory", "Honey Cedar"].includes(item.value)) {
-      return false; // remove these 2
-    }
-    return true;
-  });
+//   AvailableColorImages.forEach((imgSrc, index) => {
+//     let isChecked = index === 0 ? "checked" : "";
+//     const html = `
+//             <div class="color-button-container ${index === 0 ? "selected" : ""}">
+//                 <div class="color-button color-tooltip" data-tooltip = "${imgSrc.colorName}">
+//                     <img src="${src_path + imgSrc.url}" alt="Color ${index + 1}" class="color-image" />
+//                     <input
+//                         type="radio"
+//                         name="COLOR"
+//                         value="${imgSrc.value}"
+//                          ${isChecked}
+//                          hex="${imgSrc.hex}"
+//                          desc="${imgSrc.desc}"
+//                          colorName="${imgSrc.colorName}"
+//                         style="display:none"/>
+//                 </div>
+//             </div>
+//         `;
+
+//     $container.append(html);
+//   });
+
+//   // ✅ Add selected class and checked radio AFTER all elements are appended
+//   selectFirstColor($container);
+//   registerColorEvents();
+// }
 
 
-  filtered.forEach((imgSrc, index) => {
+// function appendOptionalColors(panel_style) {
+//   const $container = $("#OptionalColorsSection .colorContainer");
+//   //if ($container.length === 0) return;
+//   $container.html("");
 
-    if ((panel_style === "F" || panel_style === "T") && imgSrc.restricted) {
-      return;
-    }
+//   //remove these two colors when flush or Recessed smooth Ranch panel is selected
+//   const filtered = OptionalColorImages.filter(item => {
+//     if ((panel_style === "F" || panel_style === "T") &&
+//       ["Cocoa Hickory", "Honey Cedar"].includes(item.value)) {
+//       return false; // remove these 2
+//     }
+//     return true;
+//   });
 
-    let isChecked = index === 0 ? "checked" : "";
+
+//   filtered.forEach((imgSrc, index) => {
+
+//     if ((panel_style === "F" || panel_style === "T") && imgSrc.restricted) {
+//       return;
+//     }
+
+//     let isChecked = index === 0 ? "checked" : "";
+//     const html = `
+//             <div class="color-button-container ${index === 0 ? "selected" : ""}">
+//                 <div class="color-button color-tooltip" data-tooltip = "${imgSrc.colorName}">
+//                     <img src="${src_path + imgSrc.url}" alt="Color ${index + 1}" class="color-image" />
+//                     <input
+//                         type="radio"
+//                         name="COLOR"
+//                         value="${imgSrc.value}"
+//                         hex="${imgSrc.hex}"
+//                          desc="${imgSrc.desc}"
+//                          colorName="${imgSrc.colorName}"
+//                         ${isChecked}
+//                         style="display:none"
+//                     />
+//                 </div>
+//             </div>
+//         `;
+
+//     $container.append(html);
+//   });
+
+//   registerColorEvents();
+//   // Add click handler
+//   // $container.find(".color-button-container").on("click", function () {
+//   //     $container.find(".color-button-container").removeClass("selected");
+
+//   //     $(this).addClass("selected");
+//   //     $container.find("input[type='radio']").removeAttr("checked").prop("checked", false);
+
+//   //     $(this).find('input[type="radio"]').attr("checked", "checked").prop("checked", true).trigger("change");
+//   // });
+// }
+
+function appendColorsTo(containerSelector, colorArray, panel_style = null) {
+
+  const $container = $(containerSelector + " .colorContainer");
+  $container.empty();
+
+  let filteredColors = colorArray;
+
+  // Apply panel style filtering only if panel_style is provided
+  if (panel_style) {
+    filteredColors = colorArray
+      .filter(item => {
+        // Remove 2 specific colors for F or T
+        if (
+          (panel_style === "F" || panel_style === "T") &&
+          ["Cocoa Hickory", "Honey Cedar"].includes(item.value)
+        ) {
+          return false;
+        }
+
+        // Remove restricted colors
+        if (
+          (panel_style === "F" || panel_style === "T") &&
+          item.restricted
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+  }
+
+  filteredColors.forEach((imgSrc, index) => {
+
+    const isChecked = index === 0 ? "checked" : "";
+    const isSelected = index === 0 ? "selected" : "";
+
     const html = `
-            <div class="color-button-container ${index === 0 ? "selected" : ""}">
-                <div class="color-button color-tooltip" data-tooltip = "${imgSrc.colorName}">
-                    <img src="${src_path + imgSrc.url}" alt="Color ${index + 1}" class="color-image" />
+            <div class="color-button-container ${isSelected}">
+                <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
+                    <img src="${src_path + imgSrc.url}"
+                         alt="Color ${index + 1}"
+                         class="color-image" />
                     <input
                         type="radio"
                         name="COLOR"
                         value="${imgSrc.value}"
                         hex="${imgSrc.hex}"
-                         desc="${imgSrc.desc}"
-                         colorName="${imgSrc.colorName}"
+                        desc="${imgSrc.desc}"
+                        colorName="${imgSrc.colorName}"
                         ${isChecked}
                         style="display:none"
                     />
@@ -1823,15 +1932,10 @@ function appendOptionalColors(panel_style) {
   });
 
   registerColorEvents();
-  // Add click handler
-  // $container.find(".color-button-container").on("click", function () {
-  //     $container.find(".color-button-container").removeClass("selected");
+}
 
-  //     $(this).addClass("selected");
-  //     $container.find("input[type='radio']").removeAttr("checked").prop("checked", false);
-
-  //     $(this).find('input[type="radio"]').attr("checked", "checked").prop("checked", true).trigger("change");
-  // });
+function appendOptionalColors(panel_style) {
+  appendColorsTo("#OptionalColorsSection", OptionalColorImages, panel_style);
 }
 
 function registerColorEvents() {
@@ -1901,10 +2005,28 @@ function toggleStackColors() {
     showContainer($("#OptionalColorsSection .colorContainer"));
     hideContainer($("#AvaialbleColorsSection .colorContainer"));
     showStack($("#availableStackColors"));
-    //selectFirstColor($("#OptionalColorsSection .colorContainer"));
-    //unselectFirstColor($("#AvaialbleColorsSection .colorContainer"));
     registerColorEvents();
     rw(getNode("COLOR"))
+  });
+
+  $("#optionalStackFrameColors").on("click", function () {
+    setTimeout(animateTransition, 20);
+    hideStack($("#optionalStackFrameColors"));
+    showContainer($("#OptionalFrameColorsSection .colorContainer"));
+    hideContainer($("#AvailableFrameColorsSection .colorContainer"));
+    showStack($("#availableStackFrameColors"));
+    registerColorEvents();
+    // rw(getNode("COLOR"))
+  });
+
+  $("#optionalStackInsertColors").on("click", function () {
+    setTimeout(animateTransition, 20);
+    hideStack($("#optionalStackInsertColors"));
+    showContainer($("#OptionalInsertColorsSection .colorContainer"));
+    hideContainer($("#AvailableInsertColorsSection .colorContainer"));
+    showStack($("#availableStackInsertColors"));
+    registerColorEvents();
+    // rw(getNode("COLOR"))
   });
 
 
@@ -1919,6 +2041,29 @@ function toggleStackColors() {
     //unselectFirstColor($("#OptionalColorsSection .colorContainer"));
     registerColorEvents();
     rw(getNode("COLOR"))
+
+  });
+
+  $("#availableStackFrameColors").on("click", function () {
+
+    setTimeout(animateTransition, 20);
+    hideStack($("#availableStackFrameColors"));
+    showContainer($("#AvailableFrameColorsSection .colorContainer"));
+    hideContainer($("#OptionalFrameColorsSection .colorContainer"));
+    showStack($("#optionalStackFrameColors"));
+    registerColorEvents();
+    // rw(getNode("COLOR"))
+
+  });
+
+  $("#availableStackInsertColors").on("click", function () {
+    setTimeout(animateTransition, 20);
+    hideStack($("#availableStackInsertColors"));
+    showContainer($("#AvailableInsertColorsSection .colorContainer"));
+    hideContainer($("#OptionalInsertColorsSection .colorContainer"));
+    showStack($("#optionalStackInsertColors"));
+    registerColorEvents();
+    // rw(getNode("COLOR"))
 
   });
 }
@@ -2235,56 +2380,72 @@ function loadGlazingUI() {
     }
   });
 
-  const $frame_colors = $("#AvailableFrameColorsSection .colorContainer").html("");
-  const $insert_colors = $("#AvailableInsertColorsSection .colorContainer").html("");
-  AvailableColorImages.forEach((imgSrc, index) => {
-    let isChecked = index === 0 ? "checked" : "";
-    const html = `
-            <div class="color-button-container ${index === 0 ? "selected" : ""}">
-                <div class="color-button color-tooltip" data-tooltip = "${imgSrc.colorName}">
-                    <img src="${src_path + imgSrc.url}" alt="Color ${index + 1}" class="color-image" />
-                    <input
-                        type="radio"
-                        name="COLOR"
-                        value="${imgSrc.value}"
-                         ${isChecked}
-                         hex="${imgSrc.hex}"
-                         desc="${imgSrc.desc}"
-                         colorName="${imgSrc.colorName}"
-                        style="display:none"/>
-                </div>
-            </div>
-        `;
 
-    $frame_colors.append(html);
-    $insert_colors.append(html);
+  const $frameColors = $("#AvailableFrameColorsSection .colorContainer").empty();
+  const $insertColors = $("#AvailableInsertColorsSection .colorContainer").empty();
+
+  function generateColorHTML(imgSrc, index, inputName) {
+    const isSelected = index === 0;
+    return `
+        <div class="color-button-container ${isSelected ? "selected" : ""}">
+            <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
+                <img
+                    src="${src_path + imgSrc.url}"
+                    alt="${imgSrc.colorName}"
+                    class="color-image"
+                />
+                <input
+                    type="radio"
+                    name="${inputName}"
+                    value="${imgSrc.value}"
+                    ${isSelected ? "checked" : ""}
+                    hex="${imgSrc.hex}"
+                    desc="${imgSrc.desc}"
+                    colorName="${imgSrc.colorName}"
+                    style="display:none"
+                />
+            </div>
+        </div>
+    `;
+  }
+
+  AvailableColorImages.forEach((imgSrc, index) => {
+    $frameColors.append(generateColorHTML(imgSrc, index, "FRAME_COLOR"));
+    $insertColors.append(generateColorHTML(imgSrc, index, "INSERT_COLOR"));
   });
 
-  const $opt_frame_colors = $("#OptionalFrameColorsSection .colorContainer").html("");
-  const $opt_insert_colors = $("#OptionalInsertColorsSection .colorContainer").html("");
+  const $optFrameColors = $("#OptionalFrameColorsSection .colorContainer").empty();
+  const $optInsertColors = $("#OptionalInsertColorsSection .colorContainer").empty();
+
+  function generateColorHTML(imgSrc, index, inputName) {
+    const isSelected = index === 0;
+
+    return `
+        <div class="color-button-container ${isSelected ? "selected" : ""}">
+            <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
+                <img
+                    src="${src_path + imgSrc.url}"
+                    alt="${imgSrc.colorName}"
+                    class="color-image"
+                />
+                <input
+                    type="radio"
+                    name="${inputName}"
+                    value="${imgSrc.value}"
+                    hex="${imgSrc.hex}"
+                    desc="${imgSrc.desc}"
+                    colorName="${imgSrc.colorName}"
+                    ${isSelected ? "checked" : ""}
+                    style="display:none"
+                />
+            </div>
+        </div>
+    `;
+  }
 
   OptionalColorImages.forEach((imgSrc, index) => {
-    let isChecked = index === 0 ? "checked" : "";
-    const html = `
-			<div class="color-button-container ${index === 0 ? "selected" : ""}">
-				<div class="color-button color-tooltip" data-tooltip = "${imgSrc.colorName}">
-					<img src="${src_path + imgSrc.url}" alt="Color ${index + 1}" class="color-image" />
-					<input
-						type="radio"
-						name="COLOR"
-						value="${imgSrc.value}"
-						hex="${imgSrc.hex}"
-						 desc="${imgSrc.desc}"
-						 colorName="${imgSrc.colorName}"
-						${isChecked}
-						style="display:none"
-					/>
-				</div>
-			</div>
-		`;
-
-    $opt_frame_colors.append(html);
-    $opt_insert_colors.append(html);
+    $optFrameColors.append(generateColorHTML(imgSrc, index, "FRAME_COLOR"));
+    $optInsertColors.append(generateColorHTML(imgSrc, index, "INSERT_COLOR")); // enable if needed
   });
 
   const $optionalfieldset_frame = $("#optionalStackFrameColors").empty();
@@ -2308,7 +2469,8 @@ function loadGlazingUI() {
   $("#NAVIGATION_SPC").on('click', function (event) {
     if (currentSection == 1) {
       $("#window_position_container").show();
-      if (getState("GLASS_SHAPE").includes("slim")) {
+      const glass_shape = getState("GLASS_SHAPE") ?? "";
+      if (glass_shape.includes("slim")) {
         $(`[data-id="section_slim_temp"]`).show();
       } else {
       }

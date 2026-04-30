@@ -75,7 +75,7 @@ function addRenderNode() {
 			const flush = ["flush", "plank"].includes(face);
 			const num_sections = getState("NUM_OF_SEC");
 			const special = getState("SPECIAL_FACE");
-			const glass_shape = getState("GLASS_SHAPE");
+			const glass_shape = getState("GLASS_SHAPE") ?? "";
 			const single_endcap = getState("EndCaps") == "N";
 			const width = getState("WIDTH");
 
@@ -313,7 +313,7 @@ function addRenderNode() {
 
 function addSlimUi() {
 	$(`[data-id="section_slim_temp"]`).remove();
-	const glass_shape = getState("GLASS_SHAPE");
+	const glass_shape = getState("GLASS_SHAPE") ?? "";
 
 	const windows = getState("WINDOW_STATE");
 	if (!glass_shape.includes("slim")) {
@@ -837,7 +837,7 @@ function getDoorInfo() {
 	const [x, y] = getCanvasDoorPosition(width, height);
 
 	let hints = window_info.hints;
-	if (glass_shape.includes('grand')) {
+	if (glass_shape.includes('grand') || special) {
 		hints = false;
 	}
 
