@@ -19,12 +19,14 @@ function addSectionBundleDrivers() {
     }, ["WIDTH", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES", "HEIGHT", "DOOR_MODEL", "COLOR", "customSwitch", "FACE"])
 
 
-    addLogic("BUNDLE_1_RAW_PANEL_SPNUM", function () {
+    // set bundle 1 rp1 part#
+    addLogic("BUNDLE1_RP1_SPNUM", function () {
         let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
         this.value = `SR${doorModelId}01`;
     }, ["DOOR_MODEL"])
 
-    addLogic("BUNDLE_1_RAW_PANEL_DESC", function () {
+    // set bundle1 rp1 desc
+    addLogic("BUNDLE1_RP1_DESC", function () {
         let doorWidthFeet = getState("DOOR_WIDTH_FEET");
         doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
         let doorWidthInches = getState("DOOR_WIDTH_INCHES");
@@ -36,6 +38,66 @@ function addSectionBundleDrivers() {
         this.value = `SR ${doorWidthFeet}-${doorWidthInches}x${bundle1_sc1_height} ${doorModelDesc} ${color} ${panelStyle}`;
 
     }, ["DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_MODEL", "COLOR", "FACE", "BUNDLE1_SC1_HEIGHT"])
+
+    // set bundle 1 rp2 part#
+    addLogic("BUNDLE1_RP2_SPNUM", function () {
+        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        this.value = `SR${doorModelId}01`;
+    }, ["DOOR_MODEL"])
+
+    // set bundle 1 rp2 desc
+    addLogic("BUNDLE1_RP2_DESC", function () {
+        let doorWidthFeet = getState("DOOR_WIDTH_FEET");
+        doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
+        let doorWidthInches = getState("DOOR_WIDTH_INCHES");
+        let doorModelDesc = getNode("DOOR_MODEL").getAttribute("desc")
+        let color = getState("COLOR").desc;
+        let panelStyle = getNode("FACE").getAttribute("desc");
+        let bundle1_sc2_height = getState("BUNDLE1_SC2_HEIGHT");
+
+        this.value = `SR ${doorWidthFeet}-${doorWidthInches}x${bundle1_sc2_height} ${doorModelDesc} ${color} ${panelStyle}`;
+
+    }, ["DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_MODEL", "COLOR", "FACE", "BUNDLE1_SC2_HEIGHT"])
+
+    // bundle2 rp1 part#
+    addLogic("BUNDLE2_RP1_SPNUM", function () {
+        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        this.value = `SR${doorModelId}01`;
+    }, ["DOOR_MODEL"])
+
+    // bundle 2 rp1 desc
+    addLogic("BUNDLE2_RP1_DESC", function () {
+        let doorWidthFeet = getState("DOOR_WIDTH_FEET");
+        doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
+        let doorWidthInches = getState("DOOR_WIDTH_INCHES");
+        let doorModelDesc = getNode("DOOR_MODEL").getAttribute("desc")
+        let color = getState("COLOR").desc;
+        let panelStyle = getNode("FACE").getAttribute("desc");
+        let bundle2_sc1_height = getState("BUNDLE2_SC1_HEIGHT");
+
+        this.value = `SR ${doorWidthFeet}-${doorWidthInches}x${bundle2_sc1_height} ${doorModelDesc} ${color} ${panelStyle}`;
+
+    }, ["DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_MODEL", "COLOR", "FACE", "BUNDLE2_SC1_HEIGHT"])
+
+    // bundle 2 rp2 part#
+    addLogic("BUNDLE2_RP2_SPNUM", function () {
+        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        this.value = `SR${doorModelId}01`;
+    }, ["DOOR_MODEL"])
+
+    // bundle 2 rp2 desc
+    addLogic("BUNDLE2_RP2_DESC", function () {
+        let doorWidthFeet = getState("DOOR_WIDTH_FEET");
+        doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
+        let doorWidthInches = getState("DOOR_WIDTH_INCHES");
+        let doorModelDesc = getNode("DOOR_MODEL").getAttribute("desc")
+        let color = getState("COLOR").desc;
+        let panelStyle = getNode("FACE").getAttribute("desc");
+        let bundle2_sc2_height = getState("BUNDLE2_SC2_HEIGHT");
+
+        this.value = `SR ${doorWidthFeet}-${doorWidthInches}x${bundle2_sc2_height} ${doorModelDesc} ${color} ${panelStyle}`;
+
+    }, ["DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_MODEL", "COLOR", "FACE", "BUNDLE2_SC2_HEIGHT"])
 
     addLogic("BUNDLE_1_SC_1_RP_BASE_SPNUM", function () {
         let doorModelId = getNode("DOOR_MODEL").getAttribute("id")
@@ -124,8 +186,8 @@ function addSectionBundleDrivers() {
         this.value = `SC${doorModelId}02`
     }, ["DOOR_MODEL"])
 
-     addLogic("BUNDLE2_SC2_DESC", function () {
-        
+    addLogic("BUNDLE2_SC2_DESC", function () {
+
         let doorWidthFeet = getState("DOOR_WIDTH_FEET");
         doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
         let doorWidthInches = getState("DOOR_WIDTH_INCHES");
