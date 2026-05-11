@@ -9,14 +9,14 @@ function addSchedulingCodeLogic() {
 
     }, ["BTM_SECTION", "LM_DOOR_MODEL"])
 
-    addLogic("TOP_SECTION_DOOR_MODEL", function () {
-        let top_section = getState("TOP_SECTION");
+    // addLogic("TOP_SECTION_DOOR_MODEL", function () {
+    //     let top_section = getState("TOP_SECTION");
 
-        if (top_section) {
-            this.value = getState("LM_DOOR_MODEL")
-        } else this.value = '';
+    //     if (top_section) {
+    //         this.value = getState("LM_DOOR_MODEL")
+    //     } else this.value = '';
 
-    }, ["TOP_SECTION", "LM_DOOR_MODEL"])
+    // }, ["TOP_SECTION", "LM_DOOR_MODEL"])
 
     addLogic("INT1_SECTION_DOOR_MODEL", function () {
         let INT1_SECTION = getState("INT1_SECTION");

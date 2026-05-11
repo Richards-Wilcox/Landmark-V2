@@ -1,5 +1,36 @@
 function loadStyles() {
   const styles = `
+.canvas-loader {
+  width: 60px;
+  height: 60px;
+  border-radius: 50% !important;
+  display: inline-block;
+  border-top: 6px solid #000;
+  border-right: 6px solid transparent;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+.canvas-loader::after {
+  content: '';  
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 50% !important;
+  border-left: 6px solid #e21f2e;
+  border-bottom: 6px solid transparent;
+  animation: rotation 0.5s linear infinite reverse;
+}
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} 
 
 
 #displayMain{

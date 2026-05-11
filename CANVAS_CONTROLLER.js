@@ -1,5 +1,5 @@
 const canvas_mouse = {
-x: 0, y: 0,
+	x: 0, y: 0,
 	is_down: false,
 };
 
@@ -18,7 +18,7 @@ function addRenderNode() {
 
 	addNode({
 		id: "FACE_desc",
-		logic: function() {
+		logic: function () {
 			const face_map = {
 				'C': 'colonial',
 				'F': 'flush',
@@ -33,15 +33,15 @@ function addRenderNode() {
 			this.value = face;
 		},
 		value: "",
-	}, [ "FACE" ]);
+	}, ["FACE"]);
 
-	addLogic("GLASS_SHAPE", function() {
+	addLogic("GLASS_SHAPE", function () {
 		const glass_shape = $("input[name='GLASS_SHAPE']:checked").val();
 		this.value = glass_shape;
 		addSlimUi();
-	}, [ ]);
+	}, []);
 
-	addLogic("GLASS_INSERT", function() {
+	addLogic("GLASS_INSERT", function () {
 		const glass_shape = $("input[name='GLASS_INSERT']:checked").val();
 		this.value = glass_shape;
 
@@ -49,20 +49,20 @@ function addRenderNode() {
 		if (glass.includes('slim')) {
 			this.value = "";
 		}
-	}, [ "GLASS_SHAPE" ]);
+	}, ["GLASS_SHAPE"]);
 
 	addNode({
 		id: "SPECIAL_FACE",
-		logic: function() {
+		logic: function () {
 			const glass = getState('GLASS_SHAPE');
 			const face = getState("FACE_desc");
 
-			const special_ranch = [ "colonial", "ranch" ];
+			const special_ranch = ["colonial", "ranch"];
 			const special = glass != face && special_ranch.includes(glass) && special_ranch.includes(face);
 			this.value = special;
 		},
 		value: false,
-	}, [ "FACE_desc", "GLASS_SHAPE" ])
+	}, ["FACE_desc", "GLASS_SHAPE"])
 
 	addNode({
 		id: "WINDOW_STATE",
@@ -70,7 +70,7 @@ function addRenderNode() {
 			hints: false,
 			sections: [],
 		},
-		logic: function() {
+		logic: function () {
 			const face = getState('FACE_desc');
 			const flush = ["flush", "plank"].includes(face);
 			const num_sections = getState("NUM_OF_SEC");
@@ -101,8 +101,8 @@ function addRenderNode() {
 			}
 
 			const has_glass = sections.some(section => {
-					return section.enabled.some(x => x==true);
-				});
+				return section.enabled.some(x => x == true);
+			});
 
 			for (const section of sections) {
 				let shape = face;
@@ -116,7 +116,7 @@ function addRenderNode() {
 				let positions = getPanelPositions(shape, width);
 
 				const section_enabled = section.enabled;
-				const section_glass = section_enabled.some(x => x==true);
+				const section_glass = section_enabled.some(x => x == true);
 				if (section_glass && special) {
 					shape = glass_shape;
 				}
@@ -166,10 +166,10 @@ function addRenderNode() {
 			}
 		}
 	},
-	[ "WIDTH", "NUM_OF_SEC", "GLASS_SHAPE", "EndCaps", "FACE_desc", "SPECIAL_FACE",
-	 "SLIM_WINDOW_SPACING", "SLIM_WINDOW_LITES" ]);
+		["WIDTH", "NUM_OF_SEC", "GLASS_SHAPE", "EndCaps", "FACE_desc", "SPECIAL_FACE",
+			"SLIM_WINDOW_SPACING", "SLIM_WINDOW_LITES"]);
 
-	addLogic("WINDOW_POSITION", function() {
+	addLogic("WINDOW_POSITION", function () {
 		const glass_shape = getState("GLASS_SHAPE");
 		const special = getState("SPECIAL_FACE");
 		let position = $("input[name='WINDOW_POSITION']:checked").val() ?? "";
@@ -182,8 +182,8 @@ function addRenderNode() {
 
 		const sections = getState("WINDOW_STATE").sections;
 		const has_glass = sections.some(section => {
-				return section.enabled.some(x => x==true);
-			});
+			return section.enabled.some(x => x == true);
+		});
 		if (special && has_glass) {
 			position = "top";
 		}
@@ -195,20 +195,20 @@ function addRenderNode() {
 		}
 
 		setWindowPositions(position);
-	}, [ "GLASS_SHAPE", "SPECIAL_FACE", "WINDOW_STATE" ]);
+	}, ["GLASS_SHAPE", "SPECIAL_FACE", "WINDOW_STATE"]);
 
 	addNode({
 		id: "RENDER",
 		logic: renderDoor,
 		value: null,
 	}, ["WIDTH", "HEIGHT", "COLOR", "NUM_OF_SEC", "FACE_desc", "FINISH", "WINDOW_STATE", "WINDOW_POSITION",
-	 "GLASS_INSERT", "FRAME_COLOR", "INSERT_COLOR" ]);
+		"GLASS_INSERT", "FRAME_COLOR", "INSERT_COLOR"]);
 
 	addLogic("JSON_OBJ", function () {
 		this.value = JSON.stringify(getState("RENDER"))
 	}, ["RENDER"]);
 
-	$(`input[name="FACE"]`).on('change', function() {
+	$(`input[name="FACE"]`).on('change', function () {
 		const face = $(this).val();
 		if (face == 'C') {
 			$(`#GLASS_SHAPE_COLONIAL`).click();
@@ -220,95 +220,95 @@ function addRenderNode() {
 	});
 
 	$('#CONFIG_CANVAS')
-	.on('mousemove', function(event) {
-		canvas_mouse.x = event.offsetX;
-		canvas_mouse.y = event.offsetY;
+		.on('mousemove', function (event) {
+			canvas_mouse.x = event.offsetX;
+			canvas_mouse.y = event.offsetY;
 
-		if (getState("SLIM_WINDOW_LITES") == "one" && getState("GLASS_SHAPE").includes("slim")) {
-			const layer_obj = getDoorInfo();
-			layer_obj.windows = getState("WINDOW_STATE");
-			CANVAS_PLUGIN.draw(layer_obj);
-		}
-	})
-	.on('mousedown', function(event) {
-		canvas_mouse.is_down = true;
-	})
-	.on('mouseup', function(event) {
-		canvas_mouse.is_down = false;
-	})
-	.on('click', function(event) {
-		if (currentSection != GLAZING_SECTION) return;
+			if (getState("SLIM_WINDOW_LITES") == "one" && getState("GLASS_SHAPE").includes("slim")) {
+				const layer_obj = getDoorInfo();
+				layer_obj.windows = getState("WINDOW_STATE");
+				CANVAS_PLUGIN.draw(layer_obj);
+			}
+		})
+		.on('mousedown', function (event) {
+			canvas_mouse.is_down = true;
+		})
+		.on('mouseup', function (event) {
+			canvas_mouse.is_down = false;
+		})
+		.on('click', function (event) {
+			if (currentSection != GLAZING_SECTION) return;
 
-		const door_width = getState("WIDTH");
-		const door_height = getState("HEIGHT");
-		const num_sections = getState("NUM_OF_SEC");
-		const scale = getScale(door_width, door_height);
-		const [ canvas_x, canvas_y ] = getCanvasDoorPosition(door_width, door_height);
-		const special_panel_config = getState("SPECIAL_FACE");
+			const door_width = getState("WIDTH");
+			const door_height = getState("HEIGHT");
+			const num_sections = getState("NUM_OF_SEC");
+			const scale = getScale(door_width, door_height);
+			const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
+			const special_panel_config = getState("SPECIAL_FACE");
 
-		let changed = false;
-		const windows = getState("WINDOW_STATE");
-		const section_heights = getSectionHeights(door_height, num_sections);
-		for (const [i, section] of windows.sections.entries()) {
-			const panel_width = section.panel_width * scale;
-			const panel_height = section.panel_height * scale;
+			let changed = false;
+			const windows = getState("WINDOW_STATE");
+			const section_heights = getSectionHeights(door_height, num_sections);
+			for (const [i, section] of windows.sections.entries()) {
+				const panel_width = section.panel_width * scale;
+				const panel_height = section.panel_height * scale;
 
-			const y_offset = (section_heights[i] * scale - panel_height) / 2;
-			const ypos = section_heights.slice(0, i).reduce((acc, val) => acc+val, 0);
-			const py = ypos * scale + canvas_y + y_offset;
-			const positions = section.positions
-				.map(pos => ({ x: pos * scale + canvas_x, y: py }));
+				const y_offset = (section_heights[i] * scale - panel_height) / 2;
+				const ypos = section_heights.slice(0, i).reduce((acc, val) => acc + val, 0);
+				const py = ypos * scale + canvas_y + y_offset;
+				const positions = section.positions
+					.map(pos => ({ x: pos * scale + canvas_x, y: py }));
 
-			let index = -1;
-			if (section.slim_one) {
-				if (!section.selected) continue;
-				const section_intersects = isMouseIntersect(canvas_x, ypos*scale+canvas_y,
-					door_width*scale, section_heights[i]*scale);
-				if (!section_intersects) continue;
+				let index = -1;
+				if (section.slim_one) {
+					if (!section.selected) continue;
+					const section_intersects = isMouseIntersect(canvas_x, ypos * scale + canvas_y,
+						door_width * scale, section_heights[i] * scale);
+					if (!section_intersects) continue;
 
-				const [ mouse_x, mouse_y ] = getCanvasMousePos();
-				index = section.positions.map(x => x*scale+canvas_x+panel_width/2)
-					.reduce((bestIdx, currVal, currIdx, arr) => {
-					const currentDist = Math.abs(currVal - mouse_x);
-					const bestDist = Math.abs(arr[bestIdx] - mouse_x);
-					return currentDist < bestDist ? currIdx : bestIdx;
-				}, 0);
-			} else {
-				for (const [i, pos] of positions.entries()) {
-					const intersects = isMouseIntersect(pos.x, pos.y, panel_width, panel_height);
-					if (intersects) {
-						index = i;
-						break;
+					const [mouse_x, mouse_y] = getCanvasMousePos();
+					index = section.positions.map(x => x * scale + canvas_x + panel_width / 2)
+						.reduce((bestIdx, currVal, currIdx, arr) => {
+							const currentDist = Math.abs(currVal - mouse_x);
+							const bestDist = Math.abs(arr[bestIdx] - mouse_x);
+							return currentDist < bestDist ? currIdx : bestIdx;
+						}, 0);
+				} else {
+					for (const [i, pos] of positions.entries()) {
+						const intersects = isMouseIntersect(pos.x, pos.y, panel_width, panel_height);
+						if (intersects) {
+							index = i;
+							break;
+						}
 					}
 				}
-			}
 
-			if (index != -1) {
-				if (special_panel_config) {
-					const enabled = section.enabled[0];
-					windows.sections.forEach(section => section.enabled.fill(false));
-					section.enabled.fill(!enabled);
-				} else if (section.slim_one) {
-					const val = section.enabled[index];
-					section.enabled.fill(false);
-					if (!val) section.enabled[index] = true;
-				} else {
-					section.enabled[index] = !section.enabled[index];
+				if (index != -1) {
+					if (special_panel_config) {
+						const enabled = section.enabled[0];
+						windows.sections.forEach(section => section.enabled.fill(false));
+						section.enabled.fill(!enabled);
+					} else if (section.slim_one) {
+						const val = section.enabled[index];
+						section.enabled.fill(false);
+						if (!val) section.enabled[index] = true;
+					} else {
+						section.enabled[index] = !section.enabled[index];
+					}
+					changed = true;
+					break;
 				}
-				changed = true;
-				break;
 			}
-		}
 
-		if (changed) {
-			$(`input[name='WINDOW_POSITION']`)
-				.prop("checked", false)
-				.removeAttr("checked")
-				.data('wasChecked', false)
-				.parent().removeClass("btn-checked");
-			forceRedraw();
-		}
-	});
+			if (changed) {
+				$(`input[name='WINDOW_POSITION']`)
+					.prop("checked", false)
+					.removeAttr("checked")
+					.data('wasChecked', false)
+					.parent().removeClass("btn-checked");
+				forceRedraw();
+			}
+		});
 }
 
 function addSlimUi() {
@@ -328,18 +328,18 @@ function addSlimUi() {
 	const door_width = getState("WIDTH");
 	const door_height = getState("HEIGHT");
 	const scale = getScale(door_width, door_height);
-	const [ canvas_x, canvas_y ] = getCanvasDoorPosition(door_width, door_height);
+	const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
 	const canvas = $("#CONFIG_CANVAS")[0];
 	const canvas_pos = $("#CONFIG_CANVAS").offset();
 	const rect = canvas.getBoundingClientRect();
 	const cx = door_width * scale + canvas_x;
-	const menu_y = canvas_pos.top + (canvas_y + door_height * scale/2) * (rect.height/canvas.height);
+	const menu_y = canvas_pos.top + (canvas_y + door_height * scale / 2) * (rect.height / canvas.height);
 
 	const num_sections = getState("NUM_OF_SEC");
 	const section_heights = getSectionHeights(door_height, num_sections);
 	for (const [i, section] of windows.sections.entries()) {
-		const ypos = section_heights.slice(0, i).reduce((acc, val) => acc+val, 0);
-		const cy = (ypos + section_heights[i]/2) * scale + canvas_y;
+		const ypos = section_heights.slice(0, i).reduce((acc, val) => acc + val, 0);
+		const cy = (ypos + section_heights[i] / 2) * scale + canvas_y;
 		const x = cx * rect.width / canvas.width + canvas_pos.left;
 		const y = cy * rect.height / canvas.height + canvas_pos.top;
 
@@ -351,20 +351,20 @@ function addSlimUi() {
 						value="slim_single" />
 				</div>
 			</div>`)
-		.css({
-			'position': 'absolute',
-			'left': `${x}px`,
-			'top': `${y}px`,
-			'transform': 'translate(0%, -50%)',
-			'min-width': '0',
-			'width': '40px',
-		}).appendTo('body')
-		.on('click', function(event) {
-			event.stopPropagation();
-			$(`[data-id="section_slim_temp"]`).removeClass('selected');
-			$(this).addClass('selected');
-			$("#slim_spacing_container").remove();
-			$(`
+			.css({
+				'position': 'absolute',
+				'left': `${x}px`,
+				'top': `${y}px`,
+				'transform': 'translate(0%, -50%)',
+				'min-width': '0',
+				'width': '40px',
+			}).appendTo('body')
+			.on('click', function (event) {
+				event.stopPropagation();
+				$(`[data-id="section_slim_temp"]`).removeClass('selected');
+				$(this).addClass('selected');
+				$("#slim_spacing_container").remove();
+				$(`
 			   <div class="slim-options-container" id="slim_spacing_container">
 					 <div class="rw-button" id="SLIM_WINDOW_LITES_ONE" >
 					   <label for="SLIM_WINDOW_LITES_ONE">One Lite</label>
@@ -395,66 +395,66 @@ function addSlimUi() {
 						</div>
 					</div>
 			   </div>`)
-			.css({
-				'position': 'absolute',
-				'left': `${x+60}px`,
-				'top': `${menu_y}px`,
-				'transform': 'translate(0%, -50%)',
-			})
-			.appendTo('body');
+					.css({
+						'position': 'absolute',
+						'left': `${x + 60}px`,
+						'top': `${menu_y}px`,
+						'transform': 'translate(0%, -50%)',
+					})
+					.appendTo('body');
 
-			$(document).on('click.slim_menu', function(event) {
-				const $menu = $('#slim_spacing_container');
-				// If the click was NOT on the menu AND not on a child of the menu
-				if (!$menu.is(event.target) && $menu.has(event.target).length === 0) {
-					$menu.remove();
-					$document.off('click.slim_menu');
-				}
-			});
+				$(document).on('click.slim_menu', function (event) {
+					const $menu = $('#slim_spacing_container');
+					// If the click was NOT on the menu AND not on a child of the menu
+					if (!$menu.is(event.target) && $menu.has(event.target).length === 0) {
+						$menu.remove();
+						$document.off('click.slim_menu');
+					}
+				});
 
-			$("#SLIM_WINDOW_LITES_ONE").on('click', function() {
+				$("#SLIM_WINDOW_LITES_ONE").on('click', function () {
+					const state = getState("WINDOW_STATE");
+					state.sections[i].slim_one = true;
+					setState("SLIM_WINDOW_LITES", "one");
+				});
+
+				$("#SLIM_WINDOW_LITES_MORE").on('click', function () {
+					const state = getState("WINDOW_STATE");
+					state.sections[i].slim_one = false;
+					setState("SLIM_WINDOW_LITES", "more");
+				});
+
+				$("#SLIM_WINDOW_SPACING_EVEN").on('click', function () {
+					const state = getState("WINDOW_STATE");
+					state.sections[i].slim_spacing = 'even';
+					setState("SLIM_WINDOW_SPACING", "even");
+				});
+
+				$("#SLIM_WINDOW_SPACING_FIXED").on('click', function () {
+					const state = getState("WINDOW_STATE");
+					state.sections[i].slim_spacing = 'fixed';
+					setState("SLIM_WINDOW_SPACING", "fixed");
+				});
+
+				$("#SLIM_WINDOW_SINGLE").on('click', function () {
+					const state = getState("WINDOW_STATE");
+					state.sections[i].shape = "slim_single";
+					setState("GLASS_SHAPE", "slim_single");
+				});
+
+				$("#SLIM_WINDOW_DOUBLE").on('click', function () {
+					const state = getState("WINDOW_STATE");
+					state.sections[i].shape = "slim_double";
+					setState("GLASS_SHAPE", "slim_double");
+				});
+
 				const state = getState("WINDOW_STATE");
-				state.sections[i].slim_one = true;
-				setState("SLIM_WINDOW_LITES", "one");
+				state.sections.forEach(section => {
+					section.selected = false;
+				});
+				state.sections[i].selected = true;
+				forceRedraw();
 			});
-
-			$("#SLIM_WINDOW_LITES_MORE").on('click', function() {
-				const state = getState("WINDOW_STATE");
-				state.sections[i].slim_one = false;
-				setState("SLIM_WINDOW_LITES", "more");
-			});
-
-			$("#SLIM_WINDOW_SPACING_EVEN").on('click', function() {
-				const state = getState("WINDOW_STATE");
-				state.sections[i].slim_spacing = 'even';
-				setState("SLIM_WINDOW_SPACING", "even");
-			});
-
-			$("#SLIM_WINDOW_SPACING_FIXED").on('click', function() {
-				const state = getState("WINDOW_STATE");
-				state.sections[i].slim_spacing = 'fixed';
-				setState("SLIM_WINDOW_SPACING", "fixed");
-			});
-
-			$("#SLIM_WINDOW_SINGLE").on('click', function() {
-				const state = getState("WINDOW_STATE");
-				state.sections[i].shape = "slim_single";
-				setState("GLASS_SHAPE", "slim_single");
-			});
-
-			$("#SLIM_WINDOW_DOUBLE").on('click', function() {
-				const state = getState("WINDOW_STATE");
-				state.sections[i].shape = "slim_double";
-				setState("GLASS_SHAPE", "slim_double");
-			});
-
-			const state = getState("WINDOW_STATE");
-			state.sections.forEach(section => {
-				section.selected = false;
-			});
-			state.sections[i].selected = true;
-			forceRedraw();
-		});
 	}
 }
 
@@ -464,11 +464,11 @@ function getCanvasMousePos() {
 
 	const mouse_x = canvas_mouse.x * (canvas.width / rect.width);
 	const mouse_y = canvas_mouse.y * (canvas.height / rect.height);
-	return [ mouse_x, mouse_y ];
+	return [mouse_x, mouse_y];
 }
 
 function isMouseIntersect(x, y, width, height) {
-	const [ mouse_x, mouse_y ] = getCanvasMousePos();
+	const [mouse_x, mouse_y] = getCanvasMousePos();
 	const intersect_x = mouse_x > x && mouse_x < (x + width);
 	const intersect_y = mouse_y > y && mouse_y < (y + height);
 	return intersect_x && intersect_y;
@@ -479,9 +479,26 @@ function forceRedraw() {
 }
 
 async function renderDoor() {
-	const layer_obj = getDoorInfo();
-	this.value = layer_obj;
-	await CANVAS_PLUGIN.draw(layer_obj);
+	// const layer_obj = getDoorInfo();
+	// this.value = layer_obj;
+	// await CANVAS_PLUGIN.draw(layer_obj);
+
+	$("#canvas-loader").show(); // ✅ show BEFORE anything
+
+	// force browser paint before heavy work
+	await new Promise(requestAnimationFrame);
+
+	try {
+		const layer_obj = getDoorInfo();
+
+		this.value = layer_obj;
+
+		await CANVAS_PLUGIN.draw(layer_obj);
+
+	} finally {
+		$("#canvas-loader").hide(); // ✅ always hide even if error
+	}
+
 }
 
 function setWindowPositions(position) {
@@ -552,12 +569,12 @@ function getPanelQuantity(panel_type, door_width) {
 }
 
 function slim_getWindowQuantity(panel_type, door_width, fixed_end, single_endcap) {
-    const slim_s = 34.344;
-    const slim_l = 68.344;
-    const slim_h = 7.535;
+	const slim_s = 34.344;
+	const slim_l = 68.344;
+	const slim_h = 7.535;
 
-    const endcap_single = 4.8125;
-    const endcap_double = 7.8125;
+	const endcap_single = 4.8125;
+	const endcap_double = 7.8125;
 
 	if (panel_type == "slim_single")
 		return slim_single_per_section(door_width, fixed_end, single_endcap);
@@ -566,12 +583,12 @@ function slim_getWindowQuantity(panel_type, door_width, fixed_end, single_endcap
 }
 
 function slim_getWindowPositions(panel_type, door_width, fixed_end, single_endcap) {
-    const slim_s = 34.344;
-    const slim_l = 68.344;
-    const slim_h = 7.535;
+	const slim_s = 34.344;
+	const slim_l = 68.344;
+	const slim_h = 7.535;
 
-    const endcap_single = 4.8125;
-    const endcap_double = 7.8125;
+	const endcap_single = 4.8125;
+	const endcap_double = 7.8125;
 
 	const num_windows = slim_getWindowQuantity(panel_type, door_width, fixed_end, single_endcap);
 
@@ -710,14 +727,14 @@ function getSectionHeights(door_height, num_sections) {
 	}
 
 	const section1 = Math.floor(average_height / 3) * 3
-	const section2 = Math.ceil(average_height/3) * 3;
+	const section2 = Math.ceil(average_height / 3) * 3;
 
 	const diff = average_height - section1;
 	const percent = diff / 3;
 	const num_section1 = Math.round((1 - percent) * num_sections);
 	const num_section2 = Math.round(num_sections - num_section1);
 
-	const stack = [ ...Array(num_section1).fill(section1), ...Array(num_section2).fill(section2) ];
+	const stack = [...Array(num_section1).fill(section1), ...Array(num_section2).fill(section2)];
 
 	const heights = Array(num_sections).fill(0);
 
@@ -756,7 +773,7 @@ function getCanvasDoorPosition(door_width, door_height) {
 }
 
 // get inch offsets from the leftmost point of the door "0"
-function getPanelPositions(panel_type, door_width, special=false) {
+function getPanelPositions(panel_type, door_width, special = false) {
 	const rule = getRule(panel_type, door_width);
 	if (!rule) return [];
 	let panel_qty = rule.qtyOfPanels;
@@ -767,11 +784,11 @@ function getPanelPositions(panel_type, door_width, special=false) {
 	}
 	const panel_width = panelConfigurations[getPanelConfigurationKey(panel_type)].panelWidth;
 
-    const startX = (door_width - (panel_qty * panel_width + (panel_qty - 1) * muttSpacing)) / 2;
+	const startX = (door_width - (panel_qty * panel_width + (panel_qty - 1) * muttSpacing)) / 2;
 
 	let positions_x = [];
-    for (let p = 0; p < panel_qty; p++) {
-        const px = startX + p * (panel_width + muttSpacing);
+	for (let p = 0; p < panel_qty; p++) {
+		const px = startX + p * (panel_width + muttSpacing);
 		positions_x.push(px);
 	}
 
@@ -814,7 +831,7 @@ function getDoorInfo() {
 	const height = getState("HEIGHT");
 	const num_sections = getState("NUM_OF_SEC");
 
-	const [ mouse_x, mouse_y ] = getCanvasMousePos();
+	const [mouse_x, mouse_y] = getCanvasMousePos();
 	const window_info = getState("WINDOW_STATE");
 	const section_heights = getSectionHeights(height, num_sections);
 
