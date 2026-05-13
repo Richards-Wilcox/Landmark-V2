@@ -1,6 +1,6 @@
 //This file contains all the inputs related to section bundle and raw panel.
 //Author Name: Charmi Surati
-//Last Modify Date: May 08, 2026
+//Last Modify Date: May 11, 2026
 
 
 function addSectionBundleDrivers() {
@@ -341,15 +341,44 @@ function addSectionBundleDrivers() {
         let color = getState("COLOR").desc;
         let panelStyle = getNode("FACE").getAttribute("desc");
         let bundle3_height = getState("BUNDLE_3_HEIGHT");
+        let bundle3_qty = getState("BUNDLE_3_QTY");
 
         let Prefix = '';
-        if (bundle3_height > 32) {
-            prefix = 'SB-II'
-        } else prefix = 'SB-I';
+        if (bundle3_qty > 0) {
+            if (bundle3_height > 32) {
+                Prefix = 'SB-II'
+            } else Prefix = 'SB-I';
 
+            this.value = `${Prefix} ${doorWidthFeet}-${doorWidthInches}x${bundle3_height} ${doorModelDesc} ${color} ${panelStyle}`;
+        } else this.value = '';
+    }, [DIMENSION_DEPS, "BUNDLE_3_HEIGHT", "DOOR_MODEL", "COLOR", "FACE"])
 
-        this.value = `${Prefix} ${doorWidthFeet}-${doorWidthInches}x${bundle3_height} ${doorModelDesc} ${color} ${panelStyle}`;
-    }, ["DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "BUNDLE_3_HEIGHT", "DOOR_MODEL", "COLOR", "FACE"])
+    addLogic("SB4_SPNUM", function () {
+        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let bundle4_qty = getState("BUNDLE_4_QTY");
+        if (bundle4_qty > 0) this.value = `SB${doorModelId}04`
+        else this.value = 'None';
+    }, ["DOOR_MODEL", "WIDTH", "HEIGHT", "NUM_OF_SEC", "BUNDLE_4_QTY"])
+
+    addLogic("SB4_DESC", function () {
+        let doorWidthFeet = getState("DOOR_WIDTH_FEET");
+        doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
+        let doorWidthInches = getState("DOOR_WIDTH_INCHES");
+        let doorModelDesc = getNode("DOOR_MODEL").getAttribute("desc")
+        let color = getState("COLOR").desc;
+        let panelStyle = getNode("FACE").getAttribute("desc");
+        let bundle4_height = getState("BUNDLE_4_HEIGHT");
+        let bundle4_qty = getState("BUNDLE_4_QTY");
+
+        let Prefix = '';
+        if (bundle4_qty > 0) {
+            if (bundle4_height > 32) {
+                Prefix = 'SB-II'
+            } else Prefix = 'SB-I';
+
+            this.value = `${Prefix} ${doorWidthFeet}-${doorWidthInches}x${bundle4_height} ${doorModelDesc} ${color} ${panelStyle}`;
+        } else this.value = '';
+    }, [DIMENSION_DEPS, "BUNDLE_4_HEIGHT", "DOOR_MODEL", "COLOR", "FACE"])
 
 
     //Section Components part# and Desc for each bundle
@@ -432,7 +461,6 @@ function addSectionBundleDrivers() {
 
     }, ["DOOR_MODEL", "BUNDLE3_SC1_HEIGHT", DIMENSION_DEPS])
 
-
     addLogic("BUNDLE3_SC1_DESC", function () {
         let doorWidthFeet = getState("DOOR_WIDTH_FEET");
         doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
@@ -471,6 +499,56 @@ function addSectionBundleDrivers() {
         } else this.value = '';
 
     }, [DIMENSION_DEPS, "BUNDLE3_SC2_HEIGHT", "DOOR_MODEL", "COLOR", "FACE"])
+
+    //sc 4
+    addLogic("BUNDLE4_SC1_SPNUM", function () {
+        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let bundle4_sc1_height = getState("BUNDLE4_SC1_HEIGHT");
+
+        if (bundle4_sc1_height > 0) {
+            this.value = `SC${doorModelId}04`
+        } else this.value = 'None';
+
+    }, ["DOOR_MODEL", "BUNDLE4_SC1_HEIGHT", DIMENSION_DEPS])
+
+    addLogic("BUNDLE4_SC1_DESC", function () {
+        let doorWidthFeet = getState("DOOR_WIDTH_FEET");
+        doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
+        let doorWidthInches = getState("DOOR_WIDTH_INCHES");
+        let doorModelDesc = getNode("DOOR_MODEL").getAttribute("desc")
+        let color = getState("COLOR").desc;
+        let panelStyle = getNode("FACE").getAttribute("desc");
+        let bundle4_sc1_height = getState("BUNDLE4_SC1_HEIGHT");
+
+        if (bundle4_sc1_height > 0) {
+            this.value = `SC ${doorWidthFeet}-${doorWidthInches}x${bundle4_sc1_height} ${doorModelDesc} ${color} ${panelStyle}`;
+        } else this.value = '';
+    }, ["DOOR_MODEL", "COLOR", "FACE", DIMENSION_DEPS, "BUNDLE4_SC1_HEIGHT"])
+
+    addLogic("BUNDLE4_SC2_SPNUM", function () {
+        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let bundle4_sc2_height = getState("BUNDLE4_SC2_HEIGHT");
+
+        if (bundle4_sc2_height > 0) {
+            this.value = `SC${doorModelId}04`
+        } else this.value = 'None';
+
+    }, ["DOOR_MODEL", "BUNDLE4_SC2_HEIGHT", DIMENSION_DEPS])
+
+    addLogic("BUNDLE4_SC2_DESC", function () {
+        let doorWidthFeet = getState("DOOR_WIDTH_FEET");
+        doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
+        let doorWidthInches = getState("DOOR_WIDTH_INCHES");
+        let doorModelDesc = getNode("DOOR_MODEL").getAttribute("desc")
+        let color = getState("COLOR").desc;
+        let panelStyle = getNode("FACE").getAttribute("desc");
+        let bundle4_sc2_height = getState("BUNDLE4_SC2_HEIGHT");
+
+        if (bundle4_sc2_height > 0) {
+            this.value = `SC ${doorWidthFeet}-${doorWidthInches}x${bundle4_sc2_height} ${doorModelDesc} ${color} ${panelStyle}`;
+        } else this.value = '';
+
+    }, [DIMENSION_DEPS, "BUNDLE4_SC2_HEIGHT", "DOOR_MODEL", "COLOR", "FACE"])
 
 
 
@@ -650,6 +728,22 @@ function addSectionBundleDrivers() {
         } else this.value = 'None';
     }, ["DOOR_MODEL", "BUNDLE3_SC2_HEIGHT", DIMENSION_DEPS])
 
+    addLogic("BUNDLE4_SC1_RP_BASE_SPNUM", function () {
+        let doorModelId = getNode("DOOR_MODEL").getAttribute("id")
+        let bundle4_sc1_height = getState("BUNDLE4_SC1_HEIGHT");
+        if (bundle4_sc1_height > 0) {
+            this.value = `${doorModelId}-${bundle4_sc1_height}`;
+        } else this.value = 'None'
+    }, ["DOOR_MODEL", "BUNDLE4_SC1_HEIGHT", DIMENSION_DEPS])
+
+    addLogic("BUNDLE4_SC2_RP_BASE_SPNUM", function () {
+        let doorModelId = getNode("DOOR_MODEL").getAttribute("id")
+        let bundle4_sc2_height = getState("BUNDLE4_SC2_HEIGHT");
+        if (bundle4_sc2_height > 0) {
+            this.value = `${doorModelId}-${bundle4_sc2_height}`;
+        } else this.value = 'None';
+    }, ["DOOR_MODEL", "BUNDLE4_SC2_HEIGHT", DIMENSION_DEPS])
+
 
     addLogic("RP_BASE_QTY", function () {
         this.value = getState("WIDTH");
@@ -695,6 +789,22 @@ function addSectionBundleDrivers() {
             this.value = `LND-${bundle3_sc2_height}${color}`;
         } else this.value = 'None';
     }, ["BUNDLE3_SC2_HEIGHT", "COLOR", DIMENSION_DEPS])
+
+     addLogic("BUNDLE4_SC1_RP_TOP_SHEET_SPNUM", function () {
+        let color = getState("COLOR").value;
+        let bundle4_sc1_height = getState("BUNDLE4_SC1_HEIGHT");
+        if (bundle4_sc1_height > 0) {
+            this.value = `LND-${bundle4_sc1_height}${color}`;
+        } else this.value = 'None';
+    }, ["BUNDLE4_SC1_HEIGHT", "COLOR", DIMENSION_DEPS])
+
+    addLogic("BUNDLE4_SC2_RP_TOP_SHEET_SPNUM", function () {
+        let color = getState("COLOR").value;
+        let bundle4_sc2_height = getState("BUNDLE4_SC2_HEIGHT");
+        if (bundle4_sc2_height > 0) {
+            this.value = `LND-${bundle4_sc2_height}${color}`;
+        } else this.value = 'None';
+    }, ["BUNDLE4_SC2_HEIGHT", "COLOR", DIMENSION_DEPS])
 
 
     addLogic("BOTTOM_RETAINER", function () {
@@ -804,6 +914,28 @@ function addSectionBundleDrivers() {
         this.value = getEndCapsPartNum(bundle2_sc2_height, door_model, end_caps);
 
     }, ["BUNDLE2_SC2_HEIGHT", "DOOR_MODEL", "EndCaps"])
+
+    addLogic("BUNDLE3_SC1_END_CAPS_SPNUM", function () {
+        let end_caps = getState("EndCaps");
+        let door_model = getState("DOOR_MODEL");
+        let bundle3_sc1_height = getState("BUNDLE3_SC1_HEIGHT");
+        if (bundle3_sc1_height > 0) {
+            this.value = getEndCapsPartNum(bundle3_sc1_height, door_model, end_caps);
+        } else this.value = 'None';
+
+    }, ["BUNDLE3_SC1_HEIGHT", "DOOR_MODEL", "EndCaps"])
+
+    addLogic("BUNDLE3_SC2_END_CAPS_SPNUM", function () {
+        let end_caps = getState("EndCaps");
+        let door_model = getState("DOOR_MODEL");
+        let bundle3_sc2_height = getState("BUNDLE3_SC2_HEIGHT");
+
+        if (bundle3_sc2_height > 0) {
+            this.value = getEndCapsPartNum(bundle3_sc2_height, door_model, end_caps);
+        } else this.value = 'None';
+
+
+    }, ["BUNDLE3_SC2_HEIGHT", "DOOR_MODEL", "EndCaps"])
 
 
     //Packaging Input logic
