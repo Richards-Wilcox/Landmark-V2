@@ -63,8 +63,14 @@ function loadForm() {
 		   </div>
 
             <div id="CANVAS_PLUGIN" style="display:flex;justify-content:center;">
-
             </div>
+ <!-- Loader -->          
+      <div class="canvas-loader" id="canvas-loader" 
+      style="display:none; position:absolute; top:50%; left:50%;
+      transform:translate(-50%, -50%);
+      padding:10px 20px; border-radius:8px; z-index:10;"
+      ></div>
+    
         </div>
         <div class="rw-configurator__layout--right">
             <div id="DOOR_PROPERTIES"
@@ -201,11 +207,11 @@ function loadForm() {
                             </div>
                             <div class="rw-button panel-button" tabindex="0">
                                 <label for="FLUSH">Flush</label>
-                                <input type="radio" id="FLUSH" name="FACE" value="F" desc="Fls">
+                                <input type="radio" id="FLUSH" name="FACE" value="F" desc="Fls" checked>
                             </div>
                             <div class="rw-button panel-button" tabindex="0">
                                 <label for="COLONIAL">Raised Colonial</label>
-                                <input type="radio" id="COLONIAL" name="FACE" value="C" checked desc="Col">
+                                <input type="radio" id="COLONIAL" name="FACE" value="C" desc="Col">
                             </div>
                         </div>
                     </div>
@@ -783,14 +789,14 @@ function loadForm() {
                                     <div class="combined-button-container">
                                         <div class="combined-button-container-inner">
                                             <div class="rw-sliding-button selected">
-                                                <label for="10K">10K</label>
-                                                <input type="radio" style="display:none;" id="10K" name="SPRINGCYCLE"
-                                                    value="10K" checked>
+                                                <label for="10K">10K</label>                                                
+                                                    <input type="radio" style="display:none;" id="10K"
+                                                    name="SPRINGCYCLE" value="10K" checked>
                                             </div>
-                                            <div class="rw-sliding-button">
-                                                <label for="20K">20K</label>
-                                                <input type="radio" style="display:none;" id="20K" name="SPRINGCYCLE"
-                                                    value="20K">
+                                           <div class="rw-sliding-button">
+                                                <label for="20K">20K</label>                                                
+                                                  <input type="radio" style="display:none;" id="20K"
+                                                    name="SPRINGCYCLE" value="20K">
                                             </div>
                                         </div>
                                     </div>
@@ -1615,7 +1621,8 @@ function loadUI() {
   getAllInputVal();
   toggleMorePanelSwitch();
   toggleInclinedTrack();
-  toogleSpringCycle();
+  // toogleSpringCycle();
+
 
   loadGlazingUI();
 };
@@ -2106,7 +2113,6 @@ function appendDrpData() {
   $("#DOOR_HEIGHT_FEET").on("change", function () {
     const feet = parseInt($(this).val(), 10);
     refreshHeightInches(feet);
-
   });
 
 
@@ -2121,11 +2127,12 @@ function refreshHeightInches(feet) {
 //function to show and hide door width and door height dropdown
 function toggleSwitch() {
   $('#customSwitch').change(function () {
+
     if ($(this).is(':checked')) {
       toggle_Switch = 1;
       $("#customSwitch").val("on");
       $('.custom-dimension-container').slideDown();
-      $('#DOOR_HEIGHT_FEET', '#DOOR_HEIGHT_INCHES', '#DOOR_WIDTH_FEET', '#DOOR_WIDTH_INCHES').prop('selectedIndex', 0);
+      $('#DOOR_HEIGHT_FEET', '#DOOR_HEIGHT_INCHES', '#DOOR_WIDTH_FEET', '#DOOR_WIDTH_INCHES').prop('selectedIndex', 0).trigger('change');;
 
       $(`input[name='SIZE']`).each((i, radio) => {
         $(radio).prop("checked", false).removeAttr("checked");
@@ -2137,12 +2144,32 @@ function toggleSwitch() {
       getAllInputVal(toggle_Switch);
       getCounterVal(toggle_Switch);
 
+      const waitForWidth = setInterval(() => {
+        const width = getState("SIZE_WIDTH");
+        const height = getState("SIZE_HEIGHT");
+
+
+        if (width !== undefined && width !== null) {
+          clearInterval(waitForWidth);
+
+          setState("DOOR_WIDTH_FEET", width);
+        }
+
+        if (height !== undefined && height !== null) {
+          clearInterval(waitForWidth);
+
+          setState("DOOR_HEIGHT_FEET", height);
+        }
+      }, 50);
+
+
     } else {
       $('.custom-dimension-container').slideUp();
       $('#DIMENSION').slideDown();
 
       $("#DIMENSIONS_2").parent().addClass("btn-checked");
       $("#DIMENSIONS_2").prop("checked", true).trigger("change");
+      setState("SIZE", $("#DIMENSIONS_2").val());
       $("#customSwitch").val("off");
 
       toggle_Switch = 0;
@@ -2167,9 +2194,9 @@ function toggleMorePanelSwitch() {
         $(radio).parent().removeClass("btn-checked");
       });
 
-      $("#COLONIAL").parent().addClass("btn-checked");
-      $("#COLONIAL").prop("checked", true);
-      setState("FACE", "C");
+      $("#FLUSH").parent().addClass("btn-checked");
+      $("#FLUSH").prop("checked", true);
+      setState("FACE", "F");
     }
   })
 }
@@ -2184,63 +2211,65 @@ function toggleInclinedTrack() {
   });
 }
 
-function toogleSpringCycle() {
+// function toogleSpringCycle() {
 
-  const springCycle10k = $("#10K");
-  const springCycle20k = $("#20K");
+//   const springCycle10k = $("#10K");
+//   const springCycle20k = $("#20K");
 
-  const springCycle10kWrapper = springCycle10k.closest(".rw-sliding-button");
-  const springCycle20kWrapper = springCycle20k.closest(".rw-sliding-button");
+//   const springCycle10kWrapper = springCycle10k.closest(".rw-sliding-button");
+//   const springCycle20kWrapper = springCycle20k.closest(".rw-sliding-button");
 
-  function updateSpringCycle() {
+//   function updateSpringCycle() {
 
-    const selectedHardware = $("input[name='HARDWARE_SET']:checked").val();
-    const labelText = $("input[name='HARDWARE_SET']:checked")
-      .next("label")
-      .text();
+//     const selectedHardware = $("input[name='HARDWARE_SET']:checked").val();
+//     const labelText = $("input[name='HARDWARE_SET']:checked")
+//       .next("label")
+//       .text();
 
-    if (selectedHardware === "Y") {
+//     if (selectedHardware === "Y") {
 
-      // Disable 10K
-      springCycle10k.prop("checked", false).prop("disabled", true);
-      springCycle10kWrapper
-        .addClass("disabled color-tooltip spring-cycle")
-        .removeClass("btn-checked selected")
-        .attr(
-          "data-tooltip",
-          `Spring Cycle 10K not available for ${labelText} Hardware`
-        );
+//       // Disable 10K
+//       springCycle10k.prop("checked", false).prop("disabled", true);
+//       springCycle10kWrapper
+//         .addClass("disabled color-tooltip spring-cycle")
+//         .removeClass("btn-checked selected")
+//         .attr(
+//           "data-tooltip",
+//           `Spring Cycle 10K not available for ${labelText} Hardware`
+//         );
 
-      // Select 20K
-      springCycle20k.prop("checked", true).prop("disabled", false);
-      springCycle20kWrapper.addClass("btn-checked selected");
+//       // Select 20K
+//       springCycle20k.prop("checked", true).prop("disabled", false);
+//       springCycle20kWrapper.addClass("btn-checked selected");
 
-    } else {
+//     } else {
 
-      // Enable both
-      springCycle10k.prop("disabled", false);
-      springCycle20k.prop("disabled", false);
+//       // Enable both
+//       springCycle10k.prop("disabled", false);
+//       springCycle20k.prop("disabled", false);
 
-      // Default back to 10K
-      springCycle10k.prop("checked", true);
-      springCycle20k.prop("checked", false);
+//       // Default back to 10K
+//       springCycle10k.prop("checked", true);
+//       springCycle20k.prop("checked", false);
 
-      // Restore classes & tooltip
-      springCycle10kWrapper
-        .removeClass("disabled color-tooltip")
-        .removeAttr("data-tooltip")
-        .addClass("btn-checked selected");
+//       // Restore classes & tooltip
+//       springCycle10kWrapper
+//         .removeClass("disabled color-tooltip")
+//         .removeAttr("data-tooltip")
+//         .addClass("btn-checked selected");
 
-      springCycle20kWrapper.removeClass("btn-checked selected");
-    }
-  }
+//       springCycle20kWrapper.removeClass("btn-checked selected");
+//     }
+//   }
 
-  // Run when hardware changes
-  $("input[name='HARDWARE_SET']").on("change", updateSpringCycle);
+//   // Run when hardware changes
+//   $("input[name='HARDWARE_SET']").on("change", updateSpringCycle);
 
-  // Run once on page load
-  updateSpringCycle();
-}
+//   // Run once on page load
+//   updateSpringCycle();
+// }
+
+
 
 function getAllInputVal() {
 

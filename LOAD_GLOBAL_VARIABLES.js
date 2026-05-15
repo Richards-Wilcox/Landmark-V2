@@ -1,9 +1,12 @@
 function loadGlobalNodes() {
-  //   addNode({id:"DOOR_MODEL", value:""}, [])
 
-  // addNode({id:"WEIGHT",logic:function(){
-  //   this.value = getCurrentDoorWeight()
-  // }, value:500}, ["WIDTH", "HEIGHT","COLOR","HANGER_ANGLE", "HANGER_ANGLE_QTY",  "END_CAPS_OUTPUT","TRUSS_QTY","WINDOW_POSITION" ,"WINDOWS","LIFT_TYPE"])
+  addLogic("SIZE", function () {
+    let toggle_Switch = getState("customSwitch");
+    //if (toggle_Switch === "off") {
+    this.value = $("input[name='SIZE']:checked").val();
+    // }
+  }, ["customSwitch"])
+
 
   addNode({
     id: "SIZE_HEIGHT",
@@ -15,6 +18,7 @@ function loadGlobalNodes() {
     }
   }, ["SIZE"]);
 
+  //this node fetch the with from the size radio button
   addNode({
     id: "SIZE_WIDTH",
     logic() {
@@ -22,6 +26,12 @@ function loadGlobalNodes() {
       this.value = sizeNode
         ? Number(sizeNode.getAttribute("width")) || 0
         : 0;
+      // const selectedSize = getState("SIZE");
+      // const sizeNode = getNode(selectedSize);
+
+      // this.value = sizeNode
+      //   ? Number(sizeNode.getAttribute("width")) || 0
+      //   : 0;
     }
   }, ["SIZE"]);
 
@@ -46,7 +56,7 @@ function loadGlobalNodes() {
           ? getGlobalDoorHeightFromFeetInches()
           : getState("SIZE_HEIGHT") * 12;
 
-      console.log("GET STATE HEIGHT", getState("HEIGHT"), toggle_Switch);
+      // console.log("GET STATE HEIGHT", getState("HEIGHT"), toggle_Switch);
     }
   },
     ["SIZE_HEIGHT", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES", "customSwitch"]);
@@ -54,15 +64,15 @@ function loadGlobalNodes() {
   addLogic("DOOR_WIDTH_FEET", function () {
     let toggle_Switch = getState("customSwitch");
     if (toggle_Switch === "off") {
-      this.value = getDoorWidthFeetFromSize();
+      this.value = getState("SIZE_WIDTH");
     }
   }, ["customSwitch", "SIZE"])
 
   addLogic("DOOR_HEIGHT_FEET", function () {
     let toggle_Switch = getState("customSwitch");
-    //if (toggle_Switch === "off") {
-    this.value = getDoorHeightFeetFromSize();
-    //}
+    if (toggle_Switch === "off") {
+      this.value = getDoorHeightFeetFromSize();
+    }
   }, ["customSwitch", "SIZE"])
 
   addLogic("DOOR_WIDTH_INCHES", function () {

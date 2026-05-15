@@ -30,15 +30,15 @@ function loadDrivenInputEvents() {
     }
   }, [""])
 
-	addNode({
-		id: "FRAME_COLOR",
-		value: null,
-	}, []);
+  addNode({
+    id: "FRAME_COLOR",
+    value: null,
+  }, []);
 
-	addNode({
-		id: "INSERT_COLOR",
-		value: null,
-	}, []);
+  addNode({
+    id: "INSERT_COLOR",
+    value: null,
+  }, []);
 
   // addLogic("FACE", function () {
   //   this.value = $("input[name='FACE']:checked").val();
@@ -82,7 +82,9 @@ function loadDrivenInputEvents() {
         // add listener ONLY once
         if (!this.listenerAdded) {
           $select.on("change", () => {
-            this.value = Number($select.val());
+            // this.value = Number($select.val());
+            const val = Number($select.val());
+            setState("NUM_OF_SEC", val);
           });
           this.listenerAdded = true;
         }
@@ -137,39 +139,39 @@ function loadDrivenInputEvents() {
 
   }, ["HARDWARE_SET"]);
 
-  addLogic("SPRINGCYCLE", function () {
-    let hardware = getState("HARDWARE_SET");
-    const springCycle10k = $("#10K").closest(".rw-sliding-button");
-    const springCycle20k = $("#20K").closest(".rw-sliding-button");
-    var labelText = $('input[name="HARDWARE_SET"]:checked').next('label').text();
+  // addLogic("SPRINGCYCLE", function () {
+  //   let hardware = getState("HARDWARE_SET");
+  //   const springCycle10k = $("#10K").closest(".rw-sliding-button");
+  //   const springCycle20k = $("#20K").closest(".rw-sliding-button");
+  //   var labelText = $('input[name="HARDWARE_SET"]:checked').next('label').text();
 
-    console.log("hardware", hardware);
-    if (hardware === "Y") {
-      //disable 10k
-      $("#10K").prop("disabled", true).removeAttr("checked");
-      springCycle10k.addClass("disabled").removeClass("btn-checked selected");
-      springCycle10k.addClass("color-tooltip");
-      springCycle10k.attr("data-tooltip", `Spring Cycle 10K not available for ${labelText} Hardware`);
+  //   console.log("hardware", hardware);
+  //   if (hardware === "Y") {
+  //     //disable 10k
+  //     $("#10K").prop("disabled", true).removeAttr("checked");
+  //     springCycle10k.addClass("disabled").removeClass("btn-checked selected");
+  //     springCycle10k.addClass("color-tooltip");
+  //     springCycle10k.attr("data-tooltip", `Spring Cycle 10K not available for ${labelText} Hardware`);
 
-      //select 20k
-      $("#20K").prop("checked", true).attr("checked", "checked");
-      springCycle20k.addClass("btn-checked selected");
-    } else {
-      // Enable both
-      springCycle10k.prop('disabled', false);
-      springCycle20k.prop('disabled', false);
+  //     //select 20k
+  //     $("#20K").prop("checked", true).attr("checked", "checked");
+  //     springCycle20k.addClass("btn-checked selected");
+  //   } else {
+  //     // Enable both
+  //     springCycle10k.prop('disabled', false);
+  //     springCycle20k.prop('disabled', false);
 
-      // Default back to 10K
-      $("#10K").prop('checked', true).attr("checked", "checked");
-      $("#20K").prop('checked', false).removeAttr("checked");
+  //     // Default back to 10K
+  //     $("#10K").prop('checked', true).attr("checked", "checked");
+  //     $("#20K").prop('checked', false).removeAttr("checked");
 
-      springCycle10k.addClass('selected btn-checked');
-      springCycle20k.removeClass('selected btn-checked');
-    }
+  //     springCycle10k.addClass('selected btn-checked');
+  //     springCycle20k.removeClass('selected btn-checked');
+  //   }
 
-    this.value = $(`input[type="radio"][name="SPRINGCYCLE"][checked]`).val()
+  //   this.value = $(`input[type="radio"][name="SPRINGCYCLE"][checked]`).val()
 
-  }, ["HARDWARE_SET"])
+  // }, ["HARDWARE_SET"])
 
 
   addLogic("LIFT_TYPE", function () {
