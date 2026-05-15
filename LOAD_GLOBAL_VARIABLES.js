@@ -18,6 +18,7 @@ function loadGlobalNodes() {
     }
   }, ["SIZE"]);
 
+  //this node fetch the with from the size radio button
   addNode({
     id: "SIZE_WIDTH",
     logic() {
@@ -25,6 +26,12 @@ function loadGlobalNodes() {
       this.value = sizeNode
         ? Number(sizeNode.getAttribute("width")) || 0
         : 0;
+      // const selectedSize = getState("SIZE");
+      // const sizeNode = getNode(selectedSize);
+
+      // this.value = sizeNode
+      //   ? Number(sizeNode.getAttribute("width")) || 0
+      //   : 0;
     }
   }, ["SIZE"]);
 
@@ -57,7 +64,7 @@ function loadGlobalNodes() {
   addLogic("DOOR_WIDTH_FEET", function () {
     let toggle_Switch = getState("customSwitch");
     if (toggle_Switch === "off") {
-      this.value = getDoorWidthFeetFromSize();
+      this.value = getState("SIZE_WIDTH");
     }
   }, ["customSwitch", "SIZE"])
 

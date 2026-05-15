@@ -2113,7 +2113,6 @@ function appendDrpData() {
   $("#DOOR_HEIGHT_FEET").on("change", function () {
     const feet = parseInt($(this).val(), 10);
     refreshHeightInches(feet);
-
   });
 
 
@@ -2170,6 +2169,7 @@ function toggleSwitch() {
 
       $("#DIMENSIONS_2").parent().addClass("btn-checked");
       $("#DIMENSIONS_2").prop("checked", true).trigger("change");
+      setState("SIZE", $("#DIMENSIONS_2").val());
       $("#customSwitch").val("off");
 
       toggle_Switch = 0;
