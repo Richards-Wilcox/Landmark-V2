@@ -858,6 +858,39 @@ function getDoorInfo() {
 		hints = false;
 	}
 
+	console.log("door infor", {
+		mouse_x: mouse_x,
+		mouse_y: mouse_y,
+		xpos: x,
+		ypos: y,
+
+		door_width: width,
+		door_height: height,
+		num_sections: num_sections,
+
+		special_panel_config: special,
+		glass_shape: glass_shape,
+
+		background: {
+			color: color.hex,
+			pattern_url: url,
+			pattern_scale: scale,
+			frame_color: (frame_color ? frame_color : color).hex,
+			insert_color: (insert_color ? insert_color : color).hex,
+		},
+
+		insert: insert,
+
+		sections: sections,
+		scale: getScale(width, height),
+
+		face: face,
+		misc: {
+			labels: true,
+		},
+
+		draw_hints: hints,
+	})
 	return {
 		mouse_x: mouse_x,
 		mouse_y: mouse_y,

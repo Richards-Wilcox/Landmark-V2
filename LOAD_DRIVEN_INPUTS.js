@@ -16,11 +16,16 @@ function loadDrivenInputEvents() {
     this.value = parseInt(getState("HIGHLIFT")) + 9;
   }, ["HIGHLIFT"])
 
+  addLogic("FACE", function () {
+    this.value = $("input[name='FACE']:checked").val();
+  }, [""])
+
   addNode({
     id: "COLOR",
     value: "",
     logic: function () {
       const color = $(".color-button-container.selected input[type='radio']");
+
       this.value = {
         value: color.attr("value"),
         hex: color.attr("hex"),
@@ -30,19 +35,74 @@ function loadDrivenInputEvents() {
     }
   }, [""])
 
+  //  addNode({
+  //   id: "FRAME_COLOR",
+  //   value: null,
+  // }, []);
+
+  // addNode({
+  //   id: "INSERT_COLOR",
+  //   value: null,
+  // }, []);
+
   addNode({
     id: "FRAME_COLOR",
     value: null,
-  }, []);
+    logic: function () {
+      // Only fall back to door color if user hasn't made an explicit pick
+      if (!frameColorUserOverride) {
+        const doorColor = getNode("COLOR")?.value;
+        if (doorColor?.value) {
+          const match = [...AvailableColorImages, ...OptionalColorImages]
+            .find(c => c.value === doorColor.value);
+          this.value = match ?? null;
+        }
+      }
+    }
+  }, ["COLOR"]);
 
   addNode({
     id: "INSERT_COLOR",
     value: null,
-  }, []);
+    logic: function () {
+      if (!insertColorUserOverride) {
+        const doorColor = getNode("COLOR")?.value;
+        if (doorColor?.value) {
+          const match = [...AvailableColorImages, ...OptionalColorImages]
+            .find(c => c.value === doorColor.value);
+          this.value = match ?? null;
+        }
+      }
+    }
+  }, ["COLOR"]);
 
-  // addLogic("FACE", function () {
-  //   this.value = $("input[name='FACE']:checked").val();
-  // }, "customPanelSwitch")
+  //  addNode({
+  //   id: "FRAME_COLOR",
+  //   value: null,
+  //   logic: function () {
+  //     const doorColor = getNode("COLOR")?.value;
+  //     if (!frameColorUserOverride && doorColor?.value) {
+  //       const match = [...AvailableColorImages, ...OptionalColorImages]
+  //         .find(c => c.value === doorColor.value);
+  //       this.value = match ?? null;
+  //     }
+  //     // if user overrode, this.value stays as whatever setState last set
+  //   }
+  // }, ["COLOR"]);
+
+  // addNode({
+  //   id: "INSERT_COLOR",
+  //   value: null,
+  //   logic: function () {
+  //     const doorColor = getNode("COLOR")?.value;
+  //     if (!insertColorUserOverride && doorColor?.value) {
+  //       const match = [...AvailableColorImages, ...OptionalColorImages]
+  //         .find(c => c.value === doorColor.value);
+  //       this.value = match ?? null;
+  //     }
+  //   }
+  // }, ["COLOR"]);
+
 
   addLogic("MIXED", function () {
     if (getState("DOOR_MODEL") === "D" && getState("WIDTH") >= 96) {
@@ -98,11 +158,23 @@ function loadDrivenInputEvents() {
     ["HEIGHT", "customSwitch"])
 
 
-  addLogic("FINISH", function () {
-    if ((getState("FACE") === 'F' || getState("FACE") === 'V' || getState("FACE") === 'T')) {
-      $(".finish-stucco").show();
-    } else $(".finish-stucco").hide();
-  }, ["FACE"])
+  addLogic("STUCCO", function () {
+    const panel_style = getState("FACE");
+    const woodTones = ["X", "Y"];
+    const stuccoFaces = ["F", "V", "T"];
+    const door_color = getState("COLOR");
+    const $stucco = $("#finishStucco");
+
+    // default: hide
+    let show = false;
+    if (stuccoFaces.includes(panel_style) && !woodTones.includes(door_color)) {
+      show = true;
+    }
+
+    $stucco.toggle(show);
+
+
+  }, ["FACE", "COLOR"])
 
   addLogic("SPRINGTYPE", function () {
 
@@ -219,6 +291,199 @@ function loadDrivenInputEvents() {
 
     this.value = $(`input[type="radio"][name="LIFT_TYPE"][checked]`).val()
   }, ["HARDWARE_SET", "SPRINGTYPE", "INCLINEDTRACK"])
+
+
+  // addLogic("GLASS_SHAPE_RANCH", function () {
+
+  //   const face = getState("FACE");
+  //   const doorModel = getState("DOOR_MODEL");
+  //   const width = Number(getState("WIDTH")) || 0;
+  //   const doorColor = getState("COLOR")?.value;
+
+  //   const $ranch = $("#GLASS_SHAPE_RANCH").closest(".rw-button");
+
+  //   const woodTones = ["X", "Y"];
+  //   const isWoodTone = woodTones.includes(doorColor);
+
+  //   let show = false;
+
+  //   //DOOR MODEL G
+
+  //   if (doorModel === "G") {
+
+  //     if (face !== "M") {
+  //       show = true;
+  //     }
+
+  //     $ranch.toggle(show);
+  //     return;
+  //   }
+
+  //   // =========================
+  //   // 2. NORMAL RULES (NON-G)
+  //   // =========================
+
+  //   const allowedFaces = ["R", "C", "B", "S", "T", "F", "V"];
+
+  //   if (!allowedFaces.includes(face)) {
+  //     $ranch.toggle(false);
+  //     return;
+  //   }
+
+  //   switch (face) {
+
+  //     case "C":
+  //       show = isWoodTone
+  //         ? width >= 95
+  //         : !(width >= 76 && width < 95);
+  //       break;
+
+  //     case "B":
+  //       show = width >= 96;
+  //       break;
+
+  //     case "R":
+  //       show = isWoodTone ? width >= 76 : true;
+  //       break;
+
+  //     default:
+  //       show = true;
+  //   }
+
+  //   $ranch.toggle(show);
+
+  // }, ["DOOR_MODEL", "FACE", "WIDTH", "COLOR"]);
+
+  createNode(
+    "GLASS_SHAPE_VISIBILITY",
+    function () {
+
+      const door_model = getState("DOOR_MODEL");
+      const face = getState("FACE");
+      const width = Number(getState("WIDTH"));
+
+      const allowedFacesColonial = ["R", "C", "B", "F", "V", "M"];
+      const allowedFacesRanch = ["R", "C", "B", "S", "T", "F", "V"];
+      const allowedFacesSlim = ["F", "V"];
+
+      const doorColor = getState("COLOR")?.value;
+      const woodTones = ["X", "Y"];
+      const isWoodTone = woodTones.includes(doorColor);
+
+
+      $("input[name='GLASS_SHAPE']").each(function () {
+
+        const value = $(this).val();
+        const isGrandShape = value.startsWith("grand_");
+        const isColonial = value === "colonial";
+        const isRanch = value === "ranch";
+        const isSlim = value.startsWith("slim_");
+
+        let show = false;
+
+        //condition to show granview buttons only
+        if (door_model === "G" && isGrandShape) {
+          show = true;
+        }
+
+        //condition to show colonial glass
+        if (isColonial) {
+
+          // default hide
+          show = false;
+
+          // allowed only when NOT G
+          if (
+            door_model !== "G" &&
+            allowedFacesColonial.includes(face)
+          ) {
+
+            // Ranch special width restriction
+            if (face === "R") {
+
+              // hide between 76–95
+              show = !(width >= 76 && width < 95);
+            }
+
+            // M special width restriction
+            else if (face === "M") {
+
+              show = (width >= 96);
+            }
+
+            // other valid faces
+            else {
+
+              show = true;
+            }
+          }
+        }
+        else if (isRanch) {
+          if (allowedFacesRanch.includes(face) && door_model != 'G') {
+            switch (face) {
+              case "C":
+
+                show = isWoodTone
+                  ? width >= 95
+                  : !(width >= 76 && width < 95);
+
+                break;
+
+              case "B":
+
+                show = width >= 96;
+
+                break;
+
+              case "R":
+
+                show = isWoodTone
+                  ? width >= 76
+                  : true;
+
+                break;
+
+              default:
+
+                show = true;
+            }
+
+          }
+        } else if (isSlim) {
+          if (width > 96 && allowedFacesSlim.includes(face)) {
+            show = true;
+          }
+        }
+
+        $(this).closest(".rw-button").toggle(show);
+      });
+
+
+      const $selected =
+        $("input[name='GLASS_SHAPE']:checked")
+          .closest(".rw-button");
+
+      if ($selected.length && $selected.is(":hidden")) {
+
+        $("input[name='GLASS_SHAPE']")
+          .prop("checked", false);
+
+        const $firstVisible =
+          $("input[name='GLASS_SHAPE']")
+            .filter(function () {
+              return $(this).closest(".rw-button").is(":visible");
+            })
+            .first();
+
+        // $firstVisible
+        //   .prop("checked", true)
+        //   .trigger("change");
+      }
+    },
+    "",
+    $("#GLASS_SHAPE_VISIBILITY")[0],
+    ["DOOR_MODEL", "FACE", "WIDTH"]
+  );
 
 }
 

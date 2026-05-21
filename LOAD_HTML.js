@@ -24,6 +24,10 @@ let panel_style = "";
 let door_model = "";
 let door_color = "";
 
+let frameColorUserOverride = false;
+let insertColorUserOverride = false;
+
+
 // Woodtones colors (X, Y)
 const woodTones = ["X", "Y"];
 
@@ -102,9 +106,14 @@ function loadForm() {
                                 <input type="radio" id="L138" name="DOOR_MODEL" value="A" desc="Cls" checked>
                             </div>
 
-                            <div class="rw-button" tabindex="0">
+                            <div class="rw-button" tabindex="1">
                                 <label for="L200">Premium L200</label>
                                 <input type="radio" id="L200" name="DOOR_MODEL" value="D" desc="Prem">
+                            </div>
+
+                            <div class="rw-button" tabindex="2">
+                                <label for="L200GV">Grandview L200GV</label>
+                                <input type="radio" id="L200GV" name="DOOR_MODEL" value="G" desc="Grd">
                             </div>
                         </div>
                     </div>
@@ -236,7 +245,7 @@ function loadForm() {
                                 <input type="radio" id="GROOVED_COLONIAL" name="FACE" value="B" desc="ColGc">
                             </div>
                             <div class="rw-button panel-button" tabindex="0">
-                                <label for="SMOOTH_RANCH">Recessed smooth Ranch</label>
+                                <label for="SMOOTH_RANCH">Recessed Ranch</label>
                                 <input type="radio" id="SMOOTH_RANCH" name="FACE" value="T" desc="RncSc">
                             </div>
 
@@ -261,7 +270,7 @@ function loadForm() {
                                         <div aria-labelledby="colors" tabindex="0" id="availableStackColors"
                                             class="colorsFieldset"></div>
                                         <div class="tooltip">
-                                            <p>View Most Selling Colors</p>
+                                            <p>View Most Popular Colors</p>
                                         </div>
                                     </div>
                                     <div class='colorContainer'></div>
@@ -311,6 +320,7 @@ function loadForm() {
                 data-title="Glazing">
 
 		<!-- glass shapes -->
+
 		<div class = "dropdown-item">
 			<h3>Glass Shape</h3>
 			<div class="panel-layout">
@@ -325,13 +335,60 @@ function loadForm() {
 				</div>
 
 				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_3">Slim Single</label>
+					<label for="GLASS_SHAPE_3">Slim</label>
 					<input type="radio" id="GLASS_SHAPE_3" name="GLASS_SHAPE" value="slim_single" >
 				</div>
+
+       <!-- <div class="rw-button panel-button" tabindex="0">
+					<label for="GLASS_SHAPE_MORE_0">Slim Double</label>
+					<input type="radio" id="GLASS_SHAPE_MORE_0" name="GLASS_SHAPE" value="slim_double" >
+				</div> -->
+
+				<div class="rw-button panel-button" tabindex="0">
+					<label for="GLASS_SHAPE_MORE_17">Grand Wrought Iron - Rectangle</label>
+					<input type="radio" id="GLASS_SHAPE_MORE_17" name="GLASS_SHAPE" value="grand_wrought_iron_rectangle" >
+				</div>
+
+				<div class="rw-button panel-button" tabindex="0">
+					<label for="GLASS_SHAPE_MORE_18">Grand Wrought Iron - Double Arched</label>
+					<input type="radio" id="GLASS_SHAPE_MORE_18" name="GLASS_SHAPE" value="grand_wrought_iron_double_arched" >
+				</div>
+
+				<div class="rw-button panel-button" tabindex="0">
+					<label for="GLASS_SHAPE_MORE_19">Grand 4/4 - Rectangle</label>
+					<input type="radio" id="GLASS_SHAPE_MORE_19" name="GLASS_SHAPE" value="grand_44_rectangle" >
+				</div>
+
+				<div class="rw-button panel-button" tabindex="0">
+					<label for="GLASS_SHAPE_MORE_20">Grand 4/4 - Double Arched</label>
+					<input type="radio" id="GLASS_SHAPE_MORE_20" name="GLASS_SHAPE" value="grand_44_double_arched" >
+				</div>
+
+				<div class="rw-button panel-button" tabindex="0">
+					<label for="GLASS_SHAPE_MORE_21">Grand 4 Pane - Rectangle</label>
+					<input type="radio" id="GLASS_SHAPE_MORE_21" name="GLASS_SHAPE" value="grand_4_pane_rectangle" >
+				</div>
+
+				<div class="rw-button panel-button" tabindex="0">
+					<label for="GLASS_SHAPE_MORE_22">Grand 4 Pane - Double Arched</label>
+					<input type="radio" id="GLASS_SHAPE_MORE_22" name="GLASS_SHAPE" value="grand_4_pane_double_arched" >
+				</div>
+
+				<div class="rw-button panel-button" tabindex="0">
+					<label for="GLASS_SHAPE_MORE_23">Grand Clear - Rectangle</label>
+					<input type="radio" id="GLASS_SHAPE_MORE_23" name="GLASS_SHAPE" value="grand_clear_rectangle" >
+				</div>
+
+				<div class="rw-button panel-button" tabindex="0">
+					<label for="GLASS_SHAPE_MORE_24">Grand Clear - Double Arched</label>
+					<input type="radio" id="GLASS_SHAPE_MORE_24" name="GLASS_SHAPE" value="grand_clear_double_arched" >
+				</div>
+
 			</div>
 		</div>
 
-		<div class="dropdown-item custom-dimension-item">
+		 <!-- 
+     <div class="dropdown-item custom-dimension-item" id="more_glass_shapes_head">
 			<h3>More Glass Shapes</h3>
 			<label class="switch">
 				<input type="checkbox" id="more_glass_shapes" value="off">
@@ -386,7 +443,7 @@ function loadForm() {
 					<input type="radio" id="GLASS_SHAPE_MORE_24" name="GLASS_SHAPE" value="grand_clear_double_arched" >
 				</div>
 			</div>
-		</div>
+		</div> -->
 		<!-- glass shapes end>
 
 		<!-- glass types -->
@@ -587,7 +644,7 @@ function loadForm() {
 							<div aria-labelledby="colors" tabindex="0" id="availableStackFrameColors"
 								class="colorsFieldset"></div>
 							<div class="tooltip">
-								<p>View Most Selling Colors</p>
+								<p>View Most Popular Colors</p>
 							</div>
 						</div>
 						<div class='colorContainer'></div>
@@ -620,7 +677,7 @@ function loadForm() {
 							<div aria-labelledby="colors" tabindex="0" id="availableStackInsertColors"
 								class="colorsFieldset"></div>
 							<div class="tooltip">
-								<p>View Most Selling Colors</p>
+								<p>View Most Popular Colors</p>
 							</div>
 						</div>
 						<div class='colorContainer'></div>
@@ -1166,8 +1223,11 @@ function loadForm() {
   $('#accordion991246024').hide(); //weight controller
   //Hides the outputs
   $('#accordion1406547076').hide()
-  //Hides the global data for JDE
-  $("#accordion1094153584").hide()
+  $("#accordion1094153584").hide()//Hides the global data for JDE
+  //$("#accordion9757245").hide() //section bundle
+  //$("#accordion321627220").hide() //Glazing code
+  $("#accordion1892755284").hide() //Scheduling code
+
   //Here is where we add the HTML
   $('.concept-ui-form.scrollable').append(form)
   $('.concept-ui-form.scrollable').removeClass('concept-ui-form scrollable')
@@ -1611,20 +1671,25 @@ function loadUI() {
   // appendAvailableFrameColors();
   appendAvailableColorsTo("#AvaialbleColorsSection");
   appendAvailableColorsTo("#AvailableFrameColorsSection");
-
   appendOptionalColors();
-
   appendOverlappingColors();
   toggleStackColors();
-  registerColorEvents();
+  //registerColorEvents();
+  // 🔥 WAIT FOR DOM TO BE READY
+  requestAnimationFrame(() => {
+    selectFirstColor($("#AvaialbleColorsSection .colorContainer"));
+  });
+
+
   clickHandler();
+  initAppEvents();
   getAllInputVal();
   toggleMorePanelSwitch();
   toggleInclinedTrack();
   // toogleSpringCycle();
 
-
   loadGlazingUI();
+  // setGlassShapeVisibility();
 };
 
 
@@ -1695,33 +1760,45 @@ function clickHandler() {
 
 }
 
-
-function toggleFinishOption(panel_style, door_color) {
-  //enable stucco when plank or flush selected
-  //else hide it by default
-  if ((panel_style === 'F' || panel_style === 'V') && !woodTones.includes(door_color)) {
-    //if door color is not a woodtones colors
-    $(".finish-stucco").show();
-  }
-  else $(".finish-stucco").hide();
-}
-
 function selectFirstColor($container) {
-  setTimeout(() => {
-    const $first = $container.find(".color-button-container").first();
-    $first.addClass("selected");
-    $first.find('input[type="radio"]').prop("checked", true);
-  }, 0);
-}
+  // const $items = $container.find(".color-button-container");
+
+  // if (!$items.length) return;
+
+  // $items.removeClass("selected");
+
+  // const $first = $items.first();
+  // $first.addClass("selected");
+
+  // $container.find("input[type='radio'][name='COLOR']").prop("checked", false);
+
+  // const $radio = $first.find("input[type='radio']");
+  // $radio.prop("checked", true).trigger("change");
+
+  const $items = $container.find(".color-button-container");
+
+  if (!$items.length) return;
+
+  // clear UI selection in THIS container only
+  $items.removeClass("selected");
+
+  const $first = $items.first().addClass("selected");
+
+  const $radio = $first.find("input[type='radio']");
+
+  const name = $radio.attr("name");
+
+  // uncheck ONLY this group
+  $container
+    .find(`input[type='radio'][name='${name}']`)
+    .prop("checked", false);
+
+  // check first
+  $radio.prop("checked", true).trigger("change");
 
 
-function unselectFirstColor($container) {
-  setTimeout(() => {
-    const $first = $container.find(".color-button-container").first();
-    $first.removeClass("selected");
-    $first.find('input[type="radio"]').prop("checked", false);
-  }, 0);
 }
+
 
 function appendOverlappingColors() {
   const $optionalfieldset = $("#optionalStackColors"); // target the colorsFieldset
@@ -1760,124 +1837,30 @@ function appendAvailableColorsTo(containerSelector) {
   const $container = $(containerSelector + " .colorContainer");
   $container.empty();
 
-  AvailableColorImages.forEach((imgSrc, index) => {
-
-    const isChecked = index === 0 ? "checked" : "";
-    const isSelected = index === 0 ? "selected" : "";
-
+  AvailableColorImages.forEach((imgSrc) => {
     const html = `
-            <div class="color-button-container ${isSelected}">
-                <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
-                    <img src="${src_path + imgSrc.url}"
-                         alt="Color ${index + 1}"
-                         class="color-image" />
-                    <input
-                        type="radio"
-                        name="COLOR"
-                        value="${imgSrc.value}"
-                        ${isChecked}
-                        hex="${imgSrc.hex}"
-                        desc="${imgSrc.desc}"
-                        colorName="${imgSrc.colorName}"
-                        style="display:none"/>
-                </div>
-            </div>
-        `;
+      <div class="color-button-container">
+        <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
+          <img src="${src_path + imgSrc.url}" class="color-image" />
+          <input
+            type="radio"
+            name="COLOR"
+            value="${imgSrc.value}"
+            hex="${imgSrc.hex}"
+            desc="${imgSrc.desc}"
+            colorName="${imgSrc.colorName}"
+            style="display:none"
+          />
+        </div>
+      </div>
+    `;
 
     $container.append(html);
   });
 
-  selectFirstColor($container);
   registerColorEvents();
 }
 
-// function appendAvailableColors() {
-//   const $container = $("#AvaialbleColorsSection .colorContainer");
-//   $container.html("");
-//   // if (!$container.length) return;
-
-//   AvailableColorImages.forEach((imgSrc, index) => {
-//     let isChecked = index === 0 ? "checked" : "";
-//     const html = `
-//             <div class="color-button-container ${index === 0 ? "selected" : ""}">
-//                 <div class="color-button color-tooltip" data-tooltip = "${imgSrc.colorName}">
-//                     <img src="${src_path + imgSrc.url}" alt="Color ${index + 1}" class="color-image" />
-//                     <input
-//                         type="radio"
-//                         name="COLOR"
-//                         value="${imgSrc.value}"
-//                          ${isChecked}
-//                          hex="${imgSrc.hex}"
-//                          desc="${imgSrc.desc}"
-//                          colorName="${imgSrc.colorName}"
-//                         style="display:none"/>
-//                 </div>
-//             </div>
-//         `;
-
-//     $container.append(html);
-//   });
-
-//   // ✅ Add selected class and checked radio AFTER all elements are appended
-//   selectFirstColor($container);
-//   registerColorEvents();
-// }
-
-
-// function appendOptionalColors(panel_style) {
-//   const $container = $("#OptionalColorsSection .colorContainer");
-//   //if ($container.length === 0) return;
-//   $container.html("");
-
-//   //remove these two colors when flush or Recessed smooth Ranch panel is selected
-//   const filtered = OptionalColorImages.filter(item => {
-//     if ((panel_style === "F" || panel_style === "T") &&
-//       ["Cocoa Hickory", "Honey Cedar"].includes(item.value)) {
-//       return false; // remove these 2
-//     }
-//     return true;
-//   });
-
-
-//   filtered.forEach((imgSrc, index) => {
-
-//     if ((panel_style === "F" || panel_style === "T") && imgSrc.restricted) {
-//       return;
-//     }
-
-//     let isChecked = index === 0 ? "checked" : "";
-//     const html = `
-//             <div class="color-button-container ${index === 0 ? "selected" : ""}">
-//                 <div class="color-button color-tooltip" data-tooltip = "${imgSrc.colorName}">
-//                     <img src="${src_path + imgSrc.url}" alt="Color ${index + 1}" class="color-image" />
-//                     <input
-//                         type="radio"
-//                         name="COLOR"
-//                         value="${imgSrc.value}"
-//                         hex="${imgSrc.hex}"
-//                          desc="${imgSrc.desc}"
-//                          colorName="${imgSrc.colorName}"
-//                         ${isChecked}
-//                         style="display:none"
-//                     />
-//                 </div>
-//             </div>
-//         `;
-
-//     $container.append(html);
-//   });
-
-//   registerColorEvents();
-//   // Add click handler
-//   // $container.find(".color-button-container").on("click", function () {
-//   //     $container.find(".color-button-container").removeClass("selected");
-
-//   //     $(this).addClass("selected");
-//   //     $container.find("input[type='radio']").removeAttr("checked").prop("checked", false);
-
-//   //     $(this).find('input[type="radio"]').attr("checked", "checked").prop("checked", true).trigger("change");
-//   // });
-// }
 
 function appendColorsTo(containerSelector, colorArray, panel_style = null) {
 
@@ -1910,35 +1893,32 @@ function appendColorsTo(containerSelector, colorArray, panel_style = null) {
       });
   }
 
-  filteredColors.forEach((imgSrc, index) => {
-
-    const isChecked = index === 0 ? "checked" : "";
-    const isSelected = index === 0 ? "selected" : "";
-
+  filteredColors.forEach(imgSrc => {
     const html = `
-            <div class="color-button-container ${isSelected}">
-                <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
-                    <img src="${src_path + imgSrc.url}"
-                         alt="Color ${index + 1}"
-                         class="color-image" />
-                    <input
-                        type="radio"
-                        name="COLOR"
-                        value="${imgSrc.value}"
-                        hex="${imgSrc.hex}"
-                        desc="${imgSrc.desc}"
-                        colorName="${imgSrc.colorName}"
-                        ${isChecked}
-                        style="display:none"
-                    />
-                </div>
-            </div>
-        `;
+      <div class="color-button-container">
+        <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
+          <img src="${src_path + imgSrc.url}" class="color-image" />
+          <input
+            type="radio"
+            name="COLOR"
+            value="${imgSrc.value}"
+            hex="${imgSrc.hex}"
+            desc="${imgSrc.desc}"
+            colorName="${imgSrc.colorName}"
+            style="display:none"
+          />
+        </div>
+      </div>
+    `;
 
     $container.append(html);
   });
 
   registerColorEvents();
+  // 🔥 IMPORTANT FIX: re-select AFTER filtering
+  requestAnimationFrame(() => {
+    selectFirstColor($container);
+  });
 }
 
 function appendOptionalColors(panel_style) {
@@ -1946,21 +1926,48 @@ function appendOptionalColors(panel_style) {
 }
 
 function registerColorEvents() {
+  // $(document).on("click", ".color-button-container", function () {
+  //   const $container = $(this).closest(".colorContainer");
+
+  //   // 1) Remove selected class from ALL color containers
+  //   $(".color-button-container").removeClass("selected");
+
+  //   // 2) Add selected class to clicked container
+  //   $(this).addClass("selected");
+  //   // 3) Uncheck all radios
+  //   $(`input[type='radio'][name='COLOR']`).prop("checked", false);
+
+  //   // 4) Check only clicked radio
+  //   $(this).find(`input[type='radio']`).prop("checked", true).trigger("change");
+  // });
+
   $(document).on("click", ".color-button-container", function () {
     const $container = $(this).closest(".colorContainer");
 
-    // 1) Remove selected class from ALL color containers
-    $(".color-button-container").removeClass("selected");
-
-    // 2) Add selected class to clicked container
+    // ── Scope to THIS container only, not all color buttons globally ──
+    $container.find(".color-button-container").removeClass("selected");
     $(this).addClass("selected");
 
-    // 3) Uncheck all radios
-    $(`input[type='radio'][name='COLOR']`).prop("checked", false);
+    const inputName = $(this).find("input[type='radio']").attr("name");
 
-    // 4) Check only clicked radio
+    $container.find(`input[type='radio'][name='${inputName}']`).prop("checked", false);
     $(this).find(`input[type='radio']`).prop("checked", true).trigger("change");
   });
+
+
+
+  // $(document)
+  //   .off("click.colorSelect")
+  //   .on("click.colorSelect", ".color-button-container", function () {
+
+  //     const $container = $(this).closest(".colorContainer");
+
+  //     $(".color-button-container", $container).removeClass("selected");
+  //     $(this).addClass("selected");
+
+  //     $("input[type='radio'][name='COLOR']").prop("checked", false);
+  //     $(this).find("input[type='radio']").prop("checked", true).trigger("change");
+  //   });
 }
 
 
@@ -1973,21 +1980,17 @@ function toggleStackColors() {
   //function to hide stack image
   //stack images means the 3 overlap color img design
   const hideStack = ($fs) => {
-    // $fs.addClass("colorContainerInactive");
     $fs.closest(".stack-wrapper").addClass("colorContainerInactive");
   };
 
   //function to show stack images
   const showStack = ($fs) => {
-    // $fs.removeClass("colorContainerInactive");
     $fs.closest(".stack-wrapper").removeClass("colorContainerInactive");
     $fs.addClass("slide-in");
 
     setTimeout(() => {
       $fs.removeClass("slide-in");
     }, 500);
-
-
 
   };
 
@@ -2008,11 +2011,17 @@ function toggleStackColors() {
 
   $("#optionalStackColors").on("click", function () {
     setTimeout(animateTransition, 20);
-    hideStack($("#optionalStackColors"));
+
     showContainer($("#OptionalColorsSection .colorContainer"));
-    hideContainer($("#AvaialbleColorsSection .colorContainer"));
     showStack($("#availableStackColors"));
-    registerColorEvents();
+
+    hideStack($("#optionalStackColors"));
+    hideContainer($("#AvaialbleColorsSection .colorContainer"));
+
+
+    const $optional = $("#OptionalColorsSection .colorContainer");
+    selectFirstColor($optional);
+
     rw(getNode("COLOR"))
   });
 
@@ -2037,16 +2046,24 @@ function toggleStackColors() {
   });
 
 
+
   $("#availableStackColors").on("click", function () {
 
     setTimeout(animateTransition, 20);
-    hideStack($("#availableStackColors"));
+
     showContainer($("#AvaialbleColorsSection .colorContainer"));
-    hideContainer($("#OptionalColorsSection .colorContainer"));
     showStack($("#optionalStackColors"));
+
+    hideStack($("#availableStackColors"));
+    hideContainer($("#OptionalColorsSection .colorContainer"));
+
     //selectFirstColor($("#AvaialbleColorsSection .colorContainer"));
     //unselectFirstColor($("#OptionalColorsSection .colorContainer"));
-    registerColorEvents();
+
+    const $available = $("#AvaialbleColorsSection .colorContainer");
+    selectFirstColor($available);
+
+    // registerColorEvents();
     rw(getNode("COLOR"))
 
   });
@@ -2181,6 +2198,7 @@ function toggleSwitch() {
 
 function toggleMorePanelSwitch() {
   $('#customPanelSwitch').change(function () {
+
     if ($(this).is(':checked')) {
       $("#customSwitch").val("on");
       $(".custom-panel-item-container").slideDown();
@@ -2200,6 +2218,8 @@ function toggleMorePanelSwitch() {
     }
   })
 }
+
+
 
 function toggleInclinedTrack() {
   $("input[name='HARDWARE_SET']").on("change", function () {
@@ -2269,6 +2289,184 @@ function toggleInclinedTrack() {
 //   updateSpringCycle();
 // }
 
+function initAppEvents() {
+
+  // =========================
+  // PANEL STYLE CHANGE
+  // =========================
+  $(document)
+    .off("click.togglePanelStyle")
+    .on("click.togglePanelStyle", "input[name='FACE']", function () {
+
+      const panel_style = this.value;
+
+      // re-render optional colors
+      appendOptionalColors(panel_style);
+
+      // re-select first color after render
+      requestAnimationFrame(() => {
+        selectFirstColor($("#OptionalColorsSection .colorContainer"));
+        rw(getNode("COLOR"))
+      });
+    });
+
+
+  // =========================
+  // COLOR SELECTION
+  // =========================
+  // $(document)
+  //   .off("click.colorSelect")
+  //   .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
+
+  //     const $container = $(this).closest(".colorContainer");
+
+  //     $container.find(".color-button-container").removeClass("selected");
+  //     $(this).addClass("selected");
+
+  //     $container
+  //       .find("input[name='COLOR']")
+  //       .prop("checked", false);
+
+  //     $(this)
+  //       .find("input[name='COLOR']")
+  //       .prop("checked", true)
+  //       .trigger("change");
+
+  //     // optional global state
+  //     const color = $(this).find("input[name='COLOR']").val();
+  //     setState && setState("COLOR", color);
+  //     rw(getNode("COLOR"))
+  //   });
+
+  // $('#FRAME_COLOR').on('click', '.color-button-container', function () {
+  //   const color = $(this).find(`input[type='radio']`).val();
+  //   const color_info = [...AvailableColorImages, ...OptionalColorImages].find(c => c.value == color);
+  //   if (!color_info) return;
+  //   setState("FRAME_COLOR", color_info);
+  // });
+
+  // $('#INSERT_COLOR').on('click', '.color-button-container', function () {
+  //   const color = $(this).find(`input[type='radio']`).val();
+  //   const color_info = [...AvailableColorImages, ...OptionalColorImages].find(c => c.value == color);
+  //   if (!color_info) return;
+  //   setState("INSERT_COLOR", color_info);
+  // })
+
+  // COLOR (door) selection — reset overrides so frame/insert follow new door color
+  // $(document)
+  //   .off("click.colorSelect")
+  //   .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
+  //     const $container = $(this).closest(".colorContainer");
+  //     $container.find(".color-button-container").removeClass("selected");
+  //     $(this).addClass("selected");
+  //     $container.find("input[name='COLOR']").prop("checked", false);
+  //     $(this).find("input[name='COLOR']").prop("checked", true).trigger("change");
+
+  //     const color = $(this).find("input[name='COLOR']").val();
+  //     setState && setState("COLOR", color);
+
+  //     // ── Reset overrides so frame/insert sync to new door color ──
+  //     frameColorUserOverride = false;
+  //     insertColorUserOverride = false;
+
+  //     rw(getNode("COLOR"));
+  //     rw(getNode("FRAME_COLOR"));
+  //     rw(getNode("INSERT_COLOR"));
+  //   });
+
+  $(document)
+    .off("click.colorSelect")
+    .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
+      const $container = $(this).closest(".colorContainer");
+      $container.find(".color-button-container").removeClass("selected");
+      $(this).addClass("selected");
+      $container.find("input[name='COLOR']").prop("checked", false);
+      $(this).find("input[name='COLOR']").prop("checked", true).trigger("change");
+
+      const color = $(this).find("input[name='COLOR']").val();
+      setState && setState("COLOR", color);
+
+      frameColorUserOverride = false;
+      insertColorUserOverride = false;
+
+      rw(getNode("COLOR"));
+      rw(getNode("FRAME_COLOR"));
+      rw(getNode("INSERT_COLOR"));
+
+      // ── Sync selected class to new door color ──
+      requestAnimationFrame(() => {
+        [
+          $("#AvailableFrameColorsSection .colorContainer"),
+          $("#OptionalFrameColorsSection .colorContainer"),
+          $("#AvailableInsertColorsSection .colorContainer"),
+          $("#OptionalInsertColorsSection .colorContainer")
+        ].forEach($c => {
+          $c.find(".color-button-container").removeClass("selected");
+          $c.find("input[type='radio']").prop("checked", false);
+
+          const $match = $c.find(`input[type='radio'][value="${color}"]`)
+            .closest(".color-button-container");
+
+          if ($match.length) {
+            $match.addClass("selected");
+            $match.find("input[type='radio']").prop("checked", true);
+          }
+        });
+      });
+    });
+
+
+  // FRAME color — user explicitly picked, set override
+  $('#FRAME_COLOR').on('click', '.color-button-container', function () {
+    const color = $(this).find(`input[type='radio']`).val();
+    const color_info = [...AvailableColorImages, ...OptionalColorImages]
+      .find(c => c.value == color);
+    if (!color_info) return;
+
+    frameColorUserOverride = true;
+    setState("FRAME_COLOR", color_info);
+  });
+
+  // INSERT color — user explicitly picked, set override
+  $('#INSERT_COLOR').on('click', '.color-button-container', function () {
+    const color = $(this).find(`input[type='radio']`).val();
+    const color_info = [...AvailableColorImages, ...OptionalColorImages]
+      .find(c => c.value == color);
+    if (!color_info) return;
+
+    insertColorUserOverride = true;
+    setState("INSERT_COLOR", color_info);
+  });
+
+
+
+  // =========================
+  // DOOR OPTION
+  // =========================
+  $(document)
+    .off("click.doorOpt")
+    .on("click.doorOpt", ".rw-sliding-button", function () {
+      door_option = $(this).find('input[name="DOOROPT"]').val();
+    });
+
+  // =========================
+  // SPRING TYPE
+  // =========================
+  $(document)
+    .off("click.SPRINGTYPE")
+    .on("click.SPRINGTYPE", ".rw-sliding-button", function (e) {
+
+      const name = e.target.name;
+
+      $(`input[name="${name}"]`).each(function () {
+        $(this).closest(".rw-sliding-button").removeClass("selected");
+      });
+
+      const $selected = $(`input[name="${name}"]:checked`);
+      $selected.closest(".rw-sliding-button").addClass("selected");
+    });
+}
+
 
 
 function getAllInputVal() {
@@ -2279,64 +2477,64 @@ function getAllInputVal() {
   door_option = $('input[name="DOOROPT"]:checked').val();
   //toggleHardwareSection(door_option);
 
-  // Panel style click
-  $(document).off("click.togglePanelStyle").on("click.togglePanelStyle", "input[name='FACE']", function (e) {
-    panel_style = e.target.value;
-    //toggleFinishOption(panel_style, door_color);
-    appendOptionalColors(panel_style);
-  });
+  // // Panel style click
+  // $(document).off("click.togglePanelStyle").on("click.togglePanelStyle", "input[name='FACE']", function (e) {
+  //   panel_style = e.target.value;
+  //   appendOptionalColors(panel_style);
+  // });
 
-  // Optional: initialize checked panel style
-  $("input[name='FACE']:checked").each(function () {
-    appendOptionalColors(this.value);
-  });
+  // // Optional: initialize checked panel style
+  // $("input[name='FACE']:checked").each(function () {
+  //   appendOptionalColors(this.value);
+  // });
 
   // COLOR click
-  $(document)
-    .off("click.colorSelect")
-    .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
-      door_color = $(`div[data-id="COLOR"] .color-button-container.selected input[type='radio']`).val();
-      toggleFinishOption(panel_style, door_color);
-      rw(getNode("COLOR"))
-    });
+  // $(document)
+  //   .off("click.colorSelect")
+  //   .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
+  //     door_color = $(`div[data-id="COLOR"] .color-button-container.selected input[type='radio']`).val();
+  //     rw(getNode("COLOR"))
+  //   });
 
-  $('#FRAME_COLOR').on('click', '.color-button-container', function () {
-    const color = $(this).find(`input[type='radio']`).val();
-    const color_info = [...AvailableColorImages, ...OptionalColorImages].find(c => c.value == color);
-    if (!color_info) return;
-    setState("FRAME_COLOR", color_info);
-  });
+  // $('#FRAME_COLOR').on('click', '.color-button-container', function () {
+  //   const color = $(this).find(`input[type='radio']`).val();
+  //   const color_info = [...AvailableColorImages, ...OptionalColorImages].find(c => c.value == color);
+  //   console.log("color_infor", color_info);
+  //   if (!color_info) return;
+  //   setState("FRAME_COLOR", color_info);
+  // });
 
-  $('#INSERT_COLOR').on('click', '.color-button-container', function () {
-    const color = $(this).find(`input[type='radio']`).val();
-    const color_info = [...AvailableColorImages, ...OptionalColorImages].find(c => c.value == color);
-    if (!color_info) return;
-    setState("INSERT_COLOR", color_info);
-  });
+  // $('#INSERT_COLOR').on('click', '.color-button-container', function () {
+  //   const color = $(this).find(`input[type='radio']`).val();
+  //   const color_info = [...AvailableColorImages, ...OptionalColorImages].find(c => c.value == color);
+  //   if (!color_info) return;
+  //   setState("INSERT_COLOR", color_info);
+  // });
 
   //door option click
-  $(document)
-    .off("click.doorOpt")
-    .on("click.doorOpt", ".rw-sliding-button", function (e) {
-      door_option = $(this).find('input[name="DOOROPT"]').val();
-      //toggleHardwareSection(door_option);
-    });
-  $(document)
-    .off("click.SPRINGTYPE")
-    .on("click.SPRINGTYPE", ".rw-sliding-button", function (e) {
+  // $(document)
+  //   .off("click.doorOpt")
+  //   .on("click.doorOpt", ".rw-sliding-button", function (e) {
+  //     door_option = $(this).find('input[name="DOOROPT"]').val();
+  //     //toggleHardwareSection(door_option);
+  //   });
+  // $(document)
+  //   .off("click.SPRINGTYPE")
+  //   .on("click.SPRINGTYPE", ".rw-sliding-button", function (e) {
 
-      $(`input[name="${e.target.name}"]`).each(function () {
-        $(this).closest(".rw-sliding-button").removeClass("selected");
-      });
+  //     $(`input[name="${e.target.name}"]`).each(function () {
+  //       $(this).closest(".rw-sliding-button").removeClass("selected");
+  //     });
 
-      // Add selected to the currently checked one
-      const $selected = $(`input[name="${e.target.name}"]:checked`);
-      $selected.closest(".rw-sliding-button").addClass("selected");
+  //     // Add selected to the currently checked one
+  //     const $selected = $(`input[name="${e.target.name}"]:checked`);
+  //     $selected.closest(".rw-sliding-button").addClass("selected");
 
-    });
+  //   });
 
 
 }
+
 
 
 function getCounterVal(toggle_Switch) {
@@ -2409,7 +2607,6 @@ function loadGlazingUI() {
     }
   });
 
-
   const $frameColors = $("#AvailableFrameColorsSection .colorContainer").empty();
   const $insertColors = $("#AvailableInsertColorsSection .colorContainer").empty();
 
@@ -2446,35 +2643,9 @@ function loadGlazingUI() {
   const $optFrameColors = $("#OptionalFrameColorsSection .colorContainer").empty();
   const $optInsertColors = $("#OptionalInsertColorsSection .colorContainer").empty();
 
-  function generateColorHTML(imgSrc, index, inputName) {
-    const isSelected = index === 0;
-
-    return `
-        <div class="color-button-container ${isSelected ? "selected" : ""}">
-            <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
-                <img
-                    src="${src_path + imgSrc.url}"
-                    alt="${imgSrc.colorName}"
-                    class="color-image"
-                />
-                <input
-                    type="radio"
-                    name="${inputName}"
-                    value="${imgSrc.value}"
-                    hex="${imgSrc.hex}"
-                    desc="${imgSrc.desc}"
-                    colorName="${imgSrc.colorName}"
-                    ${isSelected ? "checked" : ""}
-                    style="display:none"
-                />
-            </div>
-        </div>
-    `;
-  }
-
   OptionalColorImages.forEach((imgSrc, index) => {
     $optFrameColors.append(generateColorHTML(imgSrc, index, "FRAME_COLOR"));
-    $optInsertColors.append(generateColorHTML(imgSrc, index, "INSERT_COLOR")); // enable if needed
+    $optInsertColors.append(generateColorHTML(imgSrc, index, "INSERT_COLOR"));
   });
 
   const $optionalfieldset_frame = $("#optionalStackFrameColors").empty();
@@ -2482,17 +2653,40 @@ function loadGlazingUI() {
   const $optionalfieldset_insert = $("#optionalStackInsertColors").empty();
   const $availablefieldset_insert = $("#availableStackInsertColors").empty();
 
-  // Append each image
-  OptionalColorImages.slice(0, 3).forEach((imgSrc, index) => {
+  OptionalColorImages.slice(0, 3).forEach((imgSrc) => {
     const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
     $optionalfieldset_frame.append(html);
     $optionalfieldset_insert.append(html);
   });
 
-  AvailableColorImages.slice(0, 3).forEach((imgSrc, index) => {
+  AvailableColorImages.slice(0, 3).forEach((imgSrc) => {
     const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
     $availablefieldset_frame.append(html);
     $availablefieldset_insert.append(html);
+  });
+
+  // ── Sync frame & insert UI selection to door color on load ──
+  requestAnimationFrame(() => {
+    const doorValue = getNode("COLOR")?.value?.value;
+    if (doorValue) {
+      [
+        $("#AvailableFrameColorsSection .colorContainer"),
+        $("#OptionalFrameColorsSection .colorContainer"),
+        $("#AvailableInsertColorsSection .colorContainer"),
+        $("#OptionalInsertColorsSection .colorContainer")
+      ].forEach($c => {
+        $c.find(".color-button-container").removeClass("selected");
+        $c.find("input[type='radio']").prop("checked", false);
+
+        const $match = $c.find(`input[type='radio'][value="${doorValue}"]`)
+          .closest(".color-button-container");
+
+        if ($match.length) {
+          $match.addClass("selected");
+          $match.find("input[type='radio']").prop("checked", true);
+        }
+      });
+    }
   });
 
   $("#NAVIGATION_SPC").on('click', function (event) {
@@ -2501,7 +2695,6 @@ function loadGlazingUI() {
       const glass_shape = getState("GLASS_SHAPE") ?? "";
       if (glass_shape.includes("slim")) {
         $(`[data-id="section_slim_temp"]`).show();
-      } else {
       }
       addSlimUi();
 
@@ -2518,4 +2711,16 @@ function loadGlazingUI() {
       setState("WINDOW_STATE", state);
     }
   });
+}
+
+function setGlassShapeVisibility() {
+  // all glass shape buttons
+  $('input[name="GLASS_SHAPE"]')
+    .closest(".rw-button")
+    .hide();
+
+  // const face = $("input[name='FACE']:checked").val();
+  // const door_model = $("input[name='DOOR_MODEL']:checked").val();
+  // const width = Number(getState("WIDTH")) || 0;
+
 }

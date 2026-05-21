@@ -1427,7 +1427,7 @@ function getSectionBundle() {
         result[positions[index]] = section;
     });
 
-    console.log("section heights", result);
+    //  console.log("section heights", result);
 
     return result;
 }
@@ -1660,7 +1660,7 @@ function bundleByHeight() {
         }
     });
 
-    console.log("result", result);
+    //  console.log("result", result);
 
     return result;
 }
