@@ -401,7 +401,7 @@ function loadDrivenInputEvents() {
             // Ranch special width restriction
             if (face === "R") {
 
-              // hide between 76–95
+              // hide between 76–95 6-4,7-11
               show = !(width >= 76 && width < 95);
             }
 
@@ -459,30 +459,50 @@ function loadDrivenInputEvents() {
       });
 
 
-      const $selected =
-        $("input[name='GLASS_SHAPE']:checked")
-          .closest(".rw-button");
+      // const $selected =
+      //   $("input[name='GLASS_SHAPE']:checked")
+      //     .closest(".rw-button");
 
-      if ($selected.length && $selected.is(":hidden")) {
+      // if ($selected.length && $selected.is(":hidden")) {
 
-        $("input[name='GLASS_SHAPE']")
-          .prop("checked", false);
+      //   $("input[name='GLASS_SHAPE']")
+      //     .prop("checked", false);
 
-        const $firstVisible =
-          $("input[name='GLASS_SHAPE']")
-            .filter(function () {
-              return $(this).closest(".rw-button").is(":visible");
-            })
-            .first();
+      //   const $firstVisible =
+      //     $("input[name='GLASS_SHAPE']")
+      //       .filter(function () {
+      //         return $(this).closest(".rw-button").is(":visible");
+      //       })
+      //       .first();
 
-        // $firstVisible
-        //   .prop("checked", true)
-        //   .trigger("change");
+      //   // $firstVisible
+      //   //   .prop("checked", true)
+      //   //   .trigger("change");
+      // }
+
+      const $checked =
+        $("input[name='GLASS_SHAPE']:checked");
+
+      if (
+        $checked.length &&
+        !$checked.closest(".rw-button").is(":visible")
+      ) {
+
+        $checked
+          .prop("checked", false)
+          .data("checked", false);
+
+        $checked
+          .closest(".rw-button")
+          .removeClass("selected btn-checked");
+
+        setState("GLASS_SHAPE", "");
       }
+
     },
     "",
     $("#GLASS_SHAPE_VISIBILITY")[0],
-    ["DOOR_MODEL", "FACE", "WIDTH"]
+    ["DOOR_MODEL", "FACE", "WIDTH", "COLOR"]
   );
 
 }

@@ -40,41 +40,45 @@ function loadForm() {
         <div class="rw-configurator__layout--left">
             <div id="NAVIGATION_SPC"></div>
 
-		   <div class="postion-container" style="display:none;" id="window_position_container">
-			   <div style="text-align: center; padding-bottom: 5px;" class="config-option-title-style">Window Position</div>
-			   <div class="window-position-container">
-				 <div class="rw-button" tabindex="0">
-				   <label for="WINDOW_POSITION_TOP">Top</label>
-				   <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_TOP"  name="WINDOW_POSITION" desc="Top" value="top" code="top" >
-				 </div>
-				 <div class="rw-button" tabindex="0">
-				   <label for="WINDOW_POSITION_LEFT">Left</label>
-				   <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_LEFT"  name="WINDOW_POSITION" desc="Left" value="left" code="left" >
-				 </div>
-				 <div class="rw-button" tabindex="0">
-				   <label for="WINDOW_POSITION_CENTER">Center</label>
-				   <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_CENTER" name="WINDOW_POSITION" desc="Center" value="center" code="right">
-				 </div>
-				 <div class="rw-button" tabindex="0">
-				   <label for="WINDOW_POSITION_RIGHT">Right</label>
-				   <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_RIGHT"  name="WINDOW_POSITION" desc="Right" value="right" code="center" >
-				 </div>
-				 <div class="rw-button" tabindex="0">
-				   <label for="WINDOW_POSITION_BOTH">Both</label>
-				   <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_BOTH"  name="WINDOW_POSITION" desc="Both" code="both" value="both" >
-				 </div>
-			   </div>
-		   </div>
+            <div class="postion-container" style="display:none;" id="window_position_container">
+                <div style="text-align: center; padding-bottom: 5px;" class="config-option-title-style">Window Position
+                </div>
+                <div class="window-position-container">
+                    <div class="rw-button" tabindex="0">
+                        <label for="WINDOW_POSITION_TOP">Top</label>
+                        <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_TOP"
+                            name="WINDOW_POSITION" desc="Top" value="top" code="top">
+                    </div>
+                    <div class="rw-button" tabindex="0">
+                        <label for="WINDOW_POSITION_LEFT">Left</label>
+                        <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_LEFT"
+                            name="WINDOW_POSITION" desc="Left" value="left" code="left">
+                    </div>
+                    <div class="rw-button" tabindex="0">
+                        <label for="WINDOW_POSITION_CENTER">Center</label>
+                        <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_CENTER"
+                            name="WINDOW_POSITION" desc="Center" value="center" code="right">
+                    </div>
+                    <div class="rw-button" tabindex="0">
+                        <label for="WINDOW_POSITION_RIGHT">Right</label>
+                        <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_RIGHT"
+                            name="WINDOW_POSITION" desc="Right" value="right" code="center">
+                    </div>
+                    <div class="rw-button" tabindex="0">
+                        <label for="WINDOW_POSITION_BOTH">Both</label>
+                        <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_BOTH"
+                            name="WINDOW_POSITION" desc="Both" code="both" value="both">
+                    </div>
+                </div>
+            </div>
 
             <div id="CANVAS_PLUGIN" style="display:flex;justify-content:center;">
             </div>
- <!-- Loader -->          
-      <div class="canvas-loader" id="canvas-loader" 
-      style="display:none; position:absolute; top:50%; left:50%;
+            <!-- Loader -->
+            <div class="canvas-loader" id="canvas-loader" style="display:none; position:absolute; top:50%; left:50%;
       transform:translate(-50%, -50%);
-      padding:10px 20px; border-radius:8px; z-index:10;"
-      ></div>
-    
+      padding:10px 20px; border-radius:8px; z-index:10;"></div>
+
         </div>
         <div class="rw-configurator__layout--right">
             <div id="DOOR_PROPERTIES"
@@ -94,8 +98,8 @@ function loadForm() {
 
             <!-- DOOR MODEL SECTION STARTS -->
 
-            <section id="DIMENSIONS" data-title="Door Model" class="rw-configurator__page" enabled="true"
-                face="true" hardware="true">
+            <section id="DIMENSIONS" data-title="Door Model" class="rw-configurator__page" enabled="true" face="true"
+                hardware="true">
                 <div class="dropdown-container">
                     <!-- door model element -->
                     <div class="dropdown-item">
@@ -315,413 +319,386 @@ function loadForm() {
                 </div>
             </section>
 
-		<!-- glazing section -->
-<section face="false" hardware="true" enabled="true" id="GLAZING" class="rw-configurator__page"
+            <!-- glazing section -->
+            <section face="false" hardware="true" enabled="true" id="GLAZING" class="rw-configurator__page"
                 data-title="Glazing">
 
-		<!-- glass shapes -->
+                <!-- glass shapes -->
 
-		<div class = "dropdown-item">
-			<h3>Glass Shape</h3>
-			<div class="panel-layout">
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_COLONIAL">Colonial</label>
-					<input type="radio" id="GLASS_SHAPE_COLONIAL" name="GLASS_SHAPE" value="colonial">
-				</div>
+                <div class="dropdown-item">
+                    <h3>Glass Shape</h3>
+                    <div class="panel-layout">
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_SHAPE_COLONIAL">Colonial</label>
+                            <input type="radio" id="GLASS_SHAPE_COLONIAL" name="GLASS_SHAPE" value="colonial" >
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_RANCH">Ranch</label>
-					<input type="radio" id="GLASS_SHAPE_RANCH" name="GLASS_SHAPE" value="ranch" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_SHAPE_RANCH">Ranch</label>
+                            <input type="radio" id="GLASS_SHAPE_RANCH" name="GLASS_SHAPE" value="ranch">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_3">Slim</label>
-					<input type="radio" id="GLASS_SHAPE_3" name="GLASS_SHAPE" value="slim_single" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_SHAPE_3">Slim</label>
+                            <input type="radio" id="GLASS_SHAPE_3" name="GLASS_SHAPE" value="slim_single">
+                        </div>
 
-       <!-- <div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_0">Slim Double</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_0" name="GLASS_SHAPE" value="slim_double" >
-				</div> -->
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_SHAPE_MORE_17">Grand Wrought Iron - Rectangle</label>
+                            <input type="radio" id="GLASS_SHAPE_MORE_17" name="GLASS_SHAPE"
+                                value="grand_wrought_iron_rectangle">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_17">Grand Wrought Iron - Rectangle</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_17" name="GLASS_SHAPE" value="grand_wrought_iron_rectangle" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_SHAPE_MORE_18">Grand Wrought Iron - Double Arched</label>
+                            <input type="radio" id="GLASS_SHAPE_MORE_18" name="GLASS_SHAPE"
+                                value="grand_wrought_iron_double_arched">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_18">Grand Wrought Iron - Double Arched</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_18" name="GLASS_SHAPE" value="grand_wrought_iron_double_arched" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_SHAPE_MORE_19">Grand 4/4 - Rectangle</label>
+                            <input type="radio" id="GLASS_SHAPE_MORE_19" name="GLASS_SHAPE" value="grand_44_rectangle">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_19">Grand 4/4 - Rectangle</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_19" name="GLASS_SHAPE" value="grand_44_rectangle" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_SHAPE_MORE_20">Grand 4/4 - Double Arched</label>
+                            <input type="radio" id="GLASS_SHAPE_MORE_20" name="GLASS_SHAPE"
+                                value="grand_44_double_arched">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_20">Grand 4/4 - Double Arched</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_20" name="GLASS_SHAPE" value="grand_44_double_arched" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_SHAPE_MORE_21">Grand 4 Pane - Rectangle</label>
+                            <input type="radio" id="GLASS_SHAPE_MORE_21" name="GLASS_SHAPE"
+                                value="grand_4_pane_rectangle">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_21">Grand 4 Pane - Rectangle</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_21" name="GLASS_SHAPE" value="grand_4_pane_rectangle" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_SHAPE_MORE_22">Grand 4 Pane - Double Arched</label>
+                            <input type="radio" id="GLASS_SHAPE_MORE_22" name="GLASS_SHAPE"
+                                value="grand_4_pane_double_arched">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_22">Grand 4 Pane - Double Arched</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_22" name="GLASS_SHAPE" value="grand_4_pane_double_arched" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_SHAPE_MORE_23">Grand Clear - Rectangle</label>
+                            <input type="radio" id="GLASS_SHAPE_MORE_23" name="GLASS_SHAPE"
+                                value="grand_clear_rectangle">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_23">Grand Clear - Rectangle</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_23" name="GLASS_SHAPE" value="grand_clear_rectangle" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_SHAPE_MORE_24">Grand Clear - Double Arched</label>
+                            <input type="radio" id="GLASS_SHAPE_MORE_24" name="GLASS_SHAPE"
+                                value="grand_clear_double_arched">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_24">Grand Clear - Double Arched</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_24" name="GLASS_SHAPE" value="grand_clear_double_arched" >
-				</div>
-
-			</div>
-		</div>
-
-		 <!-- 
-     <div class="dropdown-item custom-dimension-item" id="more_glass_shapes_head">
-			<h3>More Glass Shapes</h3>
-			<label class="switch">
-				<input type="checkbox" id="more_glass_shapes" value="off">
-				<span class="slider round"></span>
-			</label>
-		</div>
-
-		<div class="dropdown-item custom-panel-item-container" id="more_glass_shapes_container">
-			<div class="panel-layout">
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_0">Slim Double</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_0" name="GLASS_SHAPE" value="slim_double" >
-				</div>
-
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_17">Grand Wrought Iron - Rectangle</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_17" name="GLASS_SHAPE" value="grand_wrought_iron_rectangle" >
-				</div>
-
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_18">Grand Wrought Iron - Double Arched</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_18" name="GLASS_SHAPE" value="grand_wrought_iron_double_arched" >
-				</div>
-
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_19">Grand 4/4 - Rectangle</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_19" name="GLASS_SHAPE" value="grand_44_rectangle" >
-				</div>
-
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_20">Grand 4/4 - Double Arched</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_20" name="GLASS_SHAPE" value="grand_44_double_arched" >
-				</div>
-
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_21">Grand 4 Pane - Rectangle</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_21" name="GLASS_SHAPE" value="grand_4_pane_rectangle" >
-				</div>
-
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_22">Grand 4 Pane - Double Arched</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_22" name="GLASS_SHAPE" value="grand_4_pane_double_arched" >
-				</div>
-
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_23">Grand Clear - Rectangle</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_23" name="GLASS_SHAPE" value="grand_clear_rectangle" >
-				</div>
-
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_SHAPE_MORE_24">Grand Clear - Double Arched</label>
-					<input type="radio" id="GLASS_SHAPE_MORE_24" name="GLASS_SHAPE" value="grand_clear_double_arched" >
-				</div>
-			</div>
-		</div> -->
-		<!-- glass shapes end>
+                    </div>
+                </div>
+                
+                <!-- glass shapes end>
 
 		<!-- glass types -->
-		<div class = "dropdown-item">
-			<h3>Glass Type</h3>
-			<div class="panel-layout">
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_TYPE_0">Clear Glass</label>
-					<input type="radio" class="rw-button-toggle" id="GLASS_TYPE_0" name="GLASS_TYPE" value="clear_glass" checked>
-				</div>
+                <div class="dropdown-item">
+                    <h3>Glass Type</h3>
+                    <div class="panel-layout">
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="CLEAR">Clear Sealed</label>
+                            <input type="radio" class="rw-button-toggle" id="CLEAR" name="GLASS_TYPE" value="CLEAR"
+                                >
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_TYPE_1">Clear Glass Single</label>
-					<input type="radio" class="rw-button-toggle" id="GLASS_TYPE_1" name="GLASS_TYPE" value="clear_glass_single" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="CLEAR_SINGLE">Clear Single</label>
+                            <input type="radio" class="rw-button-toggle" id="CLEAR_SINGLE" name="GLASS_TYPE"
+                                value="CLEAR_SINGLE">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_TYPE_2">Satin</label>
-					<input type="radio" class="rw-button-toggle" id="GLASS_TYPE_2" name="GLASS_TYPE" value="satin" >
-				</div>
-			</div>
-		</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="SATIN">Satin</label>
+                            <input type="radio" class="rw-button-toggle" id="SATIN" name="GLASS_TYPE"
+                                value="SATIN">
+                        </div>
+                    </div>
+                </div>
 
-		<div class="dropdown-item custom-dimension-item">
-			<h3>More Glass Types</h3>
-			<label class="switch">
-				<input type="checkbox" id="more_glass_types" value="off">
-				<span class="slider round"></span>
-			</label>
-		</div>
+                <div class="dropdown-item custom-dimension-item">
+                    <h3>More Glass Types</h3>
+                    <label class="switch">
+                        <input type="checkbox" id="more_glass_types" value="off">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
 
-		<div class="dropdown-item custom-panel-item-container" id="more_glass_types_container">
-			<div class="panel-layout">
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_TYPE_MORE_0">Pinhead</label>
-					<input type="radio" id="GLASS_TYPE_MORE_0" name="GLASS_TYPE" value="pinhead" checked>
-				</div>
-			</div>
-		</div>
-		<!-- glass types end>
+                <div class="dropdown-item custom-panel-item-container" id="more_glass_types_container">
+                    <div class="panel-layout">
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="OBSCURE_GLASS_PINHEAD">Obscure Pinhead Sealed</label>
+                            <input type="radio" id="OBSCURE_GLASS_PINHEAD" name="GLASS_TYPE"
+                                value="OBSCURE_GLASS_PINHEAD">
+                        </div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="DARK_TINT_SEALED">Dark Tint - Sealed</label>
+                            <input type="radio" id="DARK_TINT_SEALED" name="GLASS_TYPE" value="DARK_TINT_SEALED">
+                        </div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="BLACK_SATIN_SEALED">Black Satin - Sealed</label>
+                            <input type="radio" id="BLACK_SATIN_SEALED" name="GLASS_TYPE" value="BLACK_SATIN_SEALED">
+                        </div>
+                    </div>
+                </div>
+                <!-- glass types end>
 
 		<!-- glass inserts -->
-		<div class = "dropdown-item">
-			<h3>Glass Insert</h3>
-			<div class="panel-layout">
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_1">Stockton</label>
-					<input type="radio" class="rw-button-toggle" id="GLASS_INSERT_1" name="GLASS_INSERT" value="stockton_colonial" >
-				</div>
+                <div class="dropdown-item">
+                    <h3>Glass Insert</h3>
+                    <div class="panel-layout">
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_1">Stockton</label>
+                            <input type="radio" class="rw-button-toggle" id="GLASS_INSERT_1" name="GLASS_INSERT"
+                                value="stockton_colonial" insertCode='550-309'>
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_2">Waterton</label>
-					<input type="radio" class="rw-button-toggle" id="GLASS_INSERT_2" name="GLASS_INSERT" value="waterton_colonial" checked>
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_2">Waterton</label>
+                            <input type="radio" class="rw-button-toggle" id="GLASS_INSERT_2" name="GLASS_INSERT"
+                                value="waterton_colonial" insertCode='550-337'>
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0" style="display:none;">
-					<label for="GLASS_INSERT_1">Stockton</label>
-					<input type="radio" class="rw-button-toggle" id="GLASS_INSERT_1" name="GLASS_INSERT" value="stockton_ranch" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0" style="display:none;">
+                            <label for="GLASS_INSERT_3">Stockton</label>
+                            <input type="radio" class="rw-button-toggle" id="GLASS_INSERT_3" name="GLASS_INSERT"
+                                value="stockton_ranch">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_3">Waterton</label>
-					<input type="radio" class="rw-button-toggle" id="GLASS_INSERT_3" name="GLASS_INSERT" value="waterton_ranch" checked>
-				</div>
-			</div>
-		</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_4">Waterton</label>
+                            <input type="radio" class="rw-button-toggle" id="GLASS_INSERT_4" name="GLASS_INSERT"
+                                value="waterton_ranch">
+                        </div>
+                    </div>
+                </div>
 
-		<div class="dropdown-item custom-dimension-item">
-			<h3>More Glass Inserts</h3>
-			<label class="switch">
-				<input type="checkbox" id="more_glass_inserts" value="off">
-				<span class="slider round"></span>
-			</label>
-		</div>
+                <div class="dropdown-item custom-dimension-item">
+                    <h3>More Glass Inserts</h3>
+                    <label class="switch">
+                        <input type="checkbox" id="more_glass_inserts" value="off">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
 
-		<div class="dropdown-item custom-panel-item-container" id="more_glass_inserts_container">
-			<div class="panel-layout">
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_0">Prairie</label>
-					<input type="radio" id="GLASS_INSERT_MORE_0" name="GLASS_INSERT" value="prairie" >
-				</div>
+                <div class="dropdown-item custom-panel-item-container" id="more_glass_inserts_container">
+                    <div class="panel-layout">
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_0">Prairie</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_0" name="GLASS_INSERT" value="prairie" insertCode='550-451'>
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_1">Cascade</label>
-					<input type="radio" id="GLASS_INSERT_MORE_1" name="GLASS_INSERT" value="cascade_colonial" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_1">Cascade</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_1" name="GLASS_INSERT" value="cascade_colonial" insertCode='550-317'>
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_25">Cascade</label>
-					<input type="radio" id="GLASS_INSERT_MORE_25" name="GLASS_INSERT" value="cascade_ranch" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_25">Cascade</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_25" name="GLASS_INSERT" value="cascade_ranch">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_2">Arched Stockton</label>
-					<input type="radio" id="GLASS_INSERT_MORE_2" name="GLASS_INSERT" value="arched_stockton" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_2">Arched Stockton</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_2" name="GLASS_INSERT" value="arched_stockton">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_3">Stockbridge</label>
-					<input type="radio" id="GLASS_INSERT_MORE_3" name="GLASS_INSERT" value="stockbridge" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_3">Stockbridge</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_3" name="GLASS_INSERT" value="stockbridge">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_4">Arched Stockbridge</label>
-					<input type="radio" id="GLASS_INSERT_MORE_4" name="GLASS_INSERT" value="arched_stockbridge" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_4">Arched Stockbridge</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_4" name="GLASS_INSERT" value="arched_stockbridge">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_5">Aluminum Grid - Stockton 4</label>
-					<input type="radio" id="GLASS_INSERT_MORE_5" name="GLASS_INSERT" value="alum_stockton_4" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_5">Aluminum Grid - Stockton 4</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_5" name="GLASS_INSERT" value="alum_stockton_4">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_6">Aluminum Grid - Stockton 6</label>
-					<input type="radio" id="GLASS_INSERT_MORE_6" name="GLASS_INSERT" value="alum_stockton_6" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_6">Aluminum Grid - Stockton 6</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_6" name="GLASS_INSERT" value="alum_stockton_6">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_7">Aluminum Grid - Prairie</label>
-					<input type="radio" id="GLASS_INSERT_MORE_7" name="GLASS_INSERT" value="alum_prairie" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_7">Aluminum Grid - Prairie</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_7" name="GLASS_INSERT" value="alum_prairie">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_8">Aluminum Grid - Stockton 10</label>
-					<input type="radio" id="GLASS_INSERT_MORE_8" name="GLASS_INSERT" value="alum_stockton_10" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_8">Aluminum Grid - Stockton 10</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_8" name="GLASS_INSERT" value="alum_stockton_10">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_9">Square Bar - Stockton 4</label>
-					<input type="radio" id="GLASS_INSERT_MORE_9" name="GLASS_INSERT" value="square_bar_stockton_4" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_9">Square Bar - Stockton 4</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_9" name="GLASS_INSERT"
+                                value="square_bar_stockton_4">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_10">Square Bar - Stockton 6</label>
-					<input type="radio" id="GLASS_INSERT_MORE_10" name="GLASS_INSERT" value="square_bar_stockton_6" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_10">Square Bar - Stockton 6</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_10" name="GLASS_INSERT"
+                                value="square_bar_stockton_6">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_11">Square Bar - Prairie</label>
-					<input type="radio" id="GLASS_INSERT_MORE_11" name="GLASS_INSERT" value="square_bar_prairie" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_11">Square Bar - Prairie</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_11" name="GLASS_INSERT"
+                                value="square_bar_prairie">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_12">Round Bar - Stockton 4</label>
-					<input type="radio" id="GLASS_INSERT_MORE_12" name="GLASS_INSERT" value="round_bar_stockton_4" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_12">Round Bar - Stockton 4</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_12" name="GLASS_INSERT"
+                                value="round_bar_stockton_4">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_13">Round Bar - Stockton 6</label>
-					<input type="radio" id="GLASS_INSERT_MORE_13" name="GLASS_INSERT" value="round_bar_stockton_6" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_13">Round Bar - Stockton 6</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_13" name="GLASS_INSERT"
+                                value="round_bar_stockton_6">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_14">Round Bar - Prairie</label>
-					<input type="radio" id="GLASS_INSERT_MORE_14" name="GLASS_INSERT" value="round_bar_prairie" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_14">Round Bar - Prairie</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_14" name="GLASS_INSERT" value="round_bar_prairie">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_15">Square Bar - Stockton 10</label>
-					<input type="radio" id="GLASS_INSERT_MORE_15" name="GLASS_INSERT" value="square_bar_stockton_10" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_15">Square Bar - Stockton 10</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_15" name="GLASS_INSERT"
+                                value="square_bar_stockton_10">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_16">Round Bar - Stockton 10</label>
-					<input type="radio" id="GLASS_INSERT_MORE_16" name="GLASS_INSERT" value="round_bar_stockton_10" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_16">Round Bar - Stockton 10</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_16" name="GLASS_INSERT"
+                                value="round_bar_stockton_10">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_17">Arched Stockton 3pc Set</label>
-					<input type="radio" id="GLASS_INSERT_MORE_17" name="GLASS_INSERT" value="arched_stockton_3" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_17">Arched Stockton 3pc Set</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_17" name="GLASS_INSERT" value="arched_stockton_3">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_18">Arched Stockbridge 3pc Set</label>
-					<input type="radio" id="GLASS_INSERT_MORE_18" name="GLASS_INSERT" value="arched_stockbridge_3" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_18">Arched Stockbridge 3pc Set</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_18" name="GLASS_INSERT"
+                                value="arched_stockbridge_3">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_19">Berkshire</label>
-					<input type="radio" id="GLASS_INSERT_MORE_19" name="GLASS_INSERT" value="arched_stockton_4" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_19">Berkshire</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_19" name="GLASS_INSERT" value="arched_stockton_4">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_INSERT_MORE_20">Breckenridge</label>
-					<input type="radio" id="GLASS_INSERT_MORE_20" name="GLASS_INSERT" value="arched_stockbridge_4" >
-				</div>
-			</div>
-		</div>
-		<!-- glass inserts end>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_INSERT_MORE_20">Breckenridge</label>
+                            <input type="radio" id="GLASS_INSERT_MORE_20" name="GLASS_INSERT"
+                                value="arched_stockbridge_4">
+                        </div>
+                    </div>
+                </div>
+                <!-- glass inserts end>
 
 		<!--Frame colour -->
-		<div class="dropdown-item" id="FRAME_COLOR">
-			<h3>Frame Colour</h3>
-			<div class="colorChooser">
-				<div class="available">
-					<div class="colorsSection" id="AvailableFrameColorsSection">
-						<div class="stack-wrapper colorContainerInactive bottom">
-							<div aria-labelledby="colors" tabindex="0" id="availableStackFrameColors"
-								class="colorsFieldset"></div>
-							<div class="tooltip">
-								<p>View Most Popular Colors</p>
-							</div>
-						</div>
-						<div class='colorContainer'></div>
-					</div>
-				</div>
-				<div class="optional">
-					<div class="colorsSection" id="OptionalFrameColorsSection">
-						<div class="divider"></div>
-						<div class="stack-wrapper right">
-							<div aria-labelledby="colors" tabindex="0" id="optionalStackFrameColors"
-								class="colorsFieldset"></div>
-							<div class="tooltip">
-								<p>View Other Colors</p>
-							</div>
-						</div>
+                <div class="dropdown-item" id="FRAME_COLOR">
+                    <h3>Frame Colour</h3>
+                    <div class="colorChooser">
+                        <div class="available">
+                            <div class="colorsSection" id="AvailableFrameColorsSection">
+                                <div class="stack-wrapper colorContainerInactive bottom">
+                                    <div aria-labelledby="colors" tabindex="0" id="availableStackFrameColors"
+                                        class="colorsFieldset"></div>
+                                    <div class="tooltip">
+                                        <p>View Most Popular Colors</p>
+                                    </div>
+                                </div>
+                                <div class='colorContainer'></div>
+                            </div>
+                        </div>
+                        <div class="optional">
+                            <div class="colorsSection" id="OptionalFrameColorsSection">
+                                <div class="divider"></div>
+                                <div class="stack-wrapper right">
+                                    <div aria-labelledby="colors" tabindex="0" id="optionalStackFrameColors"
+                                        class="colorsFieldset"></div>
+                                    <div class="tooltip">
+                                        <p>View Other Colors</p>
+                                    </div>
+                                </div>
 
-						<div class='colorContainer colorContainerInactive'></div>
-					</div>
-				</div>
-			</div>
-		</div>
+                                <div class='colorContainer colorContainerInactive'></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-		<!--Insert colour -->
-		<div class="dropdown-item" id="INSERT_COLOR">
-			<h3>Insert Colour</h3>
-			<div class="colorChooser">
-				<div class="available">
-					<div class="colorsSection" id="AvailableInsertColorsSection">
-						<div class="stack-wrapper colorContainerInactive bottom">
-							<div aria-labelledby="colors" tabindex="0" id="availableStackInsertColors"
-								class="colorsFieldset"></div>
-							<div class="tooltip">
-								<p>View Most Popular Colors</p>
-							</div>
-						</div>
-						<div class='colorContainer'></div>
-					</div>
-				</div>
-				<div class="optional">
-					<div class="colorsSection" id="OptionalInsertColorsSection">
-						<div class="divider"></div>
-						<div class="stack-wrapper right">
-							<div aria-labelledby="colors" tabindex="0" id="optionalStackInsertColors"
-								class="colorsFieldset"></div>
-							<div class="tooltip">
-								<p>View Other Colors</p>
-							</div>
-						</div>
+                <!--Insert colour -->
+                <div class="dropdown-item" id="INSERT_COLOR">
+                    <h3>Insert Colour</h3>
+                    <div class="colorChooser">
+                        <div class="available">
+                            <div class="colorsSection" id="AvailableInsertColorsSection">
+                                <div class="stack-wrapper colorContainerInactive bottom">
+                                    <div aria-labelledby="colors" tabindex="0" id="availableStackInsertColors"
+                                        class="colorsFieldset"></div>
+                                    <div class="tooltip">
+                                        <p>View Most Popular Colors</p>
+                                    </div>
+                                </div>
+                                <div class='colorContainer'></div>
+                            </div>
+                        </div>
+                        <div class="optional">
+                            <div class="colorsSection" id="OptionalInsertColorsSection">
+                                <div class="divider"></div>
+                                <div class="stack-wrapper right">
+                                    <div aria-labelledby="colors" tabindex="0" id="optionalStackInsertColors"
+                                        class="colorsFieldset"></div>
+                                    <div class="tooltip">
+                                        <p>View Other Colors</p>
+                                    </div>
+                                </div>
 
-						<div class='colorContainer colorContainerInactive'></div>
-					</div>
-				</div>
-			</div>
-		</div>
+                                <div class='colorContainer colorContainerInactive'></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-		<!-- tempered glass -->
-		<div class = "dropdown-item">
-			<h3>Tempered Glass</h3>
-			<div class="panel-layout">
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_TEMPERED_0">All</label>
-					<input type="radio" class="rw-button-toggle" id="GLASS_TEMPERED_0" name="GLASS_TEMPERED" value="all" >
-				</div>
+                <!-- tempered glass -->
+                <div class="dropdown-item">
+                    <h3>Tempered Glass</h3>
+                    <div class="panel-layout">
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_TEMPERED_0">All</label>
+                            <input type="radio" class="rw-button-toggle" id="GLASS_TEMPERED_0" name="GLASS_TEMPERED"
+                                value="all">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_TEMPERED_1">Bottom</label>
-					<input type="radio" class="rw-button-toggle" id="GLASS_TEMPERED_1" name="GLASS_TEMPERED" value="bottom_1" >
-				</div>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_TEMPERED_1">Bottom</label>
+                            <input type="radio" class="rw-button-toggle" id="GLASS_TEMPERED_1" name="GLASS_TEMPERED"
+                                value="bottom_1">
+                        </div>
 
-				<div class="rw-button panel-button" tabindex="0">
-					<label for="GLASS_TEMPERED_2">Bottom 2</label>
-					<input type="radio" class="rw-button-toggle" id="GLASS_TEMPERED_2" name="GLASS_TEMPERED" value="bottom_2" >
-				</div>
-			</div>
-		</div>
-		<!-- tempered glass end -->
-</section>
+                        <div class="rw-button panel-button" tabindex="0">
+                            <label for="GLASS_TEMPERED_2">Bottom 2</label>
+                            <input type="radio" class="rw-button-toggle" id="GLASS_TEMPERED_2" name="GLASS_TEMPERED"
+                                value="bottom_2">
+                        </div>
+                    </div>
+                </div>
+                <!-- tempered glass end -->
+            </section>
 
             <!-- HARDWARE SECTION -->
             <section face="false" hardware="true" enabled="true" id="HARDWARE" class="rw-configurator__page"
@@ -767,7 +744,7 @@ function loadForm() {
                                         </div>
                                     </div>
                                 </div>
-                                <div class="dropdown-subitem inclined-track" style="width:100%; display:none" >
+                                <div class="dropdown-subitem inclined-track" style="width:100%; display:none">
                                     <h3>Inclined Track</h3>
                                     <div class="combined-button-container">
                                         <div class="combined-button-container-inner">
@@ -832,7 +809,8 @@ function loadForm() {
 
                     <div class="dropdown-item" id="HIGHLIFT_LAYOUT" style="display:none">
                         <div class="range-slider-container">
-                            <h3 id="HIGHLIFT_LABEL" for="HIGHLIFT">Highlift (in) : <span id="HIGHLIFT_VALUE"></span> | Low Headroom (in) : <span id="HEADROOM_VALUE"></span>
+                            <h3 id="HIGHLIFT_LABEL" for="HIGHLIFT">Highlift (in) : <span id="HIGHLIFT_VALUE"></span> |
+                                Low Headroom (in) : <span id="HEADROOM_VALUE"></span>
                             </h3>
                             <input type="range" min="15" max="54" value="17" class="range-slider" id="HIGHLIFT">
                         </div>
@@ -846,14 +824,14 @@ function loadForm() {
                                     <div class="combined-button-container">
                                         <div class="combined-button-container-inner">
                                             <div class="rw-sliding-button selected">
-                                                <label for="10K">10K</label>                                                
-                                                    <input type="radio" style="display:none;" id="10K"
-                                                    name="SPRINGCYCLE" value="10K" checked>
+                                                <label for="10K">10K</label>
+                                                <input type="radio" style="display:none;" id="10K" name="SPRINGCYCLE"
+                                                    value="10K" checked>
                                             </div>
-                                           <div class="rw-sliding-button">
-                                                <label for="20K">20K</label>                                                
-                                                  <input type="radio" style="display:none;" id="20K"
-                                                    name="SPRINGCYCLE" value="20K">
+                                            <div class="rw-sliding-button">
+                                                <label for="20K">20K</label>
+                                                <input type="radio" style="display:none;" id="20K" name="SPRINGCYCLE"
+                                                    value="20K">
                                             </div>
                                         </div>
                                     </div>
@@ -901,8 +879,8 @@ function loadForm() {
                                 </div>
                                 <div class="dropdown-subitem" style="width:100%">
                                     <h3 for="JAMB_SEAL_SCREW_PACKAGES" style="display:flex; gap:6px">Screw Packages
-                                       <a  href="https://easywebdev.rwdoors.com/HTML/products/210005530/help/JambSealChart.pdf" class="info-icon"  target="_blank"
-      rel="noopener noreferrer"> ? </a>
+                                        <a href="https://easywebdev.rwdoors.com/HTML/products/210005530/help/JambSealChart.pdf"
+                                            class="info-icon" target="_blank" rel="noopener noreferrer"> ? </a>
                                     </h3>
                                     <div class="quantity-field">
                                         <button class="value-button decrease-button"
@@ -1214,6 +1192,7 @@ function loadForm() {
             </div>
         </div>
     </div>
+</div>
 `
   //At least one input needs to be loaded in initially to get the title.
   $('#ROOT_0').hide()
@@ -2583,13 +2562,15 @@ function additionalSaves(json) {
 }
 
 function loadGlazingUI() {
-  $('#more_glass_shapes').change(function () {
-    if ($(this).is(':checked')) {
-      $("#more_glass_shapes_container").slideDown();
-    } else {
-      $("#more_glass_shapes_container").slideUp();
-    }
-  });
+  // $('#more_glass_shapes').change(function () {
+  //   if ($(this).is(':checked')) {
+  //     $("#more_glass_shapes_container").slideDown();
+  //   } else {
+  //     $("#more_glass_shapes_container").slideUp();
+  //   }
+  // });
+
+  $('input[name="GLASS_SHAPE"]').prop('checked', false).data('checked', false);
 
   $('#more_glass_types').change(function () {
     if ($(this).is(':checked')) {

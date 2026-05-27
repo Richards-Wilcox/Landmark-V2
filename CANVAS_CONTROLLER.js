@@ -41,14 +41,26 @@ function addRenderNode() {
 		addSlimUi();
 	}, []);
 
-	addLogic("GLASS_INSERT", function () {
-		const glass_shape = $("input[name='GLASS_INSERT']:checked").val();
-		this.value = glass_shape;
 
-		const glass = getState("GLASS_SHAPE");
-		if (glass.includes('slim')) {
-			this.value = "";
+	addNode({
+		id: "GLASS_INSERT",
+		value: "",
+		logic: function () {
+			const glass_insert = $("input[name='GLASS_INSERT']:checked");
+
+			const glass_shape = getState("GLASS_SHAPE") ?? "";
+
+			if (glass_shape.includes("slim")) {
+				this.value = "";
+				return;
+			}
+
+			this.value = {
+				value: glass_insert.attr("value"),
+				insertCode: glass_insert.attr("insertCode"),
+			};
 		}
+
 	}, ["GLASS_SHAPE"]);
 
 	addNode({
@@ -179,7 +191,7 @@ function addRenderNode() {
 		if (glass_shape.includes("grand")) {
 			position = "top";
 		}
-
+  
 		const sections = getState("WINDOW_STATE").sections;
 		const has_glass = sections.some(section => {
 			return section.enabled.some(x => x == true);
@@ -849,7 +861,8 @@ function getDoorInfo() {
 	const color = getState("COLOR");
 	const frame_color = getState("FRAME_COLOR");
 	const insert_color = getState("INSERT_COLOR");
-	const insert = getState("GLASS_INSERT");
+	const insert = getNode("GLASS_INSERT").value;
+
 
 	const [x, y] = getCanvasDoorPosition(width, height);
 
@@ -858,39 +871,39 @@ function getDoorInfo() {
 		hints = false;
 	}
 
-	console.log("door infor", {
-		mouse_x: mouse_x,
-		mouse_y: mouse_y,
-		xpos: x,
-		ypos: y,
+	// console.log("door infor", {
+	// 	mouse_x: mouse_x,
+	// 	mouse_y: mouse_y,
+	// 	xpos: x,
+	// 	ypos: y,
 
-		door_width: width,
-		door_height: height,
-		num_sections: num_sections,
+	// 	door_width: width,
+	// 	door_height: height,
+	// 	num_sections: num_sections,
 
-		special_panel_config: special,
-		glass_shape: glass_shape,
+	// 	special_panel_config: special,
+	// 	glass_shape: glass_shape,
 
-		background: {
-			color: color.hex,
-			pattern_url: url,
-			pattern_scale: scale,
-			frame_color: (frame_color ? frame_color : color).hex,
-			insert_color: (insert_color ? insert_color : color).hex,
-		},
+	// 	background: {
+	// 		color: color.hex,
+	// 		pattern_url: url,
+	// 		pattern_scale: scale,
+	// 		frame_color: (frame_color ? frame_color : color).hex,
+	// 		insert_color: (insert_color ? insert_color : color).hex,
+	// 	},
 
-		insert: insert,
+	// 	insert: insert,
 
-		sections: sections,
-		scale: getScale(width, height),
+	// 	sections: sections,
+	// 	scale: getScale(width, height),
 
-		face: face,
-		misc: {
-			labels: true,
-		},
+	// 	face: face,
+	// 	misc: {
+	// 		labels: true,
+	// 	},
 
-		draw_hints: hints,
-	})
+	// 	draw_hints: hints,
+	// })
 	return {
 		mouse_x: mouse_x,
 		mouse_y: mouse_y,

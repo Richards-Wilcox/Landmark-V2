@@ -21,6 +21,12 @@ function addSectionBundleDrivers() {
         "NUM_OF_SEC"
     ];
 
+    const BUNDLE_DEPS = [
+        ...SECTION_DEPS,
+        "WINDOW_POSITION",
+        "GLASS_SHAPE"
+    ];
+
     addLogic("YLINE_DESC", function () {
         const doorType = "DF"
         let color = getState("COLOR").desc;
@@ -33,48 +39,48 @@ function addSectionBundleDrivers() {
 
 
     //each section heights
-    addLogic("BTM_SECTION", function () {
+    addLogic("SECTION_01", function () {
         let sections = getSectionBundle();
         this.value = sections[0];
     }, SECTION_DEPS)
 
-    addLogic("INT1_SECTION", function () {
+    addLogic("SECTION_02", function () {
         let sections = getSectionBundle();
         this.value = sections[1];
     }, SECTION_DEPS)
 
 
-    addLogic("INT2_SECTION", function () {
+    addLogic("SECTION_03", function () {
         let sections = getSectionBundle();
         this.value = sections[2];
     }, SECTION_DEPS)
 
-    addLogic("INT3_SECTION", function () {
+    addLogic("SECTION_04", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 4 ? sections[3] : "";
     }, SECTION_DEPS)
 
-    addLogic("INT4_SECTION", function () {
+    addLogic("SECTION_05", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 5 ? sections[4] : "";
     }, SECTION_DEPS)
 
-    addLogic("INT5_SECTION", function () {
+    addLogic("SECTION_06", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 6 ? sections[5] : "";
     }, SECTION_DEPS)
 
-    addLogic("INT6_SECTION", function () {
+    addLogic("SECTION_07", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 7 ? sections[6] : "";
     }, SECTION_DEPS)
 
-    addLogic("INT7_SECTION", function () {
+    addLogic("SECTION_08", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 8 ? sections[7] : "";
     }, SECTION_DEPS)
 
-    addLogic("INT8_SECTION", function () {
+    addLogic("SECTION_09", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 9 ? sections[8] : "";
     }, SECTION_DEPS)
@@ -86,7 +92,7 @@ function addSectionBundleDrivers() {
         const bundles = bundleByHeight(getSectionBundle());
         this.value = bundles[0]?.sections?.reduce((a, b) => a + b, 0) ?? 0;
 
-    }, SECTION_DEPS);
+    }, BUNDLE_DEPS);
 
     addLogic("BUNDLE1_SC1_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
@@ -114,7 +120,7 @@ function addSectionBundleDrivers() {
     addLogic("BUNDLE_2_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
         this.value = bundles[1]?.sections?.reduce((a, b) => a + b, 0) ?? 0;
-    }, SECTION_DEPS);
+    }, BUNDLE_DEPS);
 
     addLogic("BUNDLE2_SC1_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
@@ -143,7 +149,7 @@ function addSectionBundleDrivers() {
     addLogic("BUNDLE_3_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
         this.value = bundles[2]?.sections?.reduce((a, b) => a + b, 0) ?? 0;
-    }, SECTION_DEPS);
+    }, BUNDLE_DEPS);
 
     addLogic("BUNDLE3_SC1_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
@@ -172,7 +178,7 @@ function addSectionBundleDrivers() {
     addLogic("BUNDLE_4_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
         this.value = bundles[3]?.sections?.reduce((a, b) => a + b, 0) ?? 0;
-    }, SECTION_DEPS);
+    }, BUNDLE_DEPS);
 
     addLogic("BUNDLE4_SC1_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
@@ -201,7 +207,7 @@ function addSectionBundleDrivers() {
     addLogic("BUNDLE_5_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
         this.value = bundles[4]?.sections?.reduce((a, b) => a + b, 0) ?? 0;
-    }, SECTION_DEPS);
+    }, BUNDLE_DEPS);
 
     addLogic("BUNDLE5_SC1_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
@@ -220,7 +226,7 @@ function addSectionBundleDrivers() {
     addLogic("BUNDLE_6_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
         this.value = bundles[5]?.sections?.reduce((a, b) => a + b, 0) ?? 0;
-    }, SECTION_DEPS);
+    }, BUNDLE_DEPS);
 
     addLogic("BUNDLE6_SC1_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
@@ -239,7 +245,7 @@ function addSectionBundleDrivers() {
     addLogic("BUNDLE_7_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
         this.value = bundles[6]?.sections?.reduce((a, b) => a + b, 0) ?? 0;
-    }, SECTION_DEPS);
+    }, BUNDLE_DEPS);
 
     addLogic("BUNDLE7_SC1_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
@@ -258,7 +264,7 @@ function addSectionBundleDrivers() {
     addLogic("BUNDLE_8_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
         this.value = bundles[7]?.sections?.reduce((a, b) => a + b, 0) ?? 0;
-    }, SECTION_DEPS);
+    }, BUNDLE_DEPS);
 
     addLogic("BUNDLE8_SC1_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
@@ -277,7 +283,7 @@ function addSectionBundleDrivers() {
     addLogic("BUNDLE_9_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
         this.value = bundles[8]?.sections?.reduce((a, b) => a + b, 0) ?? 0;
-    }, SECTION_DEPS);
+    }, BUNDLE_DEPS);
 
     addLogic("BUNDLE9_SC1_HEIGHT", function () {
         const bundles = bundleByHeight(getSectionBundle());
@@ -498,7 +504,7 @@ function addSectionBundleDrivers() {
     addLogic("BUNDLE2_SC2_SPNUM", function () {
         let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
         let bundle2_sc2_qty = getState("BUNDLE2_SC2_QTY");
-        const bundles = bundleByHeight(getSectionBundle());
+        const bundles = bundleByHeight(getSectionBundle());        
         const index = bundles[1] ? bundles[1].indexes[1] : '';
 
         this.value = bundle2_sc2_qty > 0 ? `SC${doorModelId}0${index}` : 'None';
@@ -665,8 +671,10 @@ function addSectionBundleDrivers() {
     // set bundle 1 rp1 part#
     addLogic("BUNDLE1_RP1_SPNUM", function () {
         const height = getState("BUNDLE1_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
-    }, ["DOOR_MODEL"])
+        const bundles = bundleByHeight(getSectionBundle());
+        const index = bundles[0] ? bundles[0].indexes[0] : '';
+        this.value = buildRPSPNum(height, index);
+    }, ["DOOR_MODEL", "BUNDLE1_SC1_HEIGHT", DIMENSION_DEPS])
 
     // set bundle1 rp1 desc
     addLogic("BUNDLE1_RP1_DESC", function () {
@@ -680,8 +688,10 @@ function addSectionBundleDrivers() {
     // set bundle 1 rp2 part#
     addLogic("BUNDLE1_RP2_SPNUM", function () {
         const height = getState("BUNDLE1_SC2_HEIGHT");
-        this.value = buildRPSPNum(height);
-    }, ["DOOR_MODEL"])
+        const bundles = bundleByHeight(getSectionBundle());
+        const index = bundles[0] ? bundles[0].indexes[1] : '';
+        this.value = buildRPSPNum(height, index);
+    }, ["DOOR_MODEL", "BUNDLE1_SC2_HEIGHT", DIMENSION_DEPS])
 
     // set bundle 1 rp2 desc
     addLogic("BUNDLE1_RP2_DESC", function () {
@@ -694,8 +704,10 @@ function addSectionBundleDrivers() {
     // bundle2 rp1 part#
     addLogic("BUNDLE2_RP1_SPNUM", function () {
         const height = getState("BUNDLE2_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
-    }, ["DOOR_MODEL"])
+        const bundles = bundleByHeight(getSectionBundle());
+        const index = bundles[1] ? bundles[1].indexes[0] : '';
+        this.value = buildRPSPNum(height, index);
+    }, ["DOOR_MODEL", "BUNDLE2_SC1_HEIGHT", DIMENSION_DEPS])
 
     // bundle 2 rp1 desc
     addLogic("BUNDLE2_RP1_DESC", function () {
@@ -708,8 +720,10 @@ function addSectionBundleDrivers() {
     // bundle 2 rp2 part#
     addLogic("BUNDLE2_RP2_SPNUM", function () {
         const height = getState("BUNDLE2_SC2_HEIGHT");
-        this.value = buildRPSPNum(height);
-    }, ["DOOR_MODEL"])
+        const bundles = bundleByHeight(getSectionBundle());
+        const index = bundles[1] ? bundles[1].indexes[1] : '';
+        this.value = buildRPSPNum(height, index);
+    }, ["DOOR_MODEL", "BUNDLE2_SC2_HEIGHT", DIMENSION_DEPS])
 
     // bundle 2 rp2 desc
     addLogic("BUNDLE2_RP2_DESC", function () {
@@ -723,7 +737,9 @@ function addSectionBundleDrivers() {
     //bundle 3 rp1 part#
     addLogic("BUNDLE3_RP1_SPNUM", function () {
         const height = getState("BUNDLE3_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
+        const bundles = bundleByHeight(getSectionBundle());
+        const index = bundles[2] ? bundles[2].indexes[0] : '';
+        this.value = buildRPSPNum(height, index);
 
     }, ["DOOR_MODEL", "BUNDLE3_SC1_HEIGHT", DIMENSION_DEPS])
 
@@ -739,7 +755,9 @@ function addSectionBundleDrivers() {
     //bundle3 rp2 
     addLogic("BUNDLE3_RP2_SPNUM", function () {
         const height = getState("BUNDLE3_SC2_HEIGHT");
-        this.value = buildRPSPNum(height);
+        const bundles = bundleByHeight(getSectionBundle());
+        const index = bundles[2] ? bundles[2].indexes[1] : '';
+        this.value = buildRPSPNum(height, index);
     }, ["DOOR_MODEL", "BUNDLE3_SC2_HEIGHT", DIMENSION_DEPS])
 
     //bundle 3 rp2 desc
@@ -755,7 +773,9 @@ function addSectionBundleDrivers() {
     //BUNDLE4 RP1    
     addLogic("BUNDLE4_RP1_SPNUM", function () {
         const height = getState("BUNDLE4_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
+        const bundles = bundleByHeight(getSectionBundle());
+        const index = bundles[3] ? bundles[3].indexes[0] : '';
+        this.value = buildRPSPNum(height, index);
     }, ["DOOR_MODEL", "BUNDLE4_SC1_HEIGHT", DIMENSION_DEPS])
 
     //BUNDLE4 RP1 DESC
@@ -770,7 +790,9 @@ function addSectionBundleDrivers() {
     //bundle4 RP2 PART#
     addLogic("BUNDLE4_RP2_SPNUM", function () {
         const height = getState("BUNDLE4_SC2_HEIGHT");
-        this.value = buildRPSPNum(height);
+        const bundles = bundleByHeight(getSectionBundle());
+        const index = bundles[3] ? bundles[3].indexes[1] : '';
+        this.value = buildRPSPNum(height, index);
 
     }, ["DOOR_MODEL", "BUNDLE4_SC2_HEIGHT", DIMENSION_DEPS])
 
@@ -787,7 +809,9 @@ function addSectionBundleDrivers() {
     //BUNDLE5 RP1    
     addLogic("BUNDLE5_RP1_SPNUM", function () {
         const height = getState("BUNDLE5_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
+        const bundles = bundleByHeight(getSectionBundle());
+        const index = bundles[4] ? bundles[4].indexes[0] : '';
+        this.value = buildRPSPNum(height, index);
     }, ["DOOR_MODEL", "BUNDLE5_SC1_HEIGHT", DIMENSION_DEPS])
 
     //BUNDLE5 RP1 DESC
@@ -804,7 +828,9 @@ function addSectionBundleDrivers() {
     addLogic("BUNDLE6_RP1_SPNUM", function () {
 
         const height = getState("BUNDLE6_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
+        const bundles = bundleByHeight(getSectionBundle());
+        const index = bundles[5] ? bundles[5].indexes[0] : '';
+        this.value = buildRPSPNum(height, index);
 
     }, ["DOOR_MODEL", "BUNDLE6_SC1_HEIGHT", DIMENSION_DEPS])
 
@@ -821,7 +847,9 @@ function addSectionBundleDrivers() {
     //BUNDLE7 RP1    
     addLogic("BUNDLE7_RP1_SPNUM", function () {
         const height = getState("BUNDLE7_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
+        const bundles = bundleByHeight(getSectionBundle());
+        const index = bundles[6] ? bundles[6].indexes[0] : '';
+        this.value = buildRPSPNum(height, index);
 
     }, ["DOOR_MODEL", "BUNDLE7_SC1_HEIGHT", DIMENSION_DEPS])
 
@@ -838,7 +866,9 @@ function addSectionBundleDrivers() {
     //BUNDLE8 RP1    
     addLogic("BUNDLE8_RP1_SPNUM", function () {
         const height = getState("BUNDLE8_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
+        const bundles = bundleByHeight(getSectionBundle());
+        const index = bundles[7] ? bundles[7].indexes[0] : '';
+        this.value = buildRPSPNum(height, index);
 
     }, ["DOOR_MODEL", "BUNDLE8_SC1_HEIGHT", DIMENSION_DEPS])
 
@@ -855,8 +885,9 @@ function addSectionBundleDrivers() {
     //BUNDLE9 RP1    
     addLogic("BUNDLE9_RP1_SPNUM", function () {
         const height = getState("BUNDLE9_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
-
+        const bundles = bundleByHeight(getSectionBundle());
+        const index = bundles[8] ? bundles[8].indexes[0] : '';
+        this.value = buildRPSPNum(height, index);
     }, ["DOOR_MODEL", "BUNDLE9_SC1_HEIGHT", DIMENSION_DEPS])
 
     //BUNDLE7 RP1 DESC
@@ -1276,11 +1307,11 @@ function addSectionBundleDrivers() {
         this.value = getState("BUNDLE_6_HEIGHT") < 32 ? getState("PKG_QTY") : 0
     }, ["BUNDLE_6_HEIGHT"])
 
-     addLogic("BUNDLE_7_PKG_QTY_SGL", function () {
+    addLogic("BUNDLE_7_PKG_QTY_SGL", function () {
         this.value = getState("BUNDLE_7_HEIGHT") < 32 ? getState("PKG_QTY") : 0
     }, ["BUNDLE_7_HEIGHT"])
 
-     addLogic("BUNDLE_8_PKG_QTY_SGL", function () {
+    addLogic("BUNDLE_8_PKG_QTY_SGL", function () {
         this.value = getState("BUNDLE_8_HEIGHT") < 32 ? getState("PKG_QTY") : 0
     }, ["BUNDLE_8_HEIGHT"])
 
@@ -1328,18 +1359,18 @@ function getEndCapsPartNum(section_height, door_model, end_caps) {
     return partNumbers[door_model]?.[end_caps]?.[section_height] || null;
 }
 
-function getSectionHeight(height, num_of_sec) {
-    let stackChart = getStackChart();
-    let configArray = stackChart[String(height)];
+// function getSectionHeight(height, num_of_sec) {
+//     let stackChart = getStackChart();
+//     let configArray = stackChart[String(height)];
 
-    for (let i = 0; i < configArray.length; i++) {
-        const item = configArray[i];
-        if (Number(item.num_sections) === Number(num_of_sec)) {
-            // return item.btm_section_height;
-            return item;
-        }
-    }
-}
+//     for (let i = 0; i < configArray.length; i++) {
+//         const item = configArray[i];
+//         if (Number(item.num_sections) === Number(num_of_sec)) {
+//             // return item.btm_section_height;
+//             return item;
+//         }
+//     }
+// }
 
 // function getSectionBundle() {
 //     let sectionHeights = [];
@@ -1550,118 +1581,309 @@ function getSectionBundle() {
 //     return result;
 // }
 
+// function bundleByHeight() {
+
+//     const width = Number(getState("WIDTH"));
+
+//     const result = [];
+
+//     // =========================================
+//     // WIDTH >= 199
+//     // =========================================
+
+//     if (width >= 199) {
+
+//         const allSections = getSectionBundle();
+
+//         return allSections.map((h, i) => ({
+//             sections: [h],
+//             indexes: [i + 1],
+//             weight: calculateSectionShipWeight(h, false)
+//         }));
+//     }
+
+//     const sections = getSectionBundle();
+
+//     if (!sections.length) {
+//         return result;
+//     }
+
+//     // =========================================
+//     // STEP 1: BOTTOM SECTION ALWAYS SINGLE
+//     // =========================================
+
+//     result.push({
+//         sections: [sections[0]],
+//         indexes: [1],
+//         weight: calculateSectionShipWeight(sections[0], true)
+//     });
+
+//     // =========================================
+//     // STEP 2:
+//     // GROUP SAME HEIGHTS
+//     // PRESERVE FIRST APPEARANCE ORDER
+//     // =========================================
+
+//     const remainingSections = sections.slice(1);
+
+//     const processed = new Set();
+
+//     remainingSections.forEach((height) => {
+
+//         // already handled
+//         if (processed.has(height)) {
+//             return;
+//         }
+
+//         processed.add(height);
+
+//         // collect indexes for this height
+//         const matches = [];
+
+//         remainingSections.forEach((h, idx) => {
+
+//             if (h === height) {
+//                 // +2 because:
+//                 // slice(1) removed first section
+//                 // and indexes are 1-based
+//                 matches.push(idx + 2);
+//             }
+//         });
+
+//         // =====================================
+//         // CREATE PAIRS
+//         // first + last
+//         // =====================================
+
+//         while (matches.length >= 2) {
+
+//             const firstIndex = matches.shift();
+//             // const lastIndex = matches.pop();
+//             const lastIndex = matches.shift();
+
+//             const pairWeight =
+//                 calculateSectionShipWeight(height, false) +
+//                 calculateSectionShipWeight(height, false);
+
+//             if (pairWeight < 150) {
+
+//                 result.push({
+//                     sections: [height, height],
+//                     indexes: [firstIndex, lastIndex],
+//                     weight: pairWeight
+//                 });
+
+//             } else {
+//                 break;
+//             }
+//         }
+
+//         // =====================================
+//         // LEFTOVER SINGLE
+//         // =====================================
+
+//         while (matches.length) {
+
+//             result.push({
+//                 sections: [height],
+//                 indexes: [matches.shift()],
+//                 weight: calculateSectionShipWeight(height, false)
+//             });
+//         }
+//     });
+
+//       console.log("result", result);
+
+//     return result;
+// }
+
+// function bundleByHeight() {
+
+//     const width = Number(getState("WIDTH"));
+//     const sections = getSectionBundle();
+//     const result = [];
+
+//     const window_position = getState("WINDOW_POSITION");
+//     const glass_shape = getState("GLASS_SHAPE");
+
+//     const isGlazed =
+//         window_position &&
+//         window_position !== "undefined" &&
+//         glass_shape &&
+//         glass_shape !== "undefined";
+
+
+
+//     console.log("wind & glass", window_position, glass_shape)
+
+//     if (!sections.length) return result;
+
+//     // =========================================
+//     // WIDTH RULE
+//     // =========================================
+//     if (width >= 199) {
+//         return sections.map((h, i) => ({
+//             sections: [h],
+//             indexes: [i + 1],
+//             weight: calculateSectionShipWeight(h, false)
+//         }));
+//     }
+
+//     // =========================================
+//     // STEP 1: BOTTOM ALWAYS SINGLE
+//     // =========================================
+//     result.push({
+//         sections: [sections[0]],
+//         indexes: [1],
+//         weight: calculateSectionShipWeight(sections[0], true)
+//     });
+
+//     const used = new Array(sections.length).fill(false);
+//     used[0] = true;
+
+//     // =========================================
+//     // STEP 2: FORWARD NEAREST MATCH BUNDLING
+//     // =========================================
+//     for (let i = 1; i < sections.length; i++) {
+
+//         if (used[i]) continue;
+
+//         const height = sections[i];
+//         const bundleIndexes = [i + 1];
+
+//         used[i] = true;
+
+//         // find forward matches
+//         for (let j = i + 1; j < sections.length; j++) {
+
+//             if (!used[j] && sections[j] === height) {
+
+//                 bundleIndexes.push(j + 1);
+//                 used[j] = true;
+//                 break; // ONLY nearest forward match
+//             }
+//         }
+
+//         // weight calculation
+//         const weight = bundleIndexes.reduce((sum, idx) => {
+//             return sum + calculateSectionShipWeight(height, false);
+//         }, 0);
+
+//         result.push({
+//             sections: bundleIndexes.map(() => height),
+//             indexes: bundleIndexes,
+//             weight
+//         });
+//     }
+
+//     return result;
+// }
+
 function bundleByHeight() {
 
     const width = Number(getState("WIDTH"));
+    const sections = getSectionBundle();
+
+    const window_position = getState("WINDOW_POSITION");
+    const glass_shape = getState("GLASS_SHAPE");
+
+    const isGlazed =
+        window_position &&
+        window_position !== "undefined" &&
+        glass_shape &&
+        glass_shape !== "undefined";
 
     const result = [];
 
-    // =========================================
-    // WIDTH >= 199
-    // =========================================
+    if (!sections.length) return result;
 
+    // =========================================
+    // WIDTH RULE
+    // =========================================
     if (width >= 199) {
-
-        const allSections = getSectionBundle();
-
-        return allSections.map((h, i) => ({
+        return sections.map((h, i) => ({
             sections: [h],
             indexes: [i + 1],
             weight: calculateSectionShipWeight(h, false)
         }));
     }
 
-    const sections = getSectionBundle();
+    const used = new Array(sections.length).fill(false);
 
-    if (!sections.length) {
-        return result;
+    // =========================================
+    // GLAZED RULE
+    // TOP + BOTTOM BUNDLE IF SAME HEIGHT
+    // =========================================
+    if (isGlazed) {
+
+        const bottomHeight = sections[0];
+        const topHeight = sections[sections.length - 1];
+
+        if (bottomHeight === topHeight) {
+
+            result.push({
+                sections: [bottomHeight, topHeight],
+                indexes: [1, sections.length],
+                weight:
+                    calculateSectionShipWeight(bottomHeight, true) +
+                    calculateSectionShipWeight(topHeight, false)
+            });
+
+            used[0] = true;
+            used[sections.length - 1] = true;
+        }
     }
 
     // =========================================
-    // STEP 1: BOTTOM SECTION ALWAYS SINGLE
+    // NORMAL RULE
+    // bottom single only if not already used
     // =========================================
+    if (!used[0]) {
 
-    result.push({
-        sections: [sections[0]],
-        indexes: [1],
-        weight: calculateSectionShipWeight(sections[0], true)
-    });
-
-    // =========================================
-    // STEP 2:
-    // GROUP SAME HEIGHTS
-    // PRESERVE FIRST APPEARANCE ORDER
-    // =========================================
-
-    const remainingSections = sections.slice(1);
-
-    const processed = new Set();
-
-    remainingSections.forEach((height) => {
-
-        // already handled
-        if (processed.has(height)) {
-            return;
-        }
-
-        processed.add(height);
-
-        // collect indexes for this height
-        const matches = [];
-
-        remainingSections.forEach((h, idx) => {
-
-            if (h === height) {
-                // +2 because:
-                // slice(1) removed first section
-                // and indexes are 1-based
-                matches.push(idx + 2);
-            }
+        result.push({
+            sections: [sections[0]],
+            indexes: [1],
+            weight: calculateSectionShipWeight(sections[0], true)
         });
 
-        // =====================================
-        // CREATE PAIRS
-        // first + last
-        // =====================================
+        used[0] = true;
+    }
 
-        while (matches.length >= 2) {
+    // =========================================
+    // FORWARD NEAREST MATCH BUNDLING
+    // =========================================
+    for (let i = 1; i < sections.length; i++) {
 
-            const firstIndex = matches.shift();
-            const lastIndex = matches.pop();
+        if (used[i]) continue;
 
-            const pairWeight =
-                calculateSectionShipWeight(height, false) +
-                calculateSectionShipWeight(height, false);
+        const height = sections[i];
+        const bundleIndexes = [i + 1];
 
-            if (pairWeight < 150) {
+        used[i] = true;
 
-                result.push({
-                    sections: [height, height],
-                    indexes: [firstIndex, lastIndex],
-                    weight: pairWeight
-                });
+        // nearest forward same height
+        for (let j = i + 1; j < sections.length; j++) {
 
-            } else {
+            if (!used[j] && sections[j] === height) {
+
+                bundleIndexes.push(j + 1);
+                used[j] = true;
                 break;
             }
         }
 
-        // =====================================
-        // LEFTOVER SINGLE
-        // =====================================
+        const weight = bundleIndexes.reduce((sum) => {
+            return sum + calculateSectionShipWeight(height, false);
+        }, 0);
 
-        while (matches.length) {
+        result.push({
+            sections: bundleIndexes.map(() => height),
+            indexes: bundleIndexes,
+            weight
+        });
+    }
 
-            result.push({
-                sections: [height],
-                indexes: [matches.shift()],
-                weight: calculateSectionShipWeight(height, false)
-            });
-        }
-    });
-
-    //  console.log("result", result);
-
+    // console.log("bundles", result);
     return result;
 }
 
@@ -1792,14 +2014,14 @@ function getSBPrefix(type, height) {
 }
 
 //function to create raw panel part#
-function buildRPSPNum(height, suffix = "01") {
+function buildRPSPNum(height, suffix) {
 
     const doorModelId = getNode("DOOR_MODEL")
         .getAttribute("id")
         .substring(1);
 
     return height > 0
-        ? `SR${doorModelId}${suffix}`
+        ? `SR${doorModelId}0${suffix}`
         : "None";
 
 }
