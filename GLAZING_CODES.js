@@ -24,36 +24,15 @@ function addGlazingCodeLogic() {
         "WINDOW_POSITION",
         "GLAZING_CODE", 
         "WINDOW_1", "WINDOW_1_QTY",
-        "SB1_SPNUM", "SB2_SPNUM", "SB3_SPNUM", "SB4_SPNUM",
-        "BUNDLE1_SC1_SPNUM", "BUNDLE1_SC2_SPNUM",
-        "BUNDLE2_SC1_SPNUM", "BUNDLE2_SC2_SPNUM",
-        "BUNDLE3_SC1_SPNUM", "BUNDLE3_SC2_SPNUM",
-        "BUNDLE4_SC1_SPNUM", "BUNDLE4_SC2_SPNUM",
-        "BUNDLE_1_HEIGHT", "BUNDLE_2_HEIGHT",
-        "BUNDLE_3_HEIGHT", "BUNDLE_4_HEIGHT",
-    ];
-
-    const CNC_DEPS = [
-        // "NUM_OF_SEC",
-        "WINDOW_POSITION",
-        "WINDOW_1_QTY",
-        // "DOOR_THICKNESS",
-        // "LITE_LOCATION",
-        // "WIDTH",
+        "HEIGHT", "WIDTH", "NUM_OF_SEC", "LITE_LOCATION"
+        // "SB1_SPNUM", "SB2_SPNUM", "SB3_SPNUM", "SB4_SPNUM",
         // "BUNDLE1_SC1_SPNUM", "BUNDLE1_SC2_SPNUM",
         // "BUNDLE2_SC1_SPNUM", "BUNDLE2_SC2_SPNUM",
         // "BUNDLE3_SC1_SPNUM", "BUNDLE3_SC2_SPNUM",
         // "BUNDLE4_SC1_SPNUM", "BUNDLE4_SC2_SPNUM",
-        // "BUNDLE1_SC1_HEIGHT", "BUNDLE1_SC2_HEIGHT",
-        // "BUNDLE2_SC1_HEIGHT", "BUNDLE2_SC2_HEIGHT",
-        // "BUNDLE3_SC1_HEIGHT", "BUNDLE3_SC2_HEIGHT",
-        // "BUNDLE4_SC1_HEIGHT", "BUNDLE4_SC2_HEIGHT"
-        // "WINDOW_POSITION",
-        // "GLAZING_CODE",
-        // "NO_GLAZING_CODE",
+        // "BUNDLE_1_HEIGHT", "BUNDLE_2_HEIGHT",
+        // "BUNDLE_3_HEIGHT", "BUNDLE_4_HEIGHT",
     ];
-
-
 
     addLogic("DOOR_THICKNESS", function () {
         let door_model = getState("LM_DOOR_MODEL");
@@ -712,8 +691,7 @@ function getCNCString(section_height, panel_identity) {
         const LOC_Y = buildArray(num_of_windows, location_y);
         const RLL = buildArray(num_of_windows, 0); // placeholder
 
-        let cnc = `${panel_identity},${door_thickness},${lite_location},${rp_width},${section_height},LR`;
-        console.log("cnc", cnc);
+        let cnc = `${panel_identity},${door_thickness},${lite_location},${rp_width},${section_height},LR`;        
 
         // 14 zeros
         cnc += "," + Array(14).fill(0).join(",");

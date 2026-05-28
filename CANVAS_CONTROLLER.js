@@ -158,8 +158,21 @@ function addRenderNode() {
 					}
 				}
 
-				const enabled = (section_enabled.length != positions.length) ?
-					Array(positions.length).fill(false) : Array.from(section_enabled);
+				// const enabled = (section_enabled.length != positions.length) ?
+				// Array(positions.length).fill(false) : Array.from(section_enabled);
+
+
+
+				let enabled;
+
+				if (section_enabled.length === positions.length) {
+					enabled = section_enabled; // ✅ preserve existing clicks
+				} else {
+					enabled = Array(positions.length).fill(false);
+				}
+
+
+
 				if (special && section_glass) {
 					enabled.fill(true);
 				}
@@ -191,7 +204,7 @@ function addRenderNode() {
 		if (glass_shape.includes("grand")) {
 			position = "top";
 		}
-  
+
 		const sections = getState("WINDOW_STATE").sections;
 		const has_glass = sections.some(section => {
 			return section.enabled.some(x => x == true);
@@ -231,96 +244,72 @@ function addRenderNode() {
 		}
 	});
 
-	$('#CONFIG_CANVAS')
-		.on('mousemove', function (event) {
-			canvas_mouse.x = event.offsetX;
-			canvas_mouse.y = event.offsetY;
 
-			if (getState("SLIM_WINDOW_LITES") == "one" && getState("GLASS_SHAPE").includes("slim")) {
-				const layer_obj = getDoorInfo();
-				layer_obj.windows = getState("WINDOW_STATE");
-				CANVAS_PLUGIN.draw(layer_obj);
-			}
-		})
-		.on('mousedown', function (event) {
-			canvas_mouse.is_down = true;
-		})
-		.on('mouseup', function (event) {
-			canvas_mouse.is_down = false;
-		})
-		.on('click', function (event) {
-			if (currentSection != GLAZING_SECTION) return;
+	$(document).off('click.canvasFix');
 
-			const door_width = getState("WIDTH");
-			const door_height = getState("HEIGHT");
-			const num_sections = getState("NUM_OF_SEC");
-			const scale = getScale(door_width, door_height);
-			const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
-			const special_panel_config = getState("SPECIAL_FACE");
+	$(document).on('click.canvasFix', '#CONFIG_CANVAS', function (event) {
+		const door_width = getState("WIDTH");
+		const door_height = getState("HEIGHT");
+		const num_sections = getState("NUM_OF_SEC");
 
-			let changed = false;
-			const windows = getState("WINDOW_STATE");
-			const section_heights = getSectionHeights(door_height, num_sections);
-			for (const [i, section] of windows.sections.entries()) {
-				const panel_width = section.panel_width * scale;
-				const panel_height = section.panel_height * scale;
+		const scale = getScale(door_width, door_height);
+		const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
 
-				const y_offset = (section_heights[i] * scale - panel_height) / 2;
-				const ypos = section_heights.slice(0, i).reduce((acc, val) => acc + val, 0);
-				const py = ypos * scale + canvas_y + y_offset;
-				const positions = section.positions
-					.map(pos => ({ x: pos * scale + canvas_x, y: py }));
+		const windows = getState("WINDOW_STATE");
+		const section_heights = getSectionHeights(door_height, num_sections);
 
-				let index = -1;
-				if (section.slim_one) {
-					if (!section.selected) continue;
-					const section_intersects = isMouseIntersect(canvas_x, ypos * scale + canvas_y,
-						door_width * scale, section_heights[i] * scale);
-					if (!section_intersects) continue;
+		let changed = false;
 
-					const [mouse_x, mouse_y] = getCanvasMousePos();
-					index = section.positions.map(x => x * scale + canvas_x + panel_width / 2)
-						.reduce((bestIdx, currVal, currIdx, arr) => {
-							const currentDist = Math.abs(currVal - mouse_x);
-							const bestDist = Math.abs(arr[bestIdx] - mouse_x);
-							return currentDist < bestDist ? currIdx : bestIdx;
-						}, 0);
-				} else {
-					for (const [i, pos] of positions.entries()) {
-						const intersects = isMouseIntersect(pos.x, pos.y, panel_width, panel_height);
-						if (intersects) {
-							index = i;
-							break;
-						}
-					}
-				}
+		const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
 
-				if (index != -1) {
-					if (special_panel_config) {
-						const enabled = section.enabled[0];
-						windows.sections.forEach(section => section.enabled.fill(false));
-						section.enabled.fill(!enabled);
-					} else if (section.slim_one) {
-						const val = section.enabled[index];
-						section.enabled.fill(false);
-						if (!val) section.enabled[index] = true;
-					} else {
-						section.enabled[index] = !section.enabled[index];
-					}
+		for (const [sIndex, section] of windows.sections.entries()) {
+			const panel_width = section.panel_width * scale;
+			const panel_height = section.panel_height * scale;
+
+			const ypos = section_heights.slice(0, sIndex).reduce((a, b) => a + b, 0);
+			const y_offset = (section_heights[sIndex] * scale - panel_height) / 2;
+			const py = ypos * scale + canvas_y + y_offset;
+
+			for (let i = 0; i < section.positions.length; i++) {
+				const px = section.positions[i] * scale + canvas_x;
+
+				const hit =
+					mouse_x >= px &&
+					mouse_x <= px + panel_width &&
+					mouse_y >= py &&
+					mouse_y <= py + panel_height;
+
+				if (hit) {					
+					section.enabled[i] = !section.enabled[i];
 					changed = true;
 					break;
 				}
 			}
 
-			if (changed) {
-				$(`input[name='WINDOW_POSITION']`)
-					.prop("checked", false)
-					.removeAttr("checked")
-					.data('wasChecked', false)
-					.parent().removeClass("btn-checked");
-				forceRedraw();
-			}
-		});
+			if (changed) break;
+		}
+
+		if (changed) {			
+			CANVAS_PLUGIN.draw(getDoorInfo());
+
+			$(`input[name='WINDOW_POSITION']`).prop("checked", false);
+		} else {
+			// console.log("❌ NO PANEL HIT");
+		}
+	});
+
+
+	$(document).off('mousemove.canvasFix');
+
+	$(document).on('mousemove.canvasFix', '#CONFIG_CANVAS', function (event) {
+		const canvas = this;
+		const rect = canvas.getBoundingClientRect();
+
+		canvas_mouse.x = event.clientX - rect.left;
+		canvas_mouse.y = event.clientY - rect.top;
+	});
+
+
 }
 
 function addSlimUi() {
@@ -420,7 +409,8 @@ function addSlimUi() {
 					// If the click was NOT on the menu AND not on a child of the menu
 					if (!$menu.is(event.target) && $menu.has(event.target).length === 0) {
 						$menu.remove();
-						$document.off('click.slim_menu');
+						// $document.off('click.slim_menu');
+						$(document).off('click.slim_menu');
 					}
 				});
 
@@ -470,24 +460,35 @@ function addSlimUi() {
 	}
 }
 
-function getCanvasMousePos() {
+// function getCanvasMousePos() {
+// 	const canvas = $("#CONFIG_CANVAS")[0];
+// 	const rect = canvas.getBoundingClientRect();
+
+// 	const mouse_x = canvas_mouse.x * (canvas.width / rect.width);
+// 	const mouse_y = canvas_mouse.y * (canvas.height / rect.height);
+// 	return [mouse_x, mouse_y];
+// }
+
+function getCanvasMousePosFromEvent(event) {
 	const canvas = $("#CONFIG_CANVAS")[0];
 	const rect = canvas.getBoundingClientRect();
 
-	const mouse_x = canvas_mouse.x * (canvas.width / rect.width);
-	const mouse_y = canvas_mouse.y * (canvas.height / rect.height);
+	const mouse_x = (event.clientX - rect.left) * (canvas.width / rect.width);
+	const mouse_y = (event.clientY - rect.top) * (canvas.height / rect.height);
+
 	return [mouse_x, mouse_y];
 }
 
 function isMouseIntersect(x, y, width, height) {
-	const [mouse_x, mouse_y] = getCanvasMousePos();
+	const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
 	const intersect_x = mouse_x > x && mouse_x < (x + width);
 	const intersect_y = mouse_y > y && mouse_y < (y + height);
 	return intersect_x && intersect_y;
 }
 
 function forceRedraw() {
-	setState("WINDOW_STATE", getState("WINDOW_STATE"));
+	// setState("WINDOW_STATE", getState("WINDOW_STATE"));
+	CANVAS_PLUGIN.draw(getDoorInfo());
 }
 
 async function renderDoor() {
@@ -843,7 +844,7 @@ function getDoorInfo() {
 	const height = getState("HEIGHT");
 	const num_sections = getState("NUM_OF_SEC");
 
-	const [mouse_x, mouse_y] = getCanvasMousePos();
+	const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
 	const window_info = getState("WINDOW_STATE");
 	const section_heights = getSectionHeights(height, num_sections);
 
@@ -870,40 +871,6 @@ function getDoorInfo() {
 	if (glass_shape.includes('grand') || special) {
 		hints = false;
 	}
-
-	// console.log("door infor", {
-	// 	mouse_x: mouse_x,
-	// 	mouse_y: mouse_y,
-	// 	xpos: x,
-	// 	ypos: y,
-
-	// 	door_width: width,
-	// 	door_height: height,
-	// 	num_sections: num_sections,
-
-	// 	special_panel_config: special,
-	// 	glass_shape: glass_shape,
-
-	// 	background: {
-	// 		color: color.hex,
-	// 		pattern_url: url,
-	// 		pattern_scale: scale,
-	// 		frame_color: (frame_color ? frame_color : color).hex,
-	// 		insert_color: (insert_color ? insert_color : color).hex,
-	// 	},
-
-	// 	insert: insert,
-
-	// 	sections: sections,
-	// 	scale: getScale(width, height),
-
-	// 	face: face,
-	// 	misc: {
-	// 		labels: true,
-	// 	},
-
-	// 	draw_hints: hints,
-	// })
 	return {
 		mouse_x: mouse_x,
 		mouse_y: mouse_y,

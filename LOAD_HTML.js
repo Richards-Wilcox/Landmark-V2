@@ -1197,15 +1197,14 @@ function loadForm() {
   //At least one input needs to be loaded in initially to get the title.
   $('#ROOT_0').hide()
 
-  //$('#accordion9757245').hide(); //hide the inputs from section bundle page
   $('#accordion935516314').hide(); // hide load_html page
   $('#accordion991246024').hide(); //weight controller
   //Hides the outputs
   $('#accordion1406547076').hide()
   $("#accordion1094153584").hide()//Hides the global data for JDE
-  //$("#accordion9757245").hide() //section bundle
+  // $("#accordion9757245").hide() //section bundle
   //$("#accordion321627220").hide() //Glazing code
-  $("#accordion1892755284").hide() //Scheduling code
+  // $("#accordion1892755284").hide() //Scheduling code
 
   //Here is where we add the HTML
   $('.concept-ui-form.scrollable').append(form)
@@ -1630,6 +1629,8 @@ function applyDefaults() {
 
 
 function loadUI() {
+  console.time("TOTAL loadUI");
+
   let serial = $("#header-serial_number").clone()
     .children("label").remove().end()
     .text().trim();
@@ -1645,9 +1646,8 @@ function loadUI() {
 
   appendDrpData();
   toggleSwitch();
-
   // appendAvailableColors();
-  // appendAvailableFrameColors();
+  // appendAvailableFrameColors();  
   appendAvailableColorsTo("#AvaialbleColorsSection");
   appendAvailableColorsTo("#AvailableFrameColorsSection");
   appendOptionalColors();
@@ -1659,14 +1659,12 @@ function loadUI() {
     selectFirstColor($("#AvaialbleColorsSection .colorContainer"));
   });
 
-
   clickHandler();
   initAppEvents();
   getAllInputVal();
   toggleMorePanelSwitch();
   toggleInclinedTrack();
-  // toogleSpringCycle();
-
+  // toogleSpringCycle();  
   loadGlazingUI();
   // setGlassShapeVisibility();
 };

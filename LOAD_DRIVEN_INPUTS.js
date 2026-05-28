@@ -292,68 +292,7 @@ function loadDrivenInputEvents() {
     this.value = $(`input[type="radio"][name="LIFT_TYPE"][checked]`).val()
   }, ["HARDWARE_SET", "SPRINGTYPE", "INCLINEDTRACK"])
 
-
-  // addLogic("GLASS_SHAPE_RANCH", function () {
-
-  //   const face = getState("FACE");
-  //   const doorModel = getState("DOOR_MODEL");
-  //   const width = Number(getState("WIDTH")) || 0;
-  //   const doorColor = getState("COLOR")?.value;
-
-  //   const $ranch = $("#GLASS_SHAPE_RANCH").closest(".rw-button");
-
-  //   const woodTones = ["X", "Y"];
-  //   const isWoodTone = woodTones.includes(doorColor);
-
-  //   let show = false;
-
-  //   //DOOR MODEL G
-
-  //   if (doorModel === "G") {
-
-  //     if (face !== "M") {
-  //       show = true;
-  //     }
-
-  //     $ranch.toggle(show);
-  //     return;
-  //   }
-
-  //   // =========================
-  //   // 2. NORMAL RULES (NON-G)
-  //   // =========================
-
-  //   const allowedFaces = ["R", "C", "B", "S", "T", "F", "V"];
-
-  //   if (!allowedFaces.includes(face)) {
-  //     $ranch.toggle(false);
-  //     return;
-  //   }
-
-  //   switch (face) {
-
-  //     case "C":
-  //       show = isWoodTone
-  //         ? width >= 95
-  //         : !(width >= 76 && width < 95);
-  //       break;
-
-  //     case "B":
-  //       show = width >= 96;
-  //       break;
-
-  //     case "R":
-  //       show = isWoodTone ? width >= 76 : true;
-  //       break;
-
-  //     default:
-  //       show = true;
-  //   }
-
-  //   $ranch.toggle(show);
-
-  // }, ["DOOR_MODEL", "FACE", "WIDTH", "COLOR"]);
-
+  
   createNode(
     "GLASS_SHAPE_VISIBILITY",
     function () {
