@@ -1,5 +1,16 @@
 function loadStyles() {
   const styles = `
+
+// #accordion1094153584,
+// #accordion935516314,
+// #accordion991246024,
+// #accordion1406547076,
+// #accordion9757245,
+// #accordion321627220, #accordion1892755284 {
+//     display: none !important;
+// }
+
+
 .canvas-loader {
   width: 60px;
   height: 60px;

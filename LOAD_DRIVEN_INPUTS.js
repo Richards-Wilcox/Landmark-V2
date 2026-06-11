@@ -389,7 +389,7 @@ function loadDrivenInputEvents() {
 
           }
         } else if (isSlim) {
-          if (width > 96 && allowedFacesSlim.includes(face)) {
+          if (width > 96 && allowedFacesSlim.includes(face) && door_model != 'G') {
             show = true;
           }
         }

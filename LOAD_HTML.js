@@ -1,38 +1,36 @@
+const src_path = "/HTML/products/210005530/";
+
 const AvailableColorImages = [
-  { url: "images/White_2.jpg", value: "W", colorName: "White", hex: "#fdf6ee", desc: "Wht" },
-  { url: "images/Black_2.jpg", value: "K", colorName: "Black", hex: "#211f1e", desc: "Blk" },
-  { url: "images/Iron Ore_2.jpg", value: "V", colorName: "Iron Ore", hex: "#313532", desc: "Ore" },
-  { url: "images/Cafe_2.jpg", value: "F", colorName: "Cafe", hex: "#3b3831", desc: "Cafe" },
+    { url: "images/White_2.jpg", value: "W", colorName: "White", hex: "#fdf6ee", desc: "Wht" },
+    { url: "images/Black_2.jpg", value: "K", colorName: "Black", hex: "#211f1e", desc: "Blk" },
+    { url: "images/Iron Ore_2.jpg", value: "V", colorName: "Iron Ore", hex: "#313532", desc: "Ore" },
+    { url: "images/Cafe_2.jpg", value: "F", colorName: "Cafe", hex: "#3b3831", desc: "Cafe" },
 ];
 
 const OptionalColorImages = [
-  { url: "images/Sandstone_2.jpg", value: "T", colorName: "Sandstone", hex: "#938b7d", desc: "Snd" },
-  { url: "images/Brown_2.jpg", value: "B", colorName: "Brown", hex: "#453a2d", desc: "Brn" },
-  { url: "images/Slate Grey_2.jpg", value: "C", colorName: "Slate Grey", hex: "#626260", desc: "SGr" },
-  { url: "images/Bronze_2.jpg", value: "Z", colorName: "Bronze", hex: "#463a2e", desc: "Brz" },
-  { url: "images/Desert Tan_2.jpg", value: "E", colorName: "Desert Tan", hex: "#bfb6a4", desc: "DTan" },
-  { url: "images/Almond_2.jpg", value: "A", colorName: "Almond", hex: "#d1cbb3", desc: "Alm" },
-  { url: "images/Honey Cedar.png", value: "X", colorName: "Honey Cedar", restricted: true, hex: "#914e27" },
-  { url: "images/Cocoa Hickory.png", value: "Y", colorName: "Cocoa Hickory", restricted: true, hex: "#45261c" }
+    { url: "images/Sandstone_2.jpg", value: "T", colorName: "Sandstone", hex: "#938b7d", desc: "Snd" },
+    { url: "images/Brown_2.jpg", value: "B", colorName: "Brown", hex: "#453a2d", desc: "Brn" },
+    { url: "images/Slate Grey_2.jpg", value: "C", colorName: "Slate Grey", hex: "#626260", desc: "SGr" },
+    { url: "images/Bronze_2.jpg", value: "Z", colorName: "Bronze", hex: "#463a2e", desc: "Brz" },
+    { url: "images/Desert Tan_2.jpg", value: "E", colorName: "Desert Tan", hex: "#bfb6a4", desc: "DTan" },
+    { url: "images/Almond_2.jpg", value: "A", colorName: "Almond", hex: "#d1cbb3", desc: "Alm" },
+    { url: "images/Honey Cedar.png", value: "X", colorName: "Honey Cedar", restricted: true, hex: "#914e27" },
+    { url: "images/Cocoa Hickory.png", value: "Y", colorName: "Cocoa Hickory", restricted: true, hex: "#45261c" }
 ];
 
-const src_path = "/HTML/products/210005530/";
+const woodTones = ["X", "Y"];
 
+//Global State
 let toggle_Switch = 0;
-let door_height = "";
-let panel_style = "";
-let door_model = "";
-let door_color = "";
+
 
 let frameColorUserOverride = false;
 let insertColorUserOverride = false;
 
 
-// Woodtones colors (X, Y)
-const woodTones = ["X", "Y"];
 
 function loadForm() {
-  const form = `
+    const form = `
 	<script src="/HTML/products/162059085/jscripts/panelConfigurations.js"></script>
 
 	<div id="configurator">
@@ -340,8 +338,13 @@ function loadForm() {
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_SHAPE_3">Slim</label>
-                            <input type="radio" id="GLASS_SHAPE_3" name="GLASS_SHAPE" value="slim_single">
+                            <input type="radio" id="GLASS_SHAPE_3" name="GLASS_SHAPE" value="slim_single">                            
                         </div>
+
+                        <div class="rw-button panel-button" tabindex="0">
+					                  <label for="GLASS_SHAPE_SLIM_DBL">Slim Double</label>
+					                  <input type="radio" id="GLASS_SHAPE_SLIM_DBL" name="GLASS_SHAPE" value="slim_double" >
+				                </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_SHAPE_MORE_17">Grand Wrought Iron - Rectangle</label>
@@ -402,19 +405,19 @@ function loadForm() {
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="CLEAR">Clear Sealed</label>
                             <input type="radio" class="rw-button-toggle" id="CLEAR" name="GLASS_TYPE" value="CLEAR"
-                                >
+                               glazingtype = 'double' >
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="CLEAR_SINGLE">Clear Single</label>
                             <input type="radio" class="rw-button-toggle" id="CLEAR_SINGLE" name="GLASS_TYPE"
-                                value="CLEAR_SINGLE">
+                                value="CLEAR_SINGLE" glazingtype = 'single'>
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="SATIN">Satin</label>
                             <input type="radio" class="rw-button-toggle" id="SATIN" name="GLASS_TYPE"
-                                value="SATIN">
+                                value="SATIN" glazingtype = 'double'>
                         </div>
                     </div>
                 </div>
@@ -432,15 +435,15 @@ function loadForm() {
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="OBSCURE_GLASS_PINHEAD">Obscure Pinhead Sealed</label>
                             <input type="radio" id="OBSCURE_GLASS_PINHEAD" name="GLASS_TYPE"
-                                value="OBSCURE_GLASS_PINHEAD">
+                                value="OBSCURE_GLASS_PINHEAD" glazingtype = 'double'>
                         </div>
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="DARK_TINT_SEALED">Dark Tint - Sealed</label>
-                            <input type="radio" id="DARK_TINT_SEALED" name="GLASS_TYPE" value="DARK_TINT_SEALED">
+                            <input type="radio" id="DARK_TINT_SEALED" name="GLASS_TYPE" value="DARK_TINT_SEALED" glazingtype = 'double'>
                         </div>
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="BLACK_SATIN_SEALED">Black Satin - Sealed</label>
-                            <input type="radio" id="BLACK_SATIN_SEALED" name="GLASS_TYPE" value="BLACK_SATIN_SEALED">
+                            <input type="radio" id="BLACK_SATIN_SEALED" name="GLASS_TYPE" value="BLACK_SATIN_SEALED" glazingtype = 'double'>
                         </div>
                     </div>
                 </div>
@@ -1194,433 +1197,476 @@ function loadForm() {
     </div>
 </div>
 `
-  //At least one input needs to be loaded in initially to get the title.
-  $('#ROOT_0').hide()
+    //At least one input needs to be loaded in initially to get the title.
+    $('#ROOT_0').hide()
 
-  $('#accordion935516314').hide(); // hide load_html page
-  $('#accordion991246024').hide(); //weight controller
-  //Hides the outputs
-  $('#accordion1406547076').hide()
-  $("#accordion1094153584").hide()//Hides the global data for JDE
-  // $("#accordion9757245").hide() //section bundle
-  //$("#accordion321627220").hide() //Glazing code
-  // $("#accordion1892755284").hide() //Scheduling code
+    $('#accordion935516314').hide(); // hide load_html page
+    $('#accordion991246024').hide(); //weight controller
+    //Hides the outputs
+    $('#accordion1406547076').hide()
+    $("#accordion1094153584").hide()//Hides the global data for JDE
+    $("#accordion9757245").hide() //section bundle
+    // $("#accordion321627220").hide() //Glazing code
+    // $("#accordion1892755284").hide() //Scheduling code
 
-  //Here is where we add the HTML
-  $('.concept-ui-form.scrollable').append(form)
-  $('.concept-ui-form.scrollable').removeClass('concept-ui-form scrollable')
+    //Here is where we add the HTML
+    $('.concept-ui-form.scrollable').append(form)
+    $('.concept-ui-form.scrollable').removeClass('concept-ui-form scrollable')
 
-  loadUI();
-
-
-  //loadWeightNodes()
-
-  createNode("NEXT_PAGE_BTN_0", function () {
-    if (!isFormValid())
-      this.setAttribute("disabled", 'true')
-    else
-      this.removeAttribute("disabled")
-  }, "container", $("button[name=nextPageBtn]")[0], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
-  createNode("NEXT_PAGE_BTN_1", function () {
-    if (!isFormValid())
-      this.setAttribute("disabled", 'true')
-    else
-      this.removeAttribute("disabled")
-  }, "container", $("button[name=nextPageBtn]")[1], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
-
-  //The save button isn't compatible with a single page configurator
-  $("div.button-set.button-2.location-border button")[0].remove()
-  $("button[onclick='nextPage()']").text("Configure")
+    loadUI();
 
 
-  //Adding indicies to sections
-  $('#configurator section').each((index, e) => { e.setAttribute('index', index) })
-  //I just find this ugly.
-  $(`#collapse1159850199`).remove();
-  $(`#section_select`).on('change', (evt) => {
-    showSection(Number(evt.target.value))
-  })
+    //loadWeightNodes()
 
-  //Load the caching system.
-  rw_init('configurator')
-  loadGlobalNodes()
-  //loadTrussSchedule()
-  //loadPriceDrivers()
+    createNode("NEXT_PAGE_BTN_0", function () {
+        if (!isFormValid())
+            this.setAttribute("disabled", 'true')
+        else
+            this.removeAttribute("disabled")
+    }, "container", $("button[name=nextPageBtn]")[0], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
 
-  //Needed for some minor layout
-  //$('#displayMain').css('margin-bottom', '24px')
-  //$('#displayMain').css('padding', '0 100px')
+    createNode("NEXT_PAGE_BTN_1", function () {
+        if (!isFormValid())
+            this.setAttribute("disabled", 'true')
+        else
+            this.removeAttribute("disabled")
+    }, "container", $("button[name=nextPageBtn]")[1], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
 
-  //populatePrecons()
-
-  //All warnings default to hidden
-  $('.rw-warning').hide()
-  $("#DEFAULTS_PLUGIN").html(DEFAULTS_PLUGIN.load("1825206974"))
-  $('#configurator button').on("click", evt => evt.preventDefault())
-  $('#LOAD_DEFAULTS').on('click', applyDefaults)
-  $("#LIFT_TYPE").change((e) => $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display")))
-  if ($("#INPUT_JSON").val() === '')
-    applyDefaults()
-  else {
-    loadInputValues("configurator");
+    //The save button isn't compatible with a single page configurator
+    $("div.button-set.button-2.location-border button")[0].remove()
+    $("button[onclick='nextPage()']").text("Configure")
 
 
-    $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display"))
-  }
+    //Adding indicies to sections
+    $('#configurator section').each((index, e) => { e.setAttribute('index', index) })
+    //I just find this ugly.
+    $(`#collapse1159850199`).remove();
+    $(`#section_select`).on('change', (evt) => {
+        showSection(Number(evt.target.value))
+    })
 
-  // Changing Color selection and Position
-  $(function () {
+    //Load the caching system.
+    rw_init('configurator')
+    loadGlobalNodes()
+    //loadTrussSchedule()
+    //loadPriceDrivers()
 
-    if ($(".button-set.right").length > 0) {
-      $(".button-set.right").hide();
+    //Needed for some minor layout
+    //$('#displayMain').css('margin-bottom', '24px')
+    //$('#displayMain').css('padding', '0 100px')
+
+    //populatePrecons()
+
+    //All warnings default to hidden
+    $('.rw-warning').hide()
+    $("#DEFAULTS_PLUGIN").html(DEFAULTS_PLUGIN.load("1825206974"))
+    $('#configurator button').on("click", evt => evt.preventDefault())
+    $('#LOAD_DEFAULTS').on('click', applyDefaults)
+    $("#LIFT_TYPE").change((e) => $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display")))
+    if ($("#INPUT_JSON").val() === '')
+        applyDefaults()
+    else {
+        loadInputValues("configurator");
+
+
+        $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display"))
     }
 
-    const observerPosition = new MutationObserver((mutations, obs) => {
 
-      const checkedWindowOption = $('.combined-button-container-inner input[type="radio"]:checked').val();
+    $(function () {
 
-      // if (!checkedWindowOption || checkedWindowOption === 'none') {
-      //     $('.postion-container').css('visibility', 'hidden');
-      //     //$('.postion-container').hide();
-      // } else if (checkedWindowOption === 'slim_40') {
-      //     $('.postion-container').css('visibility', 'visible');
-      //     //$('.postion-container').show();
-      // }
-
-
-      if ($(".window-position-container").length > 0) {
-        const $targetButton = $("#WINDOW_POSITION_3");
-        const $targetWrapper = $targetButton.closest('.rw-button');
-        const $windowsSelected = $("#WINDOWS_1");
-
-        if (isHiddenPosition($targetWrapper) && $windowsSelected.prop("checked") && $targetButton.prop("checked")) {
-          document.querySelector('label[for="WINDOW_POSITION_0"]').click();
-        }
-      }
-    });
-
-    observerPosition.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['class', 'style']
-    });
-
-
-    // Observer for color changes
-    const observer = new MutationObserver((mutations, obs) => {
-      if ($(".color-button").length > 0) {
-        obs.disconnect(); // stops the observer
-
-        setupRadioSelectionTwoButtons("DRILL");
-        setupRadioSelectionTwoButtons("EndCaps");
-        setupRadioSelectionTwoButtons("DOOROPT");
-        setupRadioSelectionTwoButtons("SPRINGTYPE");
-        setupRadioSelectionTwoButtons("EXTRA_TRUSS");
-        setupRadioSelectionTwoButtons("SHAFT");
-        setupRadioSelectionTwoButtons("SPRINGCYCLE");
-        setupRadioSelectionTwoButtons("INCLINEDTRACK");
-
-
-
-        function updatedColorSelection() {
-          $(".color-button-container").removeClass("selected");
-          $(".door-color-text").removeClass("selected");
-          const $selected = $("input[name='COLOR']:checked");
-          $selected.closest(".color-button-container").addClass("selected");
-          $selected.siblings(".door-color-text").addClass("selected");
+        if ($(".button-set.right").length > 0) {
+            $(".button-set.right").hide();
         }
 
-        updatedColorSelection();
+        const observerPosition = new MutationObserver((mutations, obs) => {
 
-        $("input[name='COLOR']").on("change", updatedColorSelection);
-      }
-    });
+            const checkedWindowOption = $('.combined-button-container-inner input[type="radio"]:checked').val();
 
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+            if ($(".window-position-container").length > 0) {
+                const $targetButton = $("#WINDOW_POSITION_3");
+                const $targetWrapper = $targetButton.closest('.rw-button');
+                const $windowsSelected = $("#WINDOWS_1");
 
-    // Carousel Data for Hardware
-    const operatorData = {
-
-      0: {
-        id: "operator_none",
-        name: "None",
-        value: "PS",
-        img: "/HTML/products/162059085/images/Operators_none.png",
-        maxDoorHeight: 1000,
-        isHiLiftCompatible: true,
-        style: ""
-      },
-      1: {
-        id: "operator_jackshaft",
-        name: "98022 - Jackshaft",
-        value: "8500W",
-        img: "/HTML/products/162059085/images/EW-LM-8500W.jpg",
-        maxDoorHeight: 1000,
-        isHiLiftCompatible: true,
-        style: ""
-      },
-      2: {
-        id: "operator_belt",
-        name: "87504-267 -Belt",
-        value: "87504-267",
-        img: "/HTML/products/162059085/images/87504-267.png",
-        maxDoorHeight: 120,
-        isHiLiftCompatible: false,
-        style: ""
-      },
-      3: {
-        id: "operator_chain",
-        name: "83650-267 - Chain",
-        value: "8365W-267",
-        img: "/HTML/products/162059085/images/EW-LM-8365W-267.jpg",
-        maxDoorHeight: 120,
-        isHiLiftCompatible: false,
-        style: ""
-      },
-      4: {
-        id: "operator_chain_2",
-        name: "81650 - Chain",
-        value: "8165W",
-        img: "/HTML/products/162059085/images/EW-LM-8165.jpg",
-        maxDoorHeight: 120,
-        isHiLiftCompatible: false,
-        style: ""
-      },
-      5: {
-        id: "operator_belt_2",
-        name: "81550 - Belt",
-        value: "8155B",
-        img: "/HTML/products/162059085/images/EW-LM-8155B.jpg",
-        maxDoorHeight: 120,
-        isHiLiftCompatible: false,
-        style: ""
-      }
-
-
-    }
-    // Data and default start index
-    const operatorDataArray = Object.values(operatorData);
-    let currentOperatorIndex = 1;
-    let firstTimeLoading = true;
-
-    // Creates the HTML for operator
-    function createOperatorDiv(operator, activeStatus = false) {
-      const operatorItem = document.createElement('div');
-      operatorItem.classList.add('carousel-operator-item');
-
-      if (activeStatus) {
-        operatorItem.classList.add('active');
-      }
-
-      // First make sure images get loaded
-      let retryLoading = false;
-      let retryCounter = 0;
-
-      const image = document.createElement('img');
-      image.src = operator.img;
-
-      if (operator.img === "") {
-        image.style.visibility = 'hidden';
-      } else {
-        image.onload = () => {
-          image.style.visibility = 'visible';
-        }
-
-        image.onerror = () => {
-
-          if (retryCounter < 5) {
-            retryCounter++;
-            setTimeout(() => {
-              image.src = operator.img + '?retry=' + Date.now();
-            }, 1000);
-          } else {
-            image.style.visibility = 'hidden';
-          }
-        }
-      }
-
-      const operatorInnerDiv = document.createElement('div');
-      operatorInnerDiv.classList.add('carousel-operator-image');
-      operatorInnerDiv.appendChild(image);
-
-      const operatorHeader = document.createElement('h3');
-      operatorHeader.textContent = operator.name;
-
-
-      operatorItem.appendChild(operatorInnerDiv);
-      operatorItem.appendChild(operatorHeader);
-
-      return operatorItem;
-    }
-
-
-    // Creates the carousel with the data (temporary needs changing for innf scrolling)
-    function operatorCarouselLoad(indexCurrent) {
-      const content = document.getElementById('operator-carousel-container');
-      const operatorInput = document.getElementById('OPERATOR');
-
-      content.innerHTML = '';
-
-      content.appendChild(createOperatorDiv(operatorDataArray[operatorDataArray.length - 1]));
-      operatorDataArray.forEach((operator, index) => {
-        const operatorItemList = createOperatorDiv(operator, index === indexCurrent);
-        content.appendChild(operatorItemList);
-      });
-      //content.insertBefore(createOperatorDiv(operatorDataArray[operatorDataArray.length-1]), operatorDataArray[0]);
-      content.appendChild(createOperatorDiv(operatorDataArray[0]));
-    }
-
-
-    function updateActiveOperator(index) {
-      const items = document.querySelectorAll('.carousel-operator-item');
-
-      // First set the active tag
-      items.forEach((item, i) => {
-        item.classList.toggle('active', i === index);
-      });
-
-
-      // Due to clones we need to move the index so it it not out of bounds
-      let dataIndex = index - 1;
-
-
-      if (dataIndex < 0) {
-        dataIndex = operatorDataArray.length - 1;
-      } else if (dataIndex >= operatorDataArray.length) {
-        dataIndex = 0;
-      }
-
-      const currentOperator = operatorDataArray[dataIndex];
-      const operatorInput = document.getElementById('OPERATOR');
-      operatorInput.name = currentOperator.name;
-      operatorInput.value = currentOperator.value;
-      !!nodeset['OPERATOR'] ? nodeset['OPERATOR'].value = currentOperator.value : ""
-      !!rw ? rw(getNode("OPERATOR")) : ""
-      operatorInput.dataset.maxDoorHeight = currentOperator.maxDoorHeight;
-      operatorInput.dataset.isHiLiftCompatible = currentOperator.isHiLiftCompatible;
-    }
-
-    function updateCarouselPosition(index) {
-      const carousel = document.getElementById('operator-carousel-container');
-
-      // Prevents slide affect first load
-      if (firstTimeLoading) {
-        carousel.classList.add('no-transition');
-        carousel.style.transform = `translateX(-${index * 100}%)`;
-        firstTimeLoading = false;
-
-        requestAnimationFrame(() => {
-          carousel.classList.remove('no-transition');
+                if (isHiddenPosition($targetWrapper) && $windowsSelected.prop("checked") && $targetButton.prop("checked")) {
+                    document.querySelector('label[for="WINDOW_POSITION_0"]').click();
+                }
+            }
         });
-      } else {
-        carousel.style.transform = `translateX(-${index * 100}%)`;
-      }
-    }
 
-    // Check if carousel buttons are added
-    let buttonsAdded = false;
+        observerPosition.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['class', 'style']
+        });
 
-    // Setup carousel when tab 2 is clicked
-    const observerTab2 = new MutationObserver((mutations, obs) => {
-      //const tab2 = document.getElementById('tab_2');
-      const $tab2 = $('#tab_2');
-      if ($tab2) {
-        obs.disconnect();
-        $('#tab_2').on('click', function () {
 
-          const carouselContainer = document.getElementById('operator-carousel-container');
+        // Observer for color changes
+        const observer = new MutationObserver((mutations, obs) => {
+            if ($(".color-button").length > 0) {
+                obs.disconnect(); // stops the observer
 
-          if (carouselContainer) {
+                setupRadioSelectionTwoButtons("DRILL");
+                setupRadioSelectionTwoButtons("EndCaps");
+                setupRadioSelectionTwoButtons("DOOROPT");
+                setupRadioSelectionTwoButtons("SPRINGTYPE");
+                setupRadioSelectionTwoButtons("EXTRA_TRUSS");
+                setupRadioSelectionTwoButtons("SHAFT");
+                setupRadioSelectionTwoButtons("SPRINGCYCLE");
+                setupRadioSelectionTwoButtons("INCLINEDTRACK");
+
+
+
+                function updatedColorSelection() {
+                    $(".color-button-container").removeClass("selected");
+                    $(".door-color-text").removeClass("selected");
+                    const $selected = $("input[name='COLOR']:checked");
+                    $selected.closest(".color-button-container").addClass("selected");
+                    $selected.siblings(".door-color-text").addClass("selected");
+                }
+
+                updatedColorSelection();
+
+                $("input[name='COLOR']").on("change", updatedColorSelection);
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        // Carousel Data for Hardware
+        const operatorData = {
+
+            0: {
+                id: "operator_none",
+                name: "None",
+                value: "PS",
+                img: "/HTML/products/162059085/images/Operators_none.png",
+                maxDoorHeight: 1000,
+                isHiLiftCompatible: true,
+                style: ""
+            },
+            1: {
+                id: "operator_jackshaft",
+                name: "98022 - Jackshaft",
+                value: "8500W",
+                img: "/HTML/products/162059085/images/EW-LM-8500W.jpg",
+                maxDoorHeight: 1000,
+                isHiLiftCompatible: true,
+                style: ""
+            },
+            2: {
+                id: "operator_belt",
+                name: "87504-267 -Belt",
+                value: "87504-267",
+                img: "/HTML/products/162059085/images/87504-267.png",
+                maxDoorHeight: 120,
+                isHiLiftCompatible: false,
+                style: ""
+            },
+            3: {
+                id: "operator_chain",
+                name: "83650-267 - Chain",
+                value: "8365W-267",
+                img: "/HTML/products/162059085/images/EW-LM-8365W-267.jpg",
+                maxDoorHeight: 120,
+                isHiLiftCompatible: false,
+                style: ""
+            },
+            4: {
+                id: "operator_chain_2",
+                name: "81650 - Chain",
+                value: "8165W",
+                img: "/HTML/products/162059085/images/EW-LM-8165.jpg",
+                maxDoorHeight: 120,
+                isHiLiftCompatible: false,
+                style: ""
+            },
+            5: {
+                id: "operator_belt_2",
+                name: "81550 - Belt",
+                value: "8155B",
+                img: "/HTML/products/162059085/images/EW-LM-8155B.jpg",
+                maxDoorHeight: 120,
+                isHiLiftCompatible: false,
+                style: ""
+            }
+
+
+        }
+        // Data and default start index
+        const operatorDataArray = Object.values(operatorData);
+        let currentOperatorIndex = 1;
+        let firstTimeLoading = true;
+
+        // Creates the HTML for operator
+        function createOperatorDiv(operator, activeStatus = false) {
+            const operatorItem = document.createElement('div');
+            operatorItem.classList.add('carousel-operator-item');
+
+            if (activeStatus) {
+                operatorItem.classList.add('active');
+            }
+
+            // First make sure images get loaded
+            let retryLoading = false;
+            let retryCounter = 0;
+
+            const image = document.createElement('img');
+            image.src = operator.img;
+
+            if (operator.img === "") {
+                image.style.visibility = 'hidden';
+            } else {
+                image.onload = () => {
+                    image.style.visibility = 'visible';
+                }
+
+                image.onerror = () => {
+
+                    if (retryCounter < 5) {
+                        retryCounter++;
+                        setTimeout(() => {
+                            image.src = operator.img + '?retry=' + Date.now();
+                        }, 1000);
+                    } else {
+                        image.style.visibility = 'hidden';
+                    }
+                }
+            }
+
+            const operatorInnerDiv = document.createElement('div');
+            operatorInnerDiv.classList.add('carousel-operator-image');
+            operatorInnerDiv.appendChild(image);
+
+            const operatorHeader = document.createElement('h3');
+            operatorHeader.textContent = operator.name;
+
+
+            operatorItem.appendChild(operatorInnerDiv);
+            operatorItem.appendChild(operatorHeader);
+
+            return operatorItem;
+        }
+
+
+        // Creates the carousel with the data (temporary needs changing for innf scrolling)
+        function operatorCarouselLoad(indexCurrent) {
+            const content = document.getElementById('operator-carousel-container');
+            const operatorInput = document.getElementById('OPERATOR');
+
+            content.innerHTML = '';
+
+            content.appendChild(createOperatorDiv(operatorDataArray[operatorDataArray.length - 1]));
+            operatorDataArray.forEach((operator, index) => {
+                const operatorItemList = createOperatorDiv(operator, index === indexCurrent);
+                content.appendChild(operatorItemList);
+            });
+            //content.insertBefore(createOperatorDiv(operatorDataArray[operatorDataArray.length-1]), operatorDataArray[0]);
+            content.appendChild(createOperatorDiv(operatorDataArray[0]));
+        }
+
+
+        function updateActiveOperator(index) {
+            const items = document.querySelectorAll('.carousel-operator-item');
+
+            // First set the active tag
+            items.forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+
+
+            // Due to clones we need to move the index so it it not out of bounds
+            let dataIndex = index - 1;
+
+
+            if (dataIndex < 0) {
+                dataIndex = operatorDataArray.length - 1;
+            } else if (dataIndex >= operatorDataArray.length) {
+                dataIndex = 0;
+            }
+
+            const currentOperator = operatorDataArray[dataIndex];
+            const operatorInput = document.getElementById('OPERATOR');
+            operatorInput.name = currentOperator.name;
+            operatorInput.value = currentOperator.value;
+            !!nodeset['OPERATOR'] ? nodeset['OPERATOR'].value = currentOperator.value : ""
+            !!rw ? rw(getNode("OPERATOR")) : ""
+            operatorInput.dataset.maxDoorHeight = currentOperator.maxDoorHeight;
+            operatorInput.dataset.isHiLiftCompatible = currentOperator.isHiLiftCompatible;
+        }
+
+        function updateCarouselPosition(index) {
+            const carousel = document.getElementById('operator-carousel-container');
+
+            // Prevents slide affect first load
+            if (firstTimeLoading) {
+                carousel.classList.add('no-transition');
+                carousel.style.transform = `translateX(-${index * 100}%)`;
+                firstTimeLoading = false;
+
+                requestAnimationFrame(() => {
+                    carousel.classList.remove('no-transition');
+                });
+            } else {
+                carousel.style.transform = `translateX(-${index * 100}%)`;
+            }
+        }
+
+        // // Check if carousel buttons are added
+        // let buttonsAdded = false;
+
+        // // Setup carousel when tab 2 is clicked
+        // const observerTab2 = new MutationObserver((mutations, obs) => {      
+        //   const $tab3 = $('#tab_3');
+        //   if ($tab3) {
+        //     obs.disconnect();
+
+        //     $('#tab_3').on('click', function () {
+
+        //       const carouselContainer = document.getElementById('operator-carousel-container');
+
+        //       if (carouselContainer) {
+        //         operatorCarouselLoad(currentOperatorIndex);
+        //         updateSelectedOperator(currentOperatorIndex);
+
+        //         if (!buttonsAdded) {
+
+        //           buttonsAdded = true;
+
+        //           $('#nextButtonOperator').on('click', () => {
+        //             if (currentOperatorIndex > operatorDataArray.length) return;
+        //             currentOperatorIndex++;
+        //             updateSelectedOperator(currentOperatorIndex);
+        //           });
+
+        //           $('#prevButtonOperator').on('click', () => {
+        //             if (currentOperatorIndex <= 0) return;
+        //             currentOperatorIndex--;
+        //             updateSelectedOperator(currentOperatorIndex);
+        //           });
+
+
+        //           carouselContainer.addEventListener('transitionend', () => {
+
+        //             if (currentOperatorIndex > operatorDataArray.length) {
+        //               indexCorrectionList(carouselContainer, 1);
+        //             }
+
+        //             if (currentOperatorIndex <= 0) {
+        //               indexCorrectionList(carouselContainer, operatorDataArray.length);
+        //             }
+        //           });
+        //         }
+        //       } else {
+        //         console.log('Observer missing');
+        //       }
+        //     });
+        //   }
+        // });
+
+        // observerTab2.observe(document.body, {
+        //   childList: true,
+        //   subtree: true
+        // });
+
+
+        function initOperatorCarousel() {
+
+            const container = document.getElementById('operator-carousel-container');
+
+            if (!container || container.dataset.loaded) return;
+
+            console.log("✅ init operator carousel");
+
             operatorCarouselLoad(currentOperatorIndex);
             updateSelectedOperator(currentOperatorIndex);
 
-            if (!buttonsAdded) {
+            container.dataset.loaded = "true";
 
-              buttonsAdded = true;
-
-              $('#nextButtonOperator').on('click', () => {
+            // Buttons (only once)
+            $('#nextButtonOperator').off().on('click', () => {
                 if (currentOperatorIndex > operatorDataArray.length) return;
                 currentOperatorIndex++;
                 updateSelectedOperator(currentOperatorIndex);
-              });
+            });
 
-              $('#prevButtonOperator').on('click', () => {
+            $('#prevButtonOperator').off().on('click', () => {
                 if (currentOperatorIndex <= 0) return;
                 currentOperatorIndex--;
                 updateSelectedOperator(currentOperatorIndex);
-              });
+            });
 
-
-              carouselContainer.addEventListener('transitionend', () => {
-
+            // Infinite loop fix
+            container.addEventListener('transitionend', () => {
                 if (currentOperatorIndex > operatorDataArray.length) {
-                  indexCorrectionList(carouselContainer, 1);
+                    indexCorrectionList(container, 1);
                 }
 
                 if (currentOperatorIndex <= 0) {
-                  indexCorrectionList(carouselContainer, operatorDataArray.length);
+                    indexCorrectionList(container, operatorDataArray.length);
                 }
-              });
+            });
+        }
+
+        // Update data list selection and update positioning
+        function updateSelectedOperator(index) {
+            updateCarouselPosition(index);
+            updateActiveOperator(index);
+        }
+
+        // Move to the correct index for infinite loop
+        function indexCorrectionList(container, index) {
+            container.style.transition = 'none';
+            currentOperatorIndex = index;
+            updateSelectedOperator(currentOperatorIndex);
+
+            requestAnimationFrame(() => {
+                container.style.transition = 'transform 0.3s ease';
+            });
+        }
+
+
+
+        // Helper function to check if parent child exists
+        function isHiddenPosition($btn) {
+            return $btn.length === 0 || $btn[0].offsetParent === null;
+        }
+
+        // Adding selector (temporary)
+        function setupRadioSelectionTwoButtons(radioName) {
+            function updateSelection() {
+                // Remove selected from all containers of this group
+                $(`input[name="${radioName}"]`).each(function () {
+                    $(this).closest(".rw-sliding-button").removeClass("selected");
+                });
+
+                // Add selected to the currently checked one
+                const $selected = $(`input[name="${radioName}"]:checked`);
+                $selected.closest(".rw-sliding-button").addClass("selected");
             }
-          } else {
-            console.log('Observer missing');
-          }
-        });
-      }
-    });
 
-    observerTab2.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+            updateSelection();
 
+            $(`input[name="${radioName}"]`).on("change", updateSelection);
+        }
 
-    // Update data list selection and update positioning
-    function updateSelectedOperator(index) {
-      updateCarouselPosition(index);
-      updateActiveOperator(index);
-    }
+        // ✅ Load carousel when navigating pages
+        $(document).on('click', '.button-nextpage, #NAVIGATION_SPC', function () {
 
-    // Move to the correct index for infinite loop
-    function indexCorrectionList(container, index) {
-      container.style.transition = 'none';
-      currentOperatorIndex = index;
-      updateSelectedOperator(currentOperatorIndex);
+            setTimeout(() => {
 
-      requestAnimationFrame(() => {
-        container.style.transition = 'transform 0.3s ease';
-      });
-    }
+                if ($("#OPERATOR_OPTIONS").is(':visible')) {
+                    initOperatorCarousel();
+                }
 
-
-
-    // Helper function to check if parent child exists
-    function isHiddenPosition($btn) {
-      return $btn.length === 0 || $btn[0].offsetParent === null;
-    }
-
-    // Adding selector (temporary)
-    function setupRadioSelectionTwoButtons(radioName) {
-      function updateSelection() {
-        // Remove selected from all containers of this group
-        $(`input[name="${radioName}"]`).each(function () {
-          $(this).closest(".rw-sliding-button").removeClass("selected");
+            }, 100);
         });
 
-        // Add selected to the currently checked one
-        const $selected = $(`input[name="${radioName}"]:checked`);
-        $selected.closest(".rw-sliding-button").addClass("selected");
-      }
-
-      updateSelection();
-
-      $(`input[name="${radioName}"]`).on("change", updateSelection);
-    }
-  });
+    });
 }
 
 function applyDefaults() {
@@ -1629,193 +1675,189 @@ function applyDefaults() {
 
 
 function loadUI() {
-  console.time("TOTAL loadUI");
+    let serial = $("#header-serial_number").clone()
+        .children("label").remove().end()
+        .text().trim();
 
-  let serial = $("#header-serial_number").clone()
-    .children("label").remove().end()
-    .text().trim();
+    // Insert the serial number
+    $("#SERIAL_CONTAINER").append(`<h3>Serial Number: ${serial}</h3>`);
 
-  // Insert the serial number
-  $("#SERIAL_CONTAINER").append(`<h3>Serial Number: ${serial}</h3>`);
+    //hide the header that coming from the revalize
+    $("#ui-info").hide();
 
-  //hide the header that coming from the revalize
-  $("#ui-info").hide();
+    //hide the footer buttons
+    $(".bottom-buttons").hide();
 
-  //hide the footer buttons
-  $(".bottom-buttons").hide();
+    appendDrpData();
+    toggleSwitch();
+    // appendAvailableColors();
+    // appendAvailableFrameColors();  
+    appendAvailableColorsTo("#AvaialbleColorsSection");
+    appendAvailableColorsTo("#AvailableFrameColorsSection");
+    appendOptionalColors();
+    appendOverlappingColors();
+    toggleStackColors();
+    //registerColorEvents();
+    // 🔥 WAIT FOR DOM TO BE READY
+    requestAnimationFrame(() => {
+        selectFirstColor($("#AvaialbleColorsSection .colorContainer"));
+    });
 
-  appendDrpData();
-  toggleSwitch();
-  // appendAvailableColors();
-  // appendAvailableFrameColors();  
-  appendAvailableColorsTo("#AvaialbleColorsSection");
-  appendAvailableColorsTo("#AvailableFrameColorsSection");
-  appendOptionalColors();
-  appendOverlappingColors();
-  toggleStackColors();
-  //registerColorEvents();
-  // 🔥 WAIT FOR DOM TO BE READY
-  requestAnimationFrame(() => {
-    selectFirstColor($("#AvaialbleColorsSection .colorContainer"));
-  });
-
-  clickHandler();
-  initAppEvents();
-  getAllInputVal();
-  toggleMorePanelSwitch();
-  toggleInclinedTrack();
-  // toogleSpringCycle();  
-  loadGlazingUI();
-  // setGlassShapeVisibility();
+    clickHandler();
+    initAppEvents();
+    toggleMorePanelSwitch();
+    toggleInclinedTrack();
+    // toogleSpringCycle();  
+    loadGlazingUI();
 };
 
 
 function clickHandler() {
-  // Attach to all radios except color radios
+    // Attach to all radios except color radios
 
-  $("input[type='radio']")
-    .not("input[name='AVAILABLE_COLOR'], input[name='OPTIONAL_COLOR']")
-    .on("click", function (e) {
+    $("input[type='radio']")
+        .not("input[name='AVAILABLE_COLOR'], input[name='OPTIONAL_COLOR']")
+        .on("click", function (e) {
 
-      const group = e.target.name;
+            const group = e.target.name;
 
-      // Remove active class + unchecked
-      $(`input[name='${group}']`).each((i, radio) => {
-        $(radio).prop("checked", false).removeAttr("checked");
-        $(radio).parent().removeClass("btn-checked");
-      });
+            // Remove active class + unchecked
+            $(`input[name='${group}']`).each((i, radio) => {
+                $(radio).prop("checked", false).removeAttr("checked");
+                $(radio).parent().removeClass("btn-checked");
+            });
 
-      // Check this radio
-      $(this).prop("checked", true).prop("checked", true);
-      // Add class to selected
-      $(this).parent().addClass("btn-checked");
+            // Check this radio
+            $(this).prop("checked", true).prop("checked", true);
+            // Add class to selected
+            $(this).parent().addClass("btn-checked");
+        });
+
+    $("input[type='radio'].rw-button-toggle")
+        .off()
+        .on("click", function (e) {
+            const group = e.target.name;
+            const checked = $(this).data('wasChecked');
+
+            // Remove active class + unchecked
+            $(`input[name='${group}']`)
+                .prop("checked", false)
+                .removeAttr("checked")
+                .data('wasChecked', false)
+                .parent().removeClass("btn-checked");
+
+            $(this)
+                .prop("checked", !checked)
+                .data("wasChecked", !checked)
+                .parent().toggleClass("btn-checked", !checked);
+            if (checked) {
+                rw(getNode(group));
+            }
+        });
+
+    // Initial check styling
+    $("input[type='radio']:checked")
+        .not("input[name='AVAILABLE_COLOR'], input[name='OPTIONAL_COLOR']")
+        .each(function () {
+            $(this).parent().addClass("btn-checked");
+        });
+
+
+    //select and deselect the inputs on glazing tab
+    $('input[name="GLASS_SHAPE"]').on('click', function () {
+
+        if ($(this).data('checked')) {
+            $(this).prop('checked', false);
+            $(this).data('checked', false);
+        } else {
+            $('input[name="GLASS_SHAPE"]').data('checked', false);
+            $(this).data('checked', true);
+            $(this).prop('checked', true);
+        }
+
     });
-
-  $("input[type='radio'].rw-button-toggle")
-    .off()
-    .on("click", function (e) {
-      const group = e.target.name;
-      const checked = $(this).data('wasChecked');
-
-      // Remove active class + unchecked
-      $(`input[name='${group}']`)
-        .prop("checked", false)
-        .removeAttr("checked")
-        .data('wasChecked', false)
-        .parent().removeClass("btn-checked");
-
-      $(this)
-        .prop("checked", !checked)
-        .data("wasChecked", !checked)
-        .parent().toggleClass("btn-checked", !checked);
-      if (checked) {
-        rw(getNode(group));
-      }
-    });
-
-  // Initial check styling
-  $("input[type='radio']:checked")
-    .not("input[name='AVAILABLE_COLOR'], input[name='OPTIONAL_COLOR']")
-    .each(function () {
-      $(this).parent().addClass("btn-checked");
-    });
-
-
-  //select and deselect the inputs on glazing tab
-  $('input[name="GLASS_SHAPE"]').on('click', function () {
-
-    if ($(this).data('checked')) {
-      $(this).prop('checked', false);
-      $(this).data('checked', false);
-    } else {
-      $('input[name="GLASS_SHAPE"]').data('checked', false);
-      $(this).data('checked', true);
-      $(this).prop('checked', true);
-    }
-
-  });
 
 }
 
 function selectFirstColor($container) {
-  // const $items = $container.find(".color-button-container");
+    // const $items = $container.find(".color-button-container");
 
-  // if (!$items.length) return;
+    // if (!$items.length) return;
 
-  // $items.removeClass("selected");
+    // $items.removeClass("selected");
 
-  // const $first = $items.first();
-  // $first.addClass("selected");
+    // const $first = $items.first();
+    // $first.addClass("selected");
 
-  // $container.find("input[type='radio'][name='COLOR']").prop("checked", false);
+    // $container.find("input[type='radio'][name='COLOR']").prop("checked", false);
 
-  // const $radio = $first.find("input[type='radio']");
-  // $radio.prop("checked", true).trigger("change");
+    // const $radio = $first.find("input[type='radio']");
+    // $radio.prop("checked", true).trigger("change");
 
-  const $items = $container.find(".color-button-container");
+    const $items = $container.find(".color-button-container");
 
-  if (!$items.length) return;
+    if (!$items.length) return;
 
-  // clear UI selection in THIS container only
-  $items.removeClass("selected");
+    // clear UI selection in THIS container only
+    $items.removeClass("selected");
 
-  const $first = $items.first().addClass("selected");
+    const $first = $items.first().addClass("selected");
 
-  const $radio = $first.find("input[type='radio']");
+    const $radio = $first.find("input[type='radio']");
 
-  const name = $radio.attr("name");
+    const name = $radio.attr("name");
 
-  // uncheck ONLY this group
-  $container
-    .find(`input[type='radio'][name='${name}']`)
-    .prop("checked", false);
+    // uncheck ONLY this group
+    $container
+        .find(`input[type='radio'][name='${name}']`)
+        .prop("checked", false);
 
-  // check first
-  $radio.prop("checked", true).trigger("change");
+    // check first
+    $radio.prop("checked", true).trigger("change");
 
 
 }
 
 
 function appendOverlappingColors() {
-  const $optionalfieldset = $("#optionalStackColors"); // target the colorsFieldset
-  const $availablefieldset = $("#availableStackColors");
+    const $optionalfieldset = $("#optionalStackColors"); // target the colorsFieldset
+    const $availablefieldset = $("#availableStackColors");
 
-  if (!$optionalfieldset.length) {
-    return;
-  }
+    if (!$optionalfieldset.length) {
+        return;
+    }
 
-  if (!$availablefieldset.length) {
-    return;
-  }
+    if (!$availablefieldset.length) {
+        return;
+    }
 
-  // Use only the first 3 images
-  const optionalimagesToShow = OptionalColorImages.slice(0, 3);
-  const AvailableimagesToShow = AvailableColorImages.slice(0, 3);
+    // Use only the first 3 images
+    const optionalimagesToShow = OptionalColorImages.slice(0, 3);
+    const AvailableimagesToShow = AvailableColorImages.slice(0, 3);
 
 
-  // Clear existing content
-  $optionalfieldset.empty();
-  $availablefieldset.empty();
+    // Clear existing content
+    $optionalfieldset.empty();
+    $availablefieldset.empty();
 
-  // Append each image
-  optionalimagesToShow.forEach((imgSrc, index) => {
-    const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
-    $optionalfieldset.append(html);
-  });
+    // Append each image
+    optionalimagesToShow.forEach((imgSrc, index) => {
+        const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
+        $optionalfieldset.append(html);
+    });
 
-  AvailableimagesToShow.forEach((imgSrc, index) => {
-    const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
-    $availablefieldset.append(html);
-  });
+    AvailableimagesToShow.forEach((imgSrc, index) => {
+        const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
+        $availablefieldset.append(html);
+    });
 }
 
 function appendAvailableColorsTo(containerSelector) {
-  const $container = $(containerSelector + " .colorContainer");
-  $container.empty();
+    const $container = $(containerSelector + " .colorContainer");
+    $container.empty();
 
-  AvailableColorImages.forEach((imgSrc) => {
-    const html = `
+    AvailableColorImages.forEach((imgSrc) => {
+        const html = `
       <div class="color-button-container">
         <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
           <img src="${src_path + imgSrc.url}" class="color-image" />
@@ -1832,46 +1874,46 @@ function appendAvailableColorsTo(containerSelector) {
       </div>
     `;
 
-    $container.append(html);
-  });
+        $container.append(html);
+    });
 
-  registerColorEvents();
+    registerColorEvents();
 }
 
 
 function appendColorsTo(containerSelector, colorArray, panel_style = null) {
 
-  const $container = $(containerSelector + " .colorContainer");
-  $container.empty();
+    const $container = $(containerSelector + " .colorContainer");
+    $container.empty();
 
-  let filteredColors = colorArray;
+    let filteredColors = colorArray;
 
-  // Apply panel style filtering only if panel_style is provided
-  if (panel_style) {
-    filteredColors = colorArray
-      .filter(item => {
-        // Remove 2 specific colors for F or T
-        if (
-          (panel_style === "F" || panel_style === "T") &&
-          ["Cocoa Hickory", "Honey Cedar"].includes(item.value)
-        ) {
-          return false;
-        }
+    // Apply panel style filtering only if panel_style is provided
+    if (panel_style) {
+        filteredColors = colorArray
+            .filter(item => {
+                // Remove 2 specific colors for F or T
+                if (
+                    (panel_style === "F" || panel_style === "T") &&
+                    ["Cocoa Hickory", "Honey Cedar"].includes(item.value)
+                ) {
+                    return false;
+                }
 
-        // Remove restricted colors
-        if (
-          (panel_style === "F" || panel_style === "T") &&
-          item.restricted
-        ) {
-          return false;
-        }
+                // Remove restricted colors
+                if (
+                    (panel_style === "F" || panel_style === "T") &&
+                    item.restricted
+                ) {
+                    return false;
+                }
 
-        return true;
-      });
-  }
+                return true;
+            });
+    }
 
-  filteredColors.forEach(imgSrc => {
-    const html = `
+    filteredColors.forEach(imgSrc => {
+        const html = `
       <div class="color-button-container">
         <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
           <img src="${src_path + imgSrc.url}" class="color-image" />
@@ -1888,324 +1930,322 @@ function appendColorsTo(containerSelector, colorArray, panel_style = null) {
       </div>
     `;
 
-    $container.append(html);
-  });
+        $container.append(html);
+    });
 
-  registerColorEvents();
-  // 🔥 IMPORTANT FIX: re-select AFTER filtering
-  requestAnimationFrame(() => {
-    selectFirstColor($container);
-  });
+    registerColorEvents();
+    // 🔥 IMPORTANT FIX: re-select AFTER filtering
+    requestAnimationFrame(() => {
+        selectFirstColor($container);
+    });
 }
 
 function appendOptionalColors(panel_style) {
-  appendColorsTo("#OptionalColorsSection", OptionalColorImages, panel_style);
+    appendColorsTo("#OptionalColorsSection", OptionalColorImages, panel_style);
 }
 
 function registerColorEvents() {
-  // $(document).on("click", ".color-button-container", function () {
-  //   const $container = $(this).closest(".colorContainer");
+    // $(document).on("click", ".color-button-container", function () {
+    //   const $container = $(this).closest(".colorContainer");
 
-  //   // 1) Remove selected class from ALL color containers
-  //   $(".color-button-container").removeClass("selected");
+    //   // 1) Remove selected class from ALL color containers
+    //   $(".color-button-container").removeClass("selected");
 
-  //   // 2) Add selected class to clicked container
-  //   $(this).addClass("selected");
-  //   // 3) Uncheck all radios
-  //   $(`input[type='radio'][name='COLOR']`).prop("checked", false);
+    //   // 2) Add selected class to clicked container
+    //   $(this).addClass("selected");
+    //   // 3) Uncheck all radios
+    //   $(`input[type='radio'][name='COLOR']`).prop("checked", false);
 
-  //   // 4) Check only clicked radio
-  //   $(this).find(`input[type='radio']`).prop("checked", true).trigger("change");
-  // });
+    //   // 4) Check only clicked radio
+    //   $(this).find(`input[type='radio']`).prop("checked", true).trigger("change");
+    // });
 
-  $(document).on("click", ".color-button-container", function () {
-    const $container = $(this).closest(".colorContainer");
+    $(document).on("click", ".color-button-container", function () {
+        const $container = $(this).closest(".colorContainer");
 
-    // ── Scope to THIS container only, not all color buttons globally ──
-    $container.find(".color-button-container").removeClass("selected");
-    $(this).addClass("selected");
+        // ── Scope to THIS container only, not all color buttons globally ──
+        $container.find(".color-button-container").removeClass("selected");
+        $(this).addClass("selected");
 
-    const inputName = $(this).find("input[type='radio']").attr("name");
+        const inputName = $(this).find("input[type='radio']").attr("name");
 
-    $container.find(`input[type='radio'][name='${inputName}']`).prop("checked", false);
-    $(this).find(`input[type='radio']`).prop("checked", true).trigger("change");
-  });
+        $container.find(`input[type='radio'][name='${inputName}']`).prop("checked", false);
+        $(this).find(`input[type='radio']`).prop("checked", true).trigger("change");
+    });
 
 
 
-  // $(document)
-  //   .off("click.colorSelect")
-  //   .on("click.colorSelect", ".color-button-container", function () {
+    // $(document)
+    //   .off("click.colorSelect")
+    //   .on("click.colorSelect", ".color-button-container", function () {
 
-  //     const $container = $(this).closest(".colorContainer");
+    //     const $container = $(this).closest(".colorContainer");
 
-  //     $(".color-button-container", $container).removeClass("selected");
-  //     $(this).addClass("selected");
+    //     $(".color-button-container", $container).removeClass("selected");
+    //     $(this).addClass("selected");
 
-  //     $("input[type='radio'][name='COLOR']").prop("checked", false);
-  //     $(this).find("input[type='radio']").prop("checked", true).trigger("change");
-  //   });
+    //     $("input[type='radio'][name='COLOR']").prop("checked", false);
+    //     $(this).find("input[type='radio']").prop("checked", true).trigger("change");
+    //   });
 }
 
 
 function animateTransition() {
-  // Force browser reflow so transitions actually animate
-  document.body.offsetHeight;
+    // Force browser reflow so transitions actually animate
+    document.body.offsetHeight;
 }
 
 function toggleStackColors() {
-  //function to hide stack image
-  //stack images means the 3 overlap color img design
-  const hideStack = ($fs) => {
-    $fs.closest(".stack-wrapper").addClass("colorContainerInactive");
-  };
+    //function to hide stack image
+    //stack images means the 3 overlap color img design
+    const hideStack = ($fs) => {
+        $fs.closest(".stack-wrapper").addClass("colorContainerInactive");
+    };
 
-  //function to show stack images
-  const showStack = ($fs) => {
-    $fs.closest(".stack-wrapper").removeClass("colorContainerInactive");
-    $fs.addClass("slide-in");
+    //function to show stack images
+    const showStack = ($fs) => {
+        $fs.closest(".stack-wrapper").removeClass("colorContainerInactive");
+        $fs.addClass("slide-in");
 
-    setTimeout(() => {
-      $fs.removeClass("slide-in");
-    }, 500);
+        setTimeout(() => {
+            $fs.removeClass("slide-in");
+        }, 500);
 
-  };
+    };
 
-  //function to show active or optional colors - not the stack colors
-  const showContainer = ($c) => {
-    $c.removeClass("colorContainerInactive");
-    // Add slide-in effect
-    $c.addClass("slide-in");
+    //function to show active or optional colors - not the stack colors
+    const showContainer = ($c) => {
+        $c.removeClass("colorContainerInactive");
+        // Add slide-in effect
+        $c.addClass("slide-in");
 
-    setTimeout(() => {
-      $c.removeClass("slide-in");
-    }, 500);
-  };
+        setTimeout(() => {
+            $c.removeClass("slide-in");
+        }, 500);
+    };
 
-  //const showContainer = ($c) => $c.removeClass("colorContainerInactive");
-  const hideContainer = ($c) => $c.addClass("colorContainerInactive");
-
-
-  $("#optionalStackColors").on("click", function () {
-    setTimeout(animateTransition, 20);
-
-    showContainer($("#OptionalColorsSection .colorContainer"));
-    showStack($("#availableStackColors"));
-
-    hideStack($("#optionalStackColors"));
-    hideContainer($("#AvaialbleColorsSection .colorContainer"));
+    //const showContainer = ($c) => $c.removeClass("colorContainerInactive");
+    const hideContainer = ($c) => $c.addClass("colorContainerInactive");
 
 
-    const $optional = $("#OptionalColorsSection .colorContainer");
-    selectFirstColor($optional);
+    $("#optionalStackColors").on("click", function () {
+        setTimeout(animateTransition, 20);
 
-    rw(getNode("COLOR"))
-  });
+        showContainer($("#OptionalColorsSection .colorContainer"));
+        showStack($("#availableStackColors"));
 
-  $("#optionalStackFrameColors").on("click", function () {
-    setTimeout(animateTransition, 20);
-    hideStack($("#optionalStackFrameColors"));
-    showContainer($("#OptionalFrameColorsSection .colorContainer"));
-    hideContainer($("#AvailableFrameColorsSection .colorContainer"));
-    showStack($("#availableStackFrameColors"));
-    registerColorEvents();
-    // rw(getNode("COLOR"))
-  });
-
-  $("#optionalStackInsertColors").on("click", function () {
-    setTimeout(animateTransition, 20);
-    hideStack($("#optionalStackInsertColors"));
-    showContainer($("#OptionalInsertColorsSection .colorContainer"));
-    hideContainer($("#AvailableInsertColorsSection .colorContainer"));
-    showStack($("#availableStackInsertColors"));
-    registerColorEvents();
-    // rw(getNode("COLOR"))
-  });
+        hideStack($("#optionalStackColors"));
+        hideContainer($("#AvaialbleColorsSection .colorContainer"));
 
 
+        const $optional = $("#OptionalColorsSection .colorContainer");
+        selectFirstColor($optional);
 
-  $("#availableStackColors").on("click", function () {
+        rw(getNode("COLOR"))
+    });
 
-    setTimeout(animateTransition, 20);
+    $("#optionalStackFrameColors").on("click", function () {
+        setTimeout(animateTransition, 20);
+        hideStack($("#optionalStackFrameColors"));
+        showContainer($("#OptionalFrameColorsSection .colorContainer"));
+        hideContainer($("#AvailableFrameColorsSection .colorContainer"));
+        showStack($("#availableStackFrameColors"));
+        registerColorEvents();
+        // rw(getNode("COLOR"))
+    });
 
-    showContainer($("#AvaialbleColorsSection .colorContainer"));
-    showStack($("#optionalStackColors"));
+    $("#optionalStackInsertColors").on("click", function () {
+        setTimeout(animateTransition, 20);
+        hideStack($("#optionalStackInsertColors"));
+        showContainer($("#OptionalInsertColorsSection .colorContainer"));
+        hideContainer($("#AvailableInsertColorsSection .colorContainer"));
+        showStack($("#availableStackInsertColors"));
+        registerColorEvents();
+        // rw(getNode("COLOR"))
+    });
 
-    hideStack($("#availableStackColors"));
-    hideContainer($("#OptionalColorsSection .colorContainer"));
 
-    //selectFirstColor($("#AvaialbleColorsSection .colorContainer"));
-    //unselectFirstColor($("#OptionalColorsSection .colorContainer"));
 
-    const $available = $("#AvaialbleColorsSection .colorContainer");
-    selectFirstColor($available);
+    $("#availableStackColors").on("click", function () {
 
-    // registerColorEvents();
-    rw(getNode("COLOR"))
+        setTimeout(animateTransition, 20);
 
-  });
+        showContainer($("#AvaialbleColorsSection .colorContainer"));
+        showStack($("#optionalStackColors"));
 
-  $("#availableStackFrameColors").on("click", function () {
+        hideStack($("#availableStackColors"));
+        hideContainer($("#OptionalColorsSection .colorContainer"));
 
-    setTimeout(animateTransition, 20);
-    hideStack($("#availableStackFrameColors"));
-    showContainer($("#AvailableFrameColorsSection .colorContainer"));
-    hideContainer($("#OptionalFrameColorsSection .colorContainer"));
-    showStack($("#optionalStackFrameColors"));
-    registerColorEvents();
-    // rw(getNode("COLOR"))
+        //selectFirstColor($("#AvaialbleColorsSection .colorContainer"));
+        //unselectFirstColor($("#OptionalColorsSection .colorContainer"));
 
-  });
+        const $available = $("#AvaialbleColorsSection .colorContainer");
+        selectFirstColor($available);
 
-  $("#availableStackInsertColors").on("click", function () {
-    setTimeout(animateTransition, 20);
-    hideStack($("#availableStackInsertColors"));
-    showContainer($("#AvailableInsertColorsSection .colorContainer"));
-    hideContainer($("#OptionalInsertColorsSection .colorContainer"));
-    showStack($("#optionalStackInsertColors"));
-    registerColorEvents();
-    // rw(getNode("COLOR"))
+        // registerColorEvents();
+        rw(getNode("COLOR"))
 
-  });
+    });
+
+    $("#availableStackFrameColors").on("click", function () {
+
+        setTimeout(animateTransition, 20);
+        hideStack($("#availableStackFrameColors"));
+        showContainer($("#AvailableFrameColorsSection .colorContainer"));
+        hideContainer($("#OptionalFrameColorsSection .colorContainer"));
+        showStack($("#optionalStackFrameColors"));
+        registerColorEvents();
+        // rw(getNode("COLOR"))
+
+    });
+
+    $("#availableStackInsertColors").on("click", function () {
+        setTimeout(animateTransition, 20);
+        hideStack($("#availableStackInsertColors"));
+        showContainer($("#AvailableInsertColorsSection .colorContainer"));
+        hideContainer($("#OptionalInsertColorsSection .colorContainer"));
+        showStack($("#optionalStackInsertColors"));
+        registerColorEvents();
+        // rw(getNode("COLOR"))
+
+    });
 }
 
 function generateOptions(start, end) {
-  let options = '';
-  for (let i = start; i <= end; i++) {
-    options += `<option value="${i}">${i}</option>`;
-  }
-  return options;
+    let options = '';
+    for (let i = start; i <= end; i++) {
+        options += `<option value="${i}">${i}</option>`;
+    }
+    return options;
 }
 
 function generateOptionsFromArray(arr) {
-  return arr.map(val => `<option value="${val}">${val}</option>`).join('');
+    return arr.map(val => `<option value="${val}">${val}</option>`).join('');
 }
 
 function appendDrpData() {
 
-  // 1️⃣ Populate Door Width Feet (4–20)
-  $("#DOOR_WIDTH_FEET").html(generateOptions(4, 20));
-  $("#DOOR_WIDTH_FEET").val(16);
+    // 1️⃣ Populate Door Width Feet (4–20)
+    $("#DOOR_WIDTH_FEET").html(generateOptions(4, 20));
+    $("#DOOR_WIDTH_FEET").val(16);
 
-  // 2️⃣ Populate initial Door Width Inches (0–11)
-  $("#DOOR_WIDTH_INCHES").html(generateOptions(0, 11));
+    // 2️⃣ Populate initial Door Width Inches (0–11)
+    $("#DOOR_WIDTH_INCHES").html(generateOptions(0, 11));
 
-  // 3️⃣ Update inches dynamically based on feet selection
-  $("#DOOR_WIDTH_FEET").on("change", function () {
-    const feet = parseInt($(this).val(), 10);
+    // 3️⃣ Update inches dynamically based on feet selection
+    $("#DOOR_WIDTH_FEET").on("change", function () {
+        const feet = parseInt($(this).val(), 10);
 
-    const maxInches = feet === 20 ? 2 : 11; // limit inches for 20 feet
-    $("#DOOR_WIDTH_INCHES").html(generateOptions(0, maxInches));
-  });
+        const maxInches = feet === 20 ? 2 : 11; // limit inches for 20 feet
+        $("#DOOR_WIDTH_INCHES").html(generateOptions(0, maxInches));
+    });
 
-  // Populate Door height Feet (6–14)
-  $("#DOOR_HEIGHT_FEET").html(generateOptions(6, 14));
-  // $("#DOOR_HEIGHT_FEET").val(7);
+    // Populate Door height Feet (6–14)
+    $("#DOOR_HEIGHT_FEET").html(generateOptions(6, 14));
+    // $("#DOOR_HEIGHT_FEET").val(7);
 
-  refreshHeightInches(7);
+    refreshHeightInches(7);
 
-  $("#DOOR_HEIGHT_FEET").on("change", function () {
-    const feet = parseInt($(this).val(), 10);
-    refreshHeightInches(feet);
-  });
+    $("#DOOR_HEIGHT_FEET").on("change", function () {
+        const feet = parseInt($(this).val(), 10);
+        refreshHeightInches(feet);
+    });
 
 
 }
 
 function refreshHeightInches(feet) {
-  const inches = (feet === 14) ? [0] : [0, 3, 6, 9];
-  $("#DOOR_HEIGHT_INCHES").html(generateOptionsFromArray(inches));
+    const inches = (feet === 14) ? [0] : [0, 3, 6, 9];
+    $("#DOOR_HEIGHT_INCHES").html(generateOptionsFromArray(inches));
 }
 
 
 //function to show and hide door width and door height dropdown
 function toggleSwitch() {
-  $('#customSwitch').change(function () {
+    $('#customSwitch').change(function () {
 
-    if ($(this).is(':checked')) {
-      toggle_Switch = 1;
-      $("#customSwitch").val("on");
-      $('.custom-dimension-container').slideDown();
-      $('#DOOR_HEIGHT_FEET', '#DOOR_HEIGHT_INCHES', '#DOOR_WIDTH_FEET', '#DOOR_WIDTH_INCHES').prop('selectedIndex', 0).trigger('change');;
+        if ($(this).is(':checked')) {
+            toggle_Switch = 1;
+            $("#customSwitch").val("on");
+            $('.custom-dimension-container').slideDown();
+            $('#DOOR_HEIGHT_FEET', '#DOOR_HEIGHT_INCHES', '#DOOR_WIDTH_FEET', '#DOOR_WIDTH_INCHES').prop('selectedIndex', 0).trigger('change');;
 
-      $(`input[name='SIZE']`).each((i, radio) => {
-        $(radio).prop("checked", false).removeAttr("checked");
-        $(radio).parent().removeClass("btn-checked");
-        $('#DIMENSION').slideUp();
+            $(`input[name='SIZE']`).each((i, radio) => {
+                $(radio).prop("checked", false).removeAttr("checked");
+                $(radio).parent().removeClass("btn-checked");
+                $('#DIMENSION').slideUp();
 
-      });
+            });
 
-      getAllInputVal(toggle_Switch);
-      getCounterVal(toggle_Switch);
+            getCounterVal(toggle_Switch);
 
-      const waitForWidth = setInterval(() => {
-        const width = getState("SIZE_WIDTH");
-        const height = getState("SIZE_HEIGHT");
+            const waitForWidth = setInterval(() => {
+                const width = getState("SIZE_WIDTH");
+                const height = getState("SIZE_HEIGHT");
 
 
-        if (width !== undefined && width !== null) {
-          clearInterval(waitForWidth);
+                if (width !== undefined && width !== null) {
+                    clearInterval(waitForWidth);
 
-          setState("DOOR_WIDTH_FEET", width);
+                    setState("DOOR_WIDTH_FEET", width);
+                }
+
+                if (height !== undefined && height !== null) {
+                    clearInterval(waitForWidth);
+
+                    setState("DOOR_HEIGHT_FEET", height);
+                }
+            }, 50);
+
+
+        } else {
+            $('.custom-dimension-container').slideUp();
+            $('#DIMENSION').slideDown();
+
+            $("#DIMENSIONS_2").parent().addClass("btn-checked");
+            $("#DIMENSIONS_2").prop("checked", true).trigger("change");
+            setState("SIZE", $("#DIMENSIONS_2").val());
+            $("#customSwitch").val("off");
+
+            toggle_Switch = 0;
+            getCounterVal(toggle_Switch);
         }
-
-        if (height !== undefined && height !== null) {
-          clearInterval(waitForWidth);
-
-          setState("DOOR_HEIGHT_FEET", height);
-        }
-      }, 50);
-
-
-    } else {
-      $('.custom-dimension-container').slideUp();
-      $('#DIMENSION').slideDown();
-
-      $("#DIMENSIONS_2").parent().addClass("btn-checked");
-      $("#DIMENSIONS_2").prop("checked", true).trigger("change");
-      setState("SIZE", $("#DIMENSIONS_2").val());
-      $("#customSwitch").val("off");
-
-      toggle_Switch = 0;
-      getAllInputVal(toggle_Switch);
-      getCounterVal(toggle_Switch);
-    }
-  });
+    });
 }
 
 function toggleMorePanelSwitch() {
-  $('#customPanelSwitch').change(function () {
+    $('#customPanelSwitch').change(function () {
 
-    if ($(this).is(':checked')) {
-      $("#customSwitch").val("on");
-      $(".custom-panel-item-container").slideDown();
+        if ($(this).is(':checked')) {
+            $("#customSwitch").val("on");
+            $(".custom-panel-item-container").slideDown();
 
-    } else {
-      $("#customPanelSwitch").val("off");
-      $(".custom-panel-item-container").slideUp();
+        } else {
+            $("#customPanelSwitch").val("off");
+            $(".custom-panel-item-container").slideUp();
 
-      $(`input[name='FACE']`).each((i, radio) => {
-        $(radio).prop("checked", false).removeAttr("checked");
-        $(radio).parent().removeClass("btn-checked");
-      });
+            $(`input[name='FACE']`).each((i, radio) => {
+                $(radio).prop("checked", false).removeAttr("checked");
+                $(radio).parent().removeClass("btn-checked");
+            });
 
-      $("#FLUSH").parent().addClass("btn-checked");
-      $("#FLUSH").prop("checked", true);
-      setState("FACE", "F");
-    }
-  })
+            $("#FLUSH").parent().addClass("btn-checked");
+            $("#FLUSH").prop("checked", true);
+            setState("FACE", "F");
+        }
+    })
 }
 
 
 
 function toggleInclinedTrack() {
-  $("input[name='HARDWARE_SET']").on("change", function () {
-    if ($(this).val() === "C") {
-      $(".inclined-track").show();
-    } else {
-      $(".inclined-track").hide();
-    }
-  });
+    $("input[name='HARDWARE_SET']").on("change", function () {
+        if ($(this).val() === "C") {
+            $(".inclined-track").show();
+        } else {
+            $(".inclined-track").hide();
+        }
+    });
 }
 
 // function toogleSpringCycle() {
@@ -2268,290 +2308,156 @@ function toggleInclinedTrack() {
 
 function initAppEvents() {
 
-  // =========================
-  // PANEL STYLE CHANGE
-  // =========================
-  $(document)
-    .off("click.togglePanelStyle")
-    .on("click.togglePanelStyle", "input[name='FACE']", function () {
+    // =========================
+    // PANEL STYLE CHANGE
+    // =========================
+    $(document)
+        .off("click.togglePanelStyle")
+        .on("click.togglePanelStyle", "input[name='FACE']", function () {
 
-      const panel_style = this.value;
+            const panel_style = this.value;
 
-      // re-render optional colors
-      appendOptionalColors(panel_style);
+            // re-render optional colors
+            appendOptionalColors(panel_style);
 
-      // re-select first color after render
-      requestAnimationFrame(() => {
-        selectFirstColor($("#OptionalColorsSection .colorContainer"));
-        rw(getNode("COLOR"))
-      });
-    });
-
-
-  // =========================
-  // COLOR SELECTION
-  // =========================
-  // $(document)
-  //   .off("click.colorSelect")
-  //   .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
-
-  //     const $container = $(this).closest(".colorContainer");
-
-  //     $container.find(".color-button-container").removeClass("selected");
-  //     $(this).addClass("selected");
-
-  //     $container
-  //       .find("input[name='COLOR']")
-  //       .prop("checked", false);
-
-  //     $(this)
-  //       .find("input[name='COLOR']")
-  //       .prop("checked", true)
-  //       .trigger("change");
-
-  //     // optional global state
-  //     const color = $(this).find("input[name='COLOR']").val();
-  //     setState && setState("COLOR", color);
-  //     rw(getNode("COLOR"))
-  //   });
-
-  // $('#FRAME_COLOR').on('click', '.color-button-container', function () {
-  //   const color = $(this).find(`input[type='radio']`).val();
-  //   const color_info = [...AvailableColorImages, ...OptionalColorImages].find(c => c.value == color);
-  //   if (!color_info) return;
-  //   setState("FRAME_COLOR", color_info);
-  // });
-
-  // $('#INSERT_COLOR').on('click', '.color-button-container', function () {
-  //   const color = $(this).find(`input[type='radio']`).val();
-  //   const color_info = [...AvailableColorImages, ...OptionalColorImages].find(c => c.value == color);
-  //   if (!color_info) return;
-  //   setState("INSERT_COLOR", color_info);
-  // })
-
-  // COLOR (door) selection — reset overrides so frame/insert follow new door color
-  // $(document)
-  //   .off("click.colorSelect")
-  //   .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
-  //     const $container = $(this).closest(".colorContainer");
-  //     $container.find(".color-button-container").removeClass("selected");
-  //     $(this).addClass("selected");
-  //     $container.find("input[name='COLOR']").prop("checked", false);
-  //     $(this).find("input[name='COLOR']").prop("checked", true).trigger("change");
-
-  //     const color = $(this).find("input[name='COLOR']").val();
-  //     setState && setState("COLOR", color);
-
-  //     // ── Reset overrides so frame/insert sync to new door color ──
-  //     frameColorUserOverride = false;
-  //     insertColorUserOverride = false;
-
-  //     rw(getNode("COLOR"));
-  //     rw(getNode("FRAME_COLOR"));
-  //     rw(getNode("INSERT_COLOR"));
-  //   });
-
-  $(document)
-    .off("click.colorSelect")
-    .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
-      const $container = $(this).closest(".colorContainer");
-      $container.find(".color-button-container").removeClass("selected");
-      $(this).addClass("selected");
-      $container.find("input[name='COLOR']").prop("checked", false);
-      $(this).find("input[name='COLOR']").prop("checked", true).trigger("change");
-
-      const color = $(this).find("input[name='COLOR']").val();
-      setState && setState("COLOR", color);
-
-      frameColorUserOverride = false;
-      insertColorUserOverride = false;
-
-      rw(getNode("COLOR"));
-      rw(getNode("FRAME_COLOR"));
-      rw(getNode("INSERT_COLOR"));
-
-      // ── Sync selected class to new door color ──
-      requestAnimationFrame(() => {
-        [
-          $("#AvailableFrameColorsSection .colorContainer"),
-          $("#OptionalFrameColorsSection .colorContainer"),
-          $("#AvailableInsertColorsSection .colorContainer"),
-          $("#OptionalInsertColorsSection .colorContainer")
-        ].forEach($c => {
-          $c.find(".color-button-container").removeClass("selected");
-          $c.find("input[type='radio']").prop("checked", false);
-
-          const $match = $c.find(`input[type='radio'][value="${color}"]`)
-            .closest(".color-button-container");
-
-          if ($match.length) {
-            $match.addClass("selected");
-            $match.find("input[type='radio']").prop("checked", true);
-          }
+            // re-select first color after render
+            requestAnimationFrame(() => {
+                selectFirstColor($("#OptionalColorsSection .colorContainer"));
+                rw(getNode("COLOR"))
+            });
         });
-      });
+
+    $(document)
+        .off("click.colorSelect")
+        .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
+            const $container = $(this).closest(".colorContainer");
+            $container.find(".color-button-container").removeClass("selected");
+            $(this).addClass("selected");
+            $container.find("input[name='COLOR']").prop("checked", false);
+            $(this).find("input[name='COLOR']").prop("checked", true).trigger("change");
+
+            const color = $(this).find("input[name='COLOR']").val();
+            setState && setState("COLOR", color);
+
+            frameColorUserOverride = false;
+            insertColorUserOverride = false;
+
+            rw(getNode("COLOR"));
+            rw(getNode("FRAME_COLOR"));
+            rw(getNode("INSERT_COLOR"));
+
+            // ── Sync selected class to new door color ──
+            requestAnimationFrame(() => {
+                [
+                    $("#AvailableFrameColorsSection .colorContainer"),
+                    $("#OptionalFrameColorsSection .colorContainer"),
+                    $("#AvailableInsertColorsSection .colorContainer"),
+                    $("#OptionalInsertColorsSection .colorContainer")
+                ].forEach($c => {
+                    $c.find(".color-button-container").removeClass("selected");
+                    $c.find("input[type='radio']").prop("checked", false);
+
+                    const $match = $c.find(`input[type='radio'][value="${color}"]`)
+                        .closest(".color-button-container");
+
+                    if ($match.length) {
+                        $match.addClass("selected");
+                        $match.find("input[type='radio']").prop("checked", true);
+                    }
+                });
+            });
+        });
+
+
+    // FRAME color — user explicitly picked, set override
+    $('#FRAME_COLOR').on('click', '.color-button-container', function () {
+        const color = $(this).find(`input[type='radio']`).val();
+        const color_info = [...AvailableColorImages, ...OptionalColorImages]
+            .find(c => c.value == color);
+        if (!color_info) return;
+
+        frameColorUserOverride = true;
+        setState("FRAME_COLOR", color_info);
+    });
+
+    // INSERT color — user explicitly picked, set override
+    $('#INSERT_COLOR').on('click', '.color-button-container', function () {
+        const color = $(this).find(`input[type='radio']`).val();
+        const color_info = [...AvailableColorImages, ...OptionalColorImages]
+            .find(c => c.value == color);
+        if (!color_info) return;
+
+        insertColorUserOverride = true;
+        setState("INSERT_COLOR", color_info);
     });
 
 
-  // FRAME color — user explicitly picked, set override
-  $('#FRAME_COLOR').on('click', '.color-button-container', function () {
-    const color = $(this).find(`input[type='radio']`).val();
-    const color_info = [...AvailableColorImages, ...OptionalColorImages]
-      .find(c => c.value == color);
-    if (!color_info) return;
 
-    frameColorUserOverride = true;
-    setState("FRAME_COLOR", color_info);
-  });
+    // =========================
+    // DOOR OPTION
+    // =========================
+    $(document)
+        .off("click.doorOpt")
+        .on("click.doorOpt", ".rw-sliding-button", function () {
+            door_option = $(this).find('input[name="DOOROPT"]').val();
+        });
 
-  // INSERT color — user explicitly picked, set override
-  $('#INSERT_COLOR').on('click', '.color-button-container', function () {
-    const color = $(this).find(`input[type='radio']`).val();
-    const color_info = [...AvailableColorImages, ...OptionalColorImages]
-      .find(c => c.value == color);
-    if (!color_info) return;
+    // =========================
+    // SPRING TYPE
+    // =========================
+    $(document)
+        .off("click.SPRINGTYPE")
+        .on("click.SPRINGTYPE", ".rw-sliding-button", function (e) {
 
-    insertColorUserOverride = true;
-    setState("INSERT_COLOR", color_info);
-  });
+            const name = e.target.name;
 
+            $(`input[name="${name}"]`).each(function () {
+                $(this).closest(".rw-sliding-button").removeClass("selected");
+            });
 
-
-  // =========================
-  // DOOR OPTION
-  // =========================
-  $(document)
-    .off("click.doorOpt")
-    .on("click.doorOpt", ".rw-sliding-button", function () {
-      door_option = $(this).find('input[name="DOOROPT"]').val();
-    });
-
-  // =========================
-  // SPRING TYPE
-  // =========================
-  $(document)
-    .off("click.SPRINGTYPE")
-    .on("click.SPRINGTYPE", ".rw-sliding-button", function (e) {
-
-      const name = e.target.name;
-
-      $(`input[name="${name}"]`).each(function () {
-        $(this).closest(".rw-sliding-button").removeClass("selected");
-      });
-
-      const $selected = $(`input[name="${name}"]:checked`);
-      $selected.closest(".rw-sliding-button").addClass("selected");
-    });
+            const $selected = $(`input[name="${name}"]:checked`);
+            $selected.closest(".rw-sliding-button").addClass("selected");
+        });
 }
-
-
-
-function getAllInputVal() {
-
-  panel_style = $("input[name='FACE']:checked").val();
-  door_model = $("input[name='DOOR_MODEL']:checked").val();
-  door_color = $(".color-button-container.selected input[type='radio']").val();
-  door_option = $('input[name="DOOROPT"]:checked').val();
-  //toggleHardwareSection(door_option);
-
-  // // Panel style click
-  // $(document).off("click.togglePanelStyle").on("click.togglePanelStyle", "input[name='FACE']", function (e) {
-  //   panel_style = e.target.value;
-  //   appendOptionalColors(panel_style);
-  // });
-
-  // // Optional: initialize checked panel style
-  // $("input[name='FACE']:checked").each(function () {
-  //   appendOptionalColors(this.value);
-  // });
-
-  // COLOR click
-  // $(document)
-  //   .off("click.colorSelect")
-  //   .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
-  //     door_color = $(`div[data-id="COLOR"] .color-button-container.selected input[type='radio']`).val();
-  //     rw(getNode("COLOR"))
-  //   });
-
-  // $('#FRAME_COLOR').on('click', '.color-button-container', function () {
-  //   const color = $(this).find(`input[type='radio']`).val();
-  //   const color_info = [...AvailableColorImages, ...OptionalColorImages].find(c => c.value == color);
-  //   console.log("color_infor", color_info);
-  //   if (!color_info) return;
-  //   setState("FRAME_COLOR", color_info);
-  // });
-
-  // $('#INSERT_COLOR').on('click', '.color-button-container', function () {
-  //   const color = $(this).find(`input[type='radio']`).val();
-  //   const color_info = [...AvailableColorImages, ...OptionalColorImages].find(c => c.value == color);
-  //   if (!color_info) return;
-  //   setState("INSERT_COLOR", color_info);
-  // });
-
-  //door option click
-  // $(document)
-  //   .off("click.doorOpt")
-  //   .on("click.doorOpt", ".rw-sliding-button", function (e) {
-  //     door_option = $(this).find('input[name="DOOROPT"]').val();
-  //     //toggleHardwareSection(door_option);
-  //   });
-  // $(document)
-  //   .off("click.SPRINGTYPE")
-  //   .on("click.SPRINGTYPE", ".rw-sliding-button", function (e) {
-
-  //     $(`input[name="${e.target.name}"]`).each(function () {
-  //       $(this).closest(".rw-sliding-button").removeClass("selected");
-  //     });
-
-  //     // Add selected to the currently checked one
-  //     const $selected = $(`input[name="${e.target.name}"]:checked`);
-  //     $selected.closest(".rw-sliding-button").addClass("selected");
-
-  //   });
-
-
-}
-
-
 
 function getCounterVal(toggle_Switch) {
-  return toggle_Switch;
+    return toggle_Switch;
 }
 
 function toggleHardwareSection(door_option) {
-  if (door_option === "DOORFACE") {
-    disableSection("Hardware Options")
-  }
-  else {
-    enableSection("Hardware Options")
-  }
+    if (door_option === "DOORFACE") {
+        disableSection("Hardware Options")
+    }
+    else {
+        enableSection("Hardware Options")
+    }
 }
 
 function increaseValue(button, limit) {
-  const $num = $(button).closest('.quantity-field').find('.number');
-  let value = parseInt($num.text(), 10);
+    const $num = $(button).closest('.quantity-field').find('.number');
+    let value = parseInt($num.text(), 10);
 
-  if (isNaN(value)) value = 0;
-  if (limit && value >= limit) return;
+    if (isNaN(value)) value = 0;
+    if (limit && value >= limit) return;
 
-  $num.text(value + 1);
+    $num.text(value + 1);
 }
 
 function decreaseValue(button) {
-  const $num = $(button).closest('.quantity-field').find('.number');
-  let value = parseInt($num.text(), 10);
+    const $num = $(button).closest('.quantity-field').find('.number');
+    let value = parseInt($num.text(), 10);
 
-  if (isNaN(value)) value = 0;
-  if (value < 1) return;
+    if (isNaN(value)) value = 0;
+    if (value < 1) return;
 
-  $num.text(value - 1);
+    $num.text(value - 1);
 }
 
 
 function isFormValid() {
-  if (!(!!getState("SPRING_SOLUTION") && getState("WEIGHT") < 750))
-    return false;
-  return !Object.values(nodeset).map(node => node.value).includes("ERROR")
+    if (!(!!getState("SPRING_SOLUTION") && getState("WEIGHT") < 750))
+        return false;
+    return !Object.values(nodeset).map(node => node.value).includes("ERROR")
 
 }
 
@@ -2560,38 +2466,38 @@ function additionalSaves(json) {
 }
 
 function loadGlazingUI() {
-  // $('#more_glass_shapes').change(function () {
-  //   if ($(this).is(':checked')) {
-  //     $("#more_glass_shapes_container").slideDown();
-  //   } else {
-  //     $("#more_glass_shapes_container").slideUp();
-  //   }
-  // });
+    // $('#more_glass_shapes').change(function () {
+    //   if ($(this).is(':checked')) {
+    //     $("#more_glass_shapes_container").slideDown();
+    //   } else {
+    //     $("#more_glass_shapes_container").slideUp();
+    //   }
+    // });
 
-  $('input[name="GLASS_SHAPE"]').prop('checked', false).data('checked', false);
+    $('input[name="GLASS_SHAPE"]').prop('checked', false).data('checked', false);
 
-  $('#more_glass_types').change(function () {
-    if ($(this).is(':checked')) {
-      $("#more_glass_types_container").slideDown();
-    } else {
-      $("#more_glass_types_container").slideUp();
-    }
-  });
+    $('#more_glass_types').change(function () {
+        if ($(this).is(':checked')) {
+            $("#more_glass_types_container").slideDown();
+        } else {
+            $("#more_glass_types_container").slideUp();
+        }
+    });
 
-  $('#more_glass_inserts').change(function () {
-    if ($(this).is(':checked')) {
-      $("#more_glass_inserts_container").slideDown();
-    } else {
-      $("#more_glass_inserts_container").slideUp();
-    }
-  });
+    $('#more_glass_inserts').change(function () {
+        if ($(this).is(':checked')) {
+            $("#more_glass_inserts_container").slideDown();
+        } else {
+            $("#more_glass_inserts_container").slideUp();
+        }
+    });
 
-  const $frameColors = $("#AvailableFrameColorsSection .colorContainer").empty();
-  const $insertColors = $("#AvailableInsertColorsSection .colorContainer").empty();
+    const $frameColors = $("#AvailableFrameColorsSection .colorContainer").empty();
+    const $insertColors = $("#AvailableInsertColorsSection .colorContainer").empty();
 
-  function generateColorHTML(imgSrc, index, inputName) {
-    const isSelected = index === 0;
-    return `
+    function generateColorHTML(imgSrc, index, inputName) {
+        const isSelected = index === 0;
+        return `
         <div class="color-button-container ${isSelected ? "selected" : ""}">
             <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
                 <img
@@ -2612,94 +2518,82 @@ function loadGlazingUI() {
             </div>
         </div>
     `;
-  }
+    }
 
-  AvailableColorImages.forEach((imgSrc, index) => {
-    $frameColors.append(generateColorHTML(imgSrc, index, "FRAME_COLOR"));
-    $insertColors.append(generateColorHTML(imgSrc, index, "INSERT_COLOR"));
-  });
+    AvailableColorImages.forEach((imgSrc, index) => {
+        $frameColors.append(generateColorHTML(imgSrc, index, "FRAME_COLOR"));
+        $insertColors.append(generateColorHTML(imgSrc, index, "INSERT_COLOR"));
+    });
 
-  const $optFrameColors = $("#OptionalFrameColorsSection .colorContainer").empty();
-  const $optInsertColors = $("#OptionalInsertColorsSection .colorContainer").empty();
+    const $optFrameColors = $("#OptionalFrameColorsSection .colorContainer").empty();
+    const $optInsertColors = $("#OptionalInsertColorsSection .colorContainer").empty();
 
-  OptionalColorImages.forEach((imgSrc, index) => {
-    $optFrameColors.append(generateColorHTML(imgSrc, index, "FRAME_COLOR"));
-    $optInsertColors.append(generateColorHTML(imgSrc, index, "INSERT_COLOR"));
-  });
+    OptionalColorImages.forEach((imgSrc, index) => {
+        $optFrameColors.append(generateColorHTML(imgSrc, index, "FRAME_COLOR"));
+        $optInsertColors.append(generateColorHTML(imgSrc, index, "INSERT_COLOR"));
+    });
 
-  const $optionalfieldset_frame = $("#optionalStackFrameColors").empty();
-  const $availablefieldset_frame = $("#availableStackFrameColors").empty();
-  const $optionalfieldset_insert = $("#optionalStackInsertColors").empty();
-  const $availablefieldset_insert = $("#availableStackInsertColors").empty();
+    const $optionalfieldset_frame = $("#optionalStackFrameColors").empty();
+    const $availablefieldset_frame = $("#availableStackFrameColors").empty();
+    const $optionalfieldset_insert = $("#optionalStackInsertColors").empty();
+    const $availablefieldset_insert = $("#availableStackInsertColors").empty();
 
-  OptionalColorImages.slice(0, 3).forEach((imgSrc) => {
-    const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
-    $optionalfieldset_frame.append(html);
-    $optionalfieldset_insert.append(html);
-  });
+    OptionalColorImages.slice(0, 3).forEach((imgSrc) => {
+        const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
+        $optionalfieldset_frame.append(html);
+        $optionalfieldset_insert.append(html);
+    });
 
-  AvailableColorImages.slice(0, 3).forEach((imgSrc) => {
-    const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
-    $availablefieldset_frame.append(html);
-    $availablefieldset_insert.append(html);
-  });
+    AvailableColorImages.slice(0, 3).forEach((imgSrc) => {
+        const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
+        $availablefieldset_frame.append(html);
+        $availablefieldset_insert.append(html);
+    });
 
-  // ── Sync frame & insert UI selection to door color on load ──
-  requestAnimationFrame(() => {
-    const doorValue = getNode("COLOR")?.value?.value;
-    if (doorValue) {
-      [
-        $("#AvailableFrameColorsSection .colorContainer"),
-        $("#OptionalFrameColorsSection .colorContainer"),
-        $("#AvailableInsertColorsSection .colorContainer"),
-        $("#OptionalInsertColorsSection .colorContainer")
-      ].forEach($c => {
-        $c.find(".color-button-container").removeClass("selected");
-        $c.find("input[type='radio']").prop("checked", false);
+    // ── Sync frame & insert UI selection to door color on load ──
+    requestAnimationFrame(() => {
+        const doorValue = getNode("COLOR")?.value?.value;
+        if (doorValue) {
+            [
+                $("#AvailableFrameColorsSection .colorContainer"),
+                $("#OptionalFrameColorsSection .colorContainer"),
+                $("#AvailableInsertColorsSection .colorContainer"),
+                $("#OptionalInsertColorsSection .colorContainer")
+            ].forEach($c => {
+                $c.find(".color-button-container").removeClass("selected");
+                $c.find("input[type='radio']").prop("checked", false);
 
-        const $match = $c.find(`input[type='radio'][value="${doorValue}"]`)
-          .closest(".color-button-container");
+                const $match = $c.find(`input[type='radio'][value="${doorValue}"]`)
+                    .closest(".color-button-container");
 
-        if ($match.length) {
-          $match.addClass("selected");
-          $match.find("input[type='radio']").prop("checked", true);
+                if ($match.length) {
+                    $match.addClass("selected");
+                    $match.find("input[type='radio']").prop("checked", true);
+                }
+            });
         }
-      });
-    }
-  });
+    });
 
-  $("#NAVIGATION_SPC").on('click', function (event) {
-    if (currentSection == 1) {
-      $("#window_position_container").show();
-      const glass_shape = getState("GLASS_SHAPE") ?? "";
-      if (glass_shape.includes("slim")) {
-        $(`[data-id="section_slim_temp"]`).show();
-      }
-      addSlimUi();
+    $("#NAVIGATION_SPC").on('click', function (event) {
+        if (currentSection == 1) {
+            $("#window_position_container").show();
+            const glass_shape = getState("GLASS_SHAPE") ?? "";
+            if (glass_shape.includes("slim")) {
+                $(`[data-id="section_slim_temp"]`).show();
+            }
+            addSlimUi();
 
-      const state = getState("WINDOW_STATE");
-      state.hints = true;
-      setState("WINDOW_STATE", state);
-    } else {
-      $("#window_position_container").hide();
-      $(`[data-id="section_slim_temp"]`).remove();
-      $(`#slim_spacing_container`).remove();
+            const state = getState("WINDOW_STATE");
+            state.hints = true;
+            setState("WINDOW_STATE", state);
+        } else {
+            $("#window_position_container").hide();
+            $(`[data-id="section_slim_temp"]`).remove();
+            $(`#slim_spacing_container`).remove();
 
-      const state = getState("WINDOW_STATE");
-      state.hints = false;
-      setState("WINDOW_STATE", state);
-    }
-  });
-}
-
-function setGlassShapeVisibility() {
-  // all glass shape buttons
-  $('input[name="GLASS_SHAPE"]')
-    .closest(".rw-button")
-    .hide();
-
-  // const face = $("input[name='FACE']:checked").val();
-  // const door_model = $("input[name='DOOR_MODEL']:checked").val();
-  // const width = Number(getState("WIDTH")) || 0;
-
+            const state = getState("WINDOW_STATE");
+            state.hints = false;
+            setState("WINDOW_STATE", state);
+        }
+    });
 }

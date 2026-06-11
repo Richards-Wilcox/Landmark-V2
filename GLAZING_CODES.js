@@ -22,7 +22,7 @@ function addGlazingCodeLogic() {
     // Generate all 9 sections
     const GLZ_DEPS = [
         "WINDOW_POSITION",
-        "GLAZING_CODE", 
+        "GLAZING_CODE",
         "WINDOW_1", "WINDOW_1_QTY",
         "HEIGHT", "WIDTH", "NUM_OF_SEC", "LITE_LOCATION"
         // "SB1_SPNUM", "SB2_SPNUM", "SB3_SPNUM", "SB4_SPNUM",
@@ -75,10 +75,8 @@ function addGlazingCodeLogic() {
 
         const door_model = getState("DOOR_MODEL");
         const glass_shape = getState("GLASS_SHAPE") || "";
-        const frame_color = getState("FRAME_COLOR")?.value || "";
         const glass_type = getState("GLASS_TYPE") || "";
 
-        let frame_size = "";
         let window_code = "";
 
         // =========================
@@ -89,31 +87,6 @@ function addGlazingCodeLogic() {
             this.value = "0";
             return;
         }
-
-        // =========================
-        // FRAME SIZE
-        // =========================
-
-        if (door_model === "A") {
-
-            if (glass_shape === "colonial") {
-                frame_size = "2";
-            }
-            else if (glass_shape === "ranch") {
-                frame_size = "3";
-            }
-
-        }
-        else if (door_model === "D") {
-
-            if (glass_shape === "colonial") {
-                frame_size = "6";
-            }
-            else if (glass_shape === "ranch") {
-                frame_size = "7";
-            }
-        }
-
 
         // Clear Single-005
         // Clear Sealed-004
@@ -168,12 +141,12 @@ function addGlazingCodeLogic() {
             window_code = glassTypeRanchMap[glass_type] || "";
         }
 
-        if (!frame_size || !window_code) {
+        if (!window_code) {
             this.value = "0";
             return;
         }
 
-        this.value = `4${frame_size}${frame_color}-${window_code}`;
+        this.value = `552-${window_code}`;
 
     }, ["GLASS_SHAPE", "FRAME_COLOR", "DOOR_MODEL", "GLASS_TYPE"]);
 
@@ -226,15 +199,17 @@ function addGlazingCodeLogic() {
 
     addLogic("INSERT_1", function () {
         const glass_insert = getState("GLASS_INSERT");
+        const insert_color = getState("INSERT_COLOR").value;
 
         if (!glass_insert || glass_insert === "") {
             this.value = "0";
             return;
         }
 
-        this.value = getNode("GLASS_INSERT").getAttribute("insertCode") ?? "";
+        const insert_code = getNode("GLASS_INSERT").getAttribute("insertCode");
+        this.value = `${insert_code}${insert_color}` ?? "";
 
-    }, ["GLASS_INSERT"])
+    }, ["GLASS_INSERT", "INSERT_COLOR"])
 
     addLogic("INSERT_1_QTY", function () {
         const glass_insert = getState("GLASS_INSERT");
@@ -263,22 +238,112 @@ function addGlazingCodeLogic() {
         this.value = 0; //use only when mix panel is selected
     }, ["FACE"])
 
+    addLogic("EXTERIOR_FRAME_1", function () {
+        const glass_shape = getState("GLASS_SHAPE") || "";
+        const color = getState("FRAME_COLOR").value;
+
+        if (!glass_shape) {
+            this.value = "";
+            return;
+        }
+        if (glass_shape === 'colonial') this.value = `550-601${color}`;
+        if (glass_shape === 'ranch') this.value = `550-651${color}`;
+    }, ["GLASS_SHAPE", "FRAME_COLOR"])
+
+    addLogic("INTERIOR_FRAME_1", function () {
+        const door_model = getState("DOOR_MODEL");
+        const glazingtype = getNode("GLASS_TYPE").getAttribute('glazingType');
+        const glass_shape = getState("GLASS_SHAPE") || "";
+
+        if (!glass_shape) {
+            this.value = "";
+            return;
+        }
+        //colonial window
+        if (door_model === 'A' && glass_shape === 'colonial') {
+            this.value = glazingtype === 'double' ? `550-606W` : `550-612W`;
+        }
+        else if (door_model === 'D' && glass_shape === 'colonial') {
+            this.value = glazingtype === 'double' ? `550-612W` : `550-613W`;
+        }
+
+        //ranch window 
+        if (door_model === 'A' && glass_shape === 'ranch') {
+            this.value = glazingtype === 'double' ? `550-656W` : `550-662W`;
+        }
+        else if (door_model === 'D' && glass_shape === 'ranch') {
+            this.value = glazingtype === 'double' ? `550-662W` : `550-663W`;
+        }
+
+
+    }, ["GLASS_TYPE", "DOOR_MODEL", "GLASS_SHAPE"])
+
+    addLogic("SCREWS", function () {
+        const door_model = getState("DOOR_MODEL");
+        const glass_shape = getState("GLASS_SHAPE") || "";
+
+        if (!glass_shape) {
+            this.value = "";
+            return;
+        }
+
+        if (door_model === 'A') this.value = `215-321`;
+        if (door_model === 'D') this.value = `215-328`;
+
+    }, ["DOOR_MODEL", "GLASS_SHAPE"])
+
+    addLogic("SCREWS_QTY", function () {
+        const glass_shape = getState("GLASS_SHAPE") || "";
+
+        if (!glass_shape) {
+            this.value = "";
+            return;
+        }
+
+        if (glass_shape === 'colonial') this.value = 10;
+        if (glass_shape === 'ranch') this.value = 18;
+
+
+    }, ["GLASS_SHAPE"])
+
+
+    // addLogic("GLAZING_CODE", function () {
+    //     const window_1 = getState("WINDOW_1");
+    //     const window_1_qty = getState("WINDOW_1_QTY");
+    //     const insert_1 = getState("INSERT_1");
+    //     const insert_1_qty = getState("INSERT_1_QTY");
+    //     const window_2 = getState("WINDOW_2");
+    //     const window_2_qty = getState("WINDOW_2_QTY");
+    //     const insert_2 = getState("INSERT_2");
+    //     const insert_2_qty = getState("INSERT_2_QTY");
+    //     const panel_spacing = getState("PANEL_SPACING");
+    //     const lite_location = getState("LITE_LOCATION");
+
+
+    //     this.value = `${window_1},${window_1_qty},${insert_1},${insert_1_qty},${window_2},${window_2_qty},${insert_2},${insert_2_qty},${panel_spacing},${lite_location}`;
+
+    // }, ["WINDOW_1", "WINDOW_1_QTY", "INSERT_1", "INSERT_1_QTY", "WINDOW_2", "WINDOW_2_QTY", "INSERT_2", "INSERT_2_QTY", "PANEL_SPACING", "LITE_LOCATION"]);
+
     addLogic("GLAZING_CODE", function () {
-        const window_1 = getState("WINDOW_1");
-        const window_1_qty = getState("WINDOW_1_QTY");
+
+        const ext_frame_1 = getState("EXTERIOR_FRAME_1");
+        const int_frame_1 = getState("INTERIOR_FRAME_1");
+        const screw = getState("SCREWS");
+        const glass = getState("WINDOW_1");
         const insert_1 = getState("INSERT_1");
         const insert_1_qty = getState("INSERT_1_QTY");
-        const window_2 = getState("WINDOW_2");
-        const window_2_qty = getState("WINDOW_2_QTY");
-        const insert_2 = getState("INSERT_2");
-        const insert_2_qty = getState("INSERT_2_QTY");
-        const panel_spacing = getState("PANEL_SPACING");
+
+        // const insert_2 = getState("INSERT_2");
+        // const insert_2_qty = getState("INSERT_2_QTY");
+
         const lite_location = getState("LITE_LOCATION");
 
 
-        this.value = `${window_1},${window_1_qty},${insert_1},${insert_1_qty},${window_2},${window_2_qty},${insert_2},${insert_2_qty},${panel_spacing},${lite_location}`;
+        this.value = `${ext_frame_1},${glass},${int_frame_1},${screw},${insert_1},${insert_1_qty},${lite_location}`;
 
-    }, ["WINDOW_1", "WINDOW_1_QTY", "INSERT_1", "INSERT_1_QTY", "WINDOW_2", "WINDOW_2_QTY", "INSERT_2", "INSERT_2_QTY", "PANEL_SPACING", "LITE_LOCATION"]);
+    }, ["EXTERIOR_FRAME_1", "WINDOW_1", "INTERIOR_FRAME_1", "INSERT_1", "INSERT_1_QTY", "SCREWS", "PANEL_SPACING", "LITE_LOCATION"]);
+
+
 
     addNode({
         id: "NO_GLAZING_CODE",
@@ -332,42 +397,68 @@ function addGlazingCodeLogic() {
     addLogic("CNC_SECTION_02", function () {
         const glz = getState("GLZ_CODE_SECTION_02");
         this.value = glz ? buildCncCode(2) : "";
-    },  ["GLZ_CODE_SECTION_02"]);
+    }, ["GLZ_CODE_SECTION_02"]);
 
     addLogic("CNC_SECTION_03", function () {
         const glz = getState("GLZ_CODE_SECTION_03");
         this.value = glz ? buildCncCode(3) : "";
-    },  ["GLZ_CODE_SECTION_03"]);
+    }, ["GLZ_CODE_SECTION_03"]);
 
     addLogic("CNC_SECTION_04", function () {
         const glz = getState("GLZ_CODE_SECTION_04");
         this.value = glz ? buildCncCode(4) : "";
-    },  ["GLZ_CODE_SECTION_04"]);
+    }, ["GLZ_CODE_SECTION_04"]);
 
     addLogic("CNC_SECTION_05", function () {
         const glz = getState("GLZ_CODE_SECTION_05");
         this.value = glz ? buildCncCode(5) : "";
-    },  ["GLZ_CODE_SECTION_05"]);
+    }, ["GLZ_CODE_SECTION_05"]);
 
     addLogic("CNC_SECTION_06", function () {
         const glz = getState("GLZ_CODE_SECTION_06");
         this.value = glz ? buildCncCode(6) : "";
-    },  ["GLZ_CODE_SECTION_06"]);
+    }, ["GLZ_CODE_SECTION_06"]);
 
     addLogic("CNC_SECTION_07", function () {
         const glz = getState("GLZ_CODE_SECTION_07");
         this.value = glz ? buildCncCode(7) : "";
-    },  ["GLZ_CODE_SECTION_07"]);
+    }, ["GLZ_CODE_SECTION_07"]);
 
     addLogic("CNC_SECTION_08", function () {
         const glz = getState("GLZ_CODE_SECTION_08");
         this.value = glz ? buildCncCode(8) : "";
-    },  ["GLZ_CODE_SECTION_08"]);
+    }, ["GLZ_CODE_SECTION_08"]);
 
     addLogic("CNC_SECTION_09", function () {
         const glz = getState("GLZ_CODE_SECTION_09");
         this.value = glz ? buildCncCode(9) : "";
-    },  ["GLZ_CODE_SECTION_09"]);
+    }, ["GLZ_CODE_SECTION_09"]);
+
+    addLogic("SECTION_01_SMARTCOM_CODE", function () {
+
+        let Pre_b = '';
+        const finish = getState("FINISH");
+        const door_model = getState("DOOR_MODEL");
+        const panel_style = getState("FACE");
+
+        let Pre_A = finish === 'W' ? 'L' : 2;
+        Pre_b = door_model === 'G' ? 'D' : 'A';
+    
+        if(panel_style === 'M'){
+            Pre_b = 'E'
+        }
+
+        //Pre A - Stucco text = 2, woodgrain  - L, 
+        // Pre B - Stucco - door model code (A - CLASSIC, K - l138C, D-l200, C-L200C, G-L200GV), 
+        // DOOR MODEL = G , C - pre b = D, DOOR_MODEL = A,K - PRE B = A
+        //DOOR MODEL = G , C AND MIXED PANEL - PRE-B = E
+
+        //Pre -C
+        //stucco - face!= T ? IC_SB_DESIGN_CODE : D
+        // Wdg mixed panel, fls/plk =  IC_SB_DESIGN_CODE
+        //
+
+    }, ["FINISH", "DOOR_MODEL", "FACE"])
 }
 
 function getScForSection(sectionIndex) {
@@ -691,7 +782,7 @@ function getCNCString(section_height, panel_identity) {
         const LOC_Y = buildArray(num_of_windows, location_y);
         const RLL = buildArray(num_of_windows, 0); // placeholder
 
-        let cnc = `${panel_identity},${door_thickness},${lite_location},${rp_width},${section_height},LR`;        
+        let cnc = `${panel_identity},${door_thickness},${lite_location},${rp_width},${section_height},LR`;
 
         // 14 zeros
         cnc += "," + Array(14).fill(0).join(",");
@@ -754,3 +845,6 @@ function buildCncCode(sectionIndex) {
 
     return getCNCString(section_height, panel_identity);
 }
+
+
+

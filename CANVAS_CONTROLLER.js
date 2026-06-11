@@ -279,7 +279,7 @@ function addRenderNode() {
 					mouse_y >= py &&
 					mouse_y <= py + panel_height;
 
-				if (hit) {					
+				if (hit) {
 					section.enabled[i] = !section.enabled[i];
 					changed = true;
 					break;
@@ -289,7 +289,7 @@ function addRenderNode() {
 			if (changed) break;
 		}
 
-		if (changed) {			
+		if (changed) {
 			CANVAS_PLUGIN.draw(getDoorInfo());
 
 			$(`input[name='WINDOW_POSITION']`).prop("checked", false);
