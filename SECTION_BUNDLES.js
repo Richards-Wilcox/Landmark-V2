@@ -504,7 +504,7 @@ function addSectionBundleDrivers() {
     addLogic("BUNDLE2_SC2_SPNUM", function () {
         let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
         let bundle2_sc2_qty = getState("BUNDLE2_SC2_QTY");
-        const bundles = bundleByHeight(getSectionBundle());        
+        const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[1] ? bundles[1].indexes[1] : '';
 
         this.value = bundle2_sc2_qty > 0 ? `SC${doorModelId}0${index}` : 'None';
@@ -1975,11 +1975,20 @@ function buildRPBaseSpNum(height) {
     return `${doorModelId}-${height}`;
 }
 
-//function to get the raw panel top sheet part#
 function buildRPTopSpNum(height) {
-    const color = getState("COLOR").value;
-    return `LND-${height}${color}`;
+    const color = getState("COLOR")?.value;
+    const codeMap = {
+        18: '034',
+        21: '032',
+        24: '033',
+        28: '034',
+        32: '035'
+    };
+
+    const code = codeMap[height];
+    return `127-${code}${color}`;
 }
+
 
 //function to build section bundle desc
 function buildSBDescription(prefix, height, qty) {

@@ -1,5 +1,5 @@
 function addSchedulingCodeLogic() {
- 
+
     addLogic("SECTION_01_SC_CODE", createSectionScCodeLogic(0), ["SECTION_01", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "EndCaps"]);
     addLogic("SECTION_02_SC_CODE", createSectionScCodeLogic(1), ["SECTION_02", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "EndCaps"]);
     addLogic("SECTION_03_SC_CODE", createSectionScCodeLogic(2), ["SECTION_03", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "EndCaps"]);
@@ -15,7 +15,7 @@ function getSectionInfo() {
     return [...getDoorInfo().sections].reverse();
 }
 
-function generateScCode(glazed, btm_retainer, panel_seq, section_height) {
+function generateScCode(glazed, btm_retainer, panel_seq, section_height, sc_code) {
 
     // smartcom_code, width_code, panel_per_sb, setup_code
     const door_model = getState("LM_DOOR_MODEL");
@@ -23,11 +23,11 @@ function generateScCode(glazed, btm_retainer, panel_seq, section_height) {
     const door_color = getState("COLOR")?.value;
     const drill = getState("DRILL");
     let drill_code = `${panel_style}${getState("PANEL_SPACING")}`;
-    let end_caps = getState("EndCaps");
+    let end_caps = getState("EndCaps") === 'Y' ? 1 : 0;
     let width_code = `${section_height}-R${door_color}`;
     let panel_per_sb = 1;
 
-    return `${door_model},${panel_style},${door_color},${drill},${drill_code},${glazed},${btm_retainer},${end_caps},${panel_seq},${width_code},${panel_per_sb}`;
+    return `${door_model},${panel_style},${door_color},${drill},${drill_code},${glazed},${btm_retainer},${end_caps},${panel_seq},${sc_code},${width_code},${panel_per_sb}`;
 }
 
 
@@ -45,14 +45,14 @@ function createSectionScCodeLogic(sectionIndex) {
             });
 
             let glazed = section?.[sectionIndex]?.enabled?.some(v => v) ? 1 : 0;
-            let btm_retainer = 1;
+            let btm_retainer = sectionIndex === 0 ? 1 : 0;
             let panel_seq = sequence[sectionIndex] ?? 0;
             let section_height = section?.[sectionIndex].height;
-
-            console.log("section_height", section_height);
+            let sc_code = getState(`SECTION_0${sectionIndex+1}_SMARTCOM_CODE`);
+            
 
             // ✅ FIX HERE
-            this.value = generateScCode(glazed, btm_retainer, panel_seq, section_height);
+            this.value = generateScCode(glazed, btm_retainer, panel_seq, section_height, sc_code);
         } else {
             this.value = null; // optional safety
         }

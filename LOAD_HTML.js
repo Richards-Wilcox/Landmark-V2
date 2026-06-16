@@ -1067,12 +1067,12 @@ function loadForm() {
                                         <div class="rw-sliding-button">
                                             <label for="DrillYes">YES</label>
                                             <input type="radio" style="display:none;" id="DrillYes" name="DRILL"
-                                                value="Y">
+                                                value="Y" checked>
                                         </div>
                                         <div class="rw-sliding-button selected">
                                             <label for="DrillNo">NO</label>
                                             <input type="radio" style="display:none;" id="DrillNo" name="DRILL"
-                                                value="N" checked>
+                                                value="N" >
                                         </div>
                                     </div>
                                 </div>
@@ -1205,7 +1205,7 @@ function loadForm() {
     //Hides the outputs
     $('#accordion1406547076').hide()
     $("#accordion1094153584").hide()//Hides the global data for JDE
-    $("#accordion9757245").hide() //section bundle
+   // $("#accordion9757245").hide() //section bundle
     // $("#accordion321627220").hide() //Glazing code
     // $("#accordion1892755284").hide() //Scheduling code
 
