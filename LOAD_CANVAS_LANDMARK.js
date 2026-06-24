@@ -992,7 +992,8 @@ const CANVAS_PLUGIN = {
         const bgColor = door_info.background.color;
 
         const ctx = document.createElement("canvas").getContext("2d");
-        ctx.canvas.width = canvas.width; ctx.canvas.height = canvas.height;
+        ctx.canvas.width = canvas.width; 
+		ctx.canvas.height = canvas.height;
 
         const scale = door_info.scale;
 

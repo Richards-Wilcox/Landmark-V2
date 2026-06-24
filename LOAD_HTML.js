@@ -30,10 +30,67 @@ let insertColorUserOverride = false;
 
 
 function loadForm() {
+
+    toggleAccordion();
+    const form = createForm();
+    //Here is where we append the HTML
+    $('.concept-ui-form.scrollable').append(form)
+    $('.concept-ui-form.scrollable').removeClass('concept-ui-form scrollable')
+
+    loadUI();
+    //All warnings default to hidden
+    $('.rw-warning').hide()
+    $("#DEFAULTS_PLUGIN").html(DEFAULTS_PLUGIN.load("1825206974"))
+    $('#configurator button').on("click", evt => evt.preventDefault())
+    $('#LOAD_DEFAULTS').on('click', applyDefaults)
+    $("#LIFT_TYPE").change((e) => $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display")))
+    if ($("#INPUT_JSON").val() === '')
+        applyDefaults()
+    else {
+        loadInputValues("configurator");
+        $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display"))
+    }
+
+    //loadWeightNodes()
+
+    createNode("NEXT_PAGE_BTN_0", function () {
+        if (!isFormValid())
+            this.setAttribute("disabled", 'true')
+        else
+            this.removeAttribute("disabled")
+    }, "container", $("button[name=nextPageBtn]")[0], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
+
+    createNode("NEXT_PAGE_BTN_1", function () {
+        if (!isFormValid())
+            this.setAttribute("disabled", 'true')
+        else
+            this.removeAttribute("disabled")
+    }, "container", $("button[name=nextPageBtn]")[1], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
+
+    //The save button isn't compatible with a single page configurator
+    $("div.button-set.button-2.location-border button")[0].remove()
+    $("button[onclick='nextPage()']").text("Configure")
+
+
+    //Adding indicies to sections
+    $('#configurator section').each((index, e) => { e.setAttribute('index', index) })
+    //I just find this ugly.
+    $(`#collapse1159850199`).remove();
+    $(`#section_select`).on('change', (evt) => {
+        showSection(Number(evt.target.value))
+    })
+
+    //Load the caching system.
+    rw_init('configurator')
+    populateCarousel()
+
+}
+
+function createForm() {
     const form = `
 	<script src="/HTML/products/162059085/jscripts/panelConfigurations.js"></script>
 
-	<div id="configurator">
+<div id="configurator">
     <div class="rw-configurator__layout">
         <div class="rw-configurator__layout--left">
             <div id="NAVIGATION_SPC"></div>
@@ -328,7 +385,7 @@ function loadForm() {
                     <div class="panel-layout">
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_SHAPE_COLONIAL">Colonial</label>
-                            <input type="radio" id="GLASS_SHAPE_COLONIAL" name="GLASS_SHAPE" value="colonial" >
+                            <input type="radio" id="GLASS_SHAPE_COLONIAL" name="GLASS_SHAPE" value="colonial">
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
@@ -338,13 +395,13 @@ function loadForm() {
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_SHAPE_3">Slim</label>
-                            <input type="radio" id="GLASS_SHAPE_3" name="GLASS_SHAPE" value="slim_single">                            
+                            <input type="radio" id="GLASS_SHAPE_3" name="GLASS_SHAPE" value="slim_single">
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
-					                  <label for="GLASS_SHAPE_SLIM_DBL">Slim Double</label>
-					                  <input type="radio" id="GLASS_SHAPE_SLIM_DBL" name="GLASS_SHAPE" value="slim_double" >
-				                </div>
+                            <label for="GLASS_SHAPE_SLIM_DBL">Slim Double</label>
+                            <input type="radio" id="GLASS_SHAPE_SLIM_DBL" name="GLASS_SHAPE" value="slim_double">
+                        </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_SHAPE_MORE_17">Grand Wrought Iron - Rectangle</label>
@@ -395,7 +452,7 @@ function loadForm() {
 
                     </div>
                 </div>
-                
+
                 <!-- glass shapes end>
 
 		<!-- glass types -->
@@ -405,19 +462,19 @@ function loadForm() {
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="CLEAR">Clear Sealed</label>
                             <input type="radio" class="rw-button-toggle" id="CLEAR" name="GLASS_TYPE" value="CLEAR"
-                               glazingtype = 'double' >
+                                glazingtype='double'>
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="CLEAR_SINGLE">Clear Single</label>
                             <input type="radio" class="rw-button-toggle" id="CLEAR_SINGLE" name="GLASS_TYPE"
-                                value="CLEAR_SINGLE" glazingtype = 'single'>
+                                value="CLEAR_SINGLE" glazingtype='single'>
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="SATIN">Satin</label>
-                            <input type="radio" class="rw-button-toggle" id="SATIN" name="GLASS_TYPE"
-                                value="SATIN" glazingtype = 'double'>
+                            <input type="radio" class="rw-button-toggle" id="SATIN" name="GLASS_TYPE" value="SATIN"
+                                glazingtype='double'>
                         </div>
                     </div>
                 </div>
@@ -435,15 +492,17 @@ function loadForm() {
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="OBSCURE_GLASS_PINHEAD">Obscure Pinhead Sealed</label>
                             <input type="radio" id="OBSCURE_GLASS_PINHEAD" name="GLASS_TYPE"
-                                value="OBSCURE_GLASS_PINHEAD" glazingtype = 'double'>
+                                value="OBSCURE_GLASS_PINHEAD" glazingtype='double'>
                         </div>
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="DARK_TINT_SEALED">Dark Tint - Sealed</label>
-                            <input type="radio" id="DARK_TINT_SEALED" name="GLASS_TYPE" value="DARK_TINT_SEALED" glazingtype = 'double'>
+                            <input type="radio" id="DARK_TINT_SEALED" name="GLASS_TYPE" value="DARK_TINT_SEALED"
+                                glazingtype='double'>
                         </div>
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="BLACK_SATIN_SEALED">Black Satin - Sealed</label>
-                            <input type="radio" id="BLACK_SATIN_SEALED" name="GLASS_TYPE" value="BLACK_SATIN_SEALED" glazingtype = 'double'>
+                            <input type="radio" id="BLACK_SATIN_SEALED" name="GLASS_TYPE" value="BLACK_SATIN_SEALED"
+                                glazingtype='double'>
                         </div>
                     </div>
                 </div>
@@ -1072,7 +1131,7 @@ function loadForm() {
                                         <div class="rw-sliding-button selected">
                                             <label for="DrillNo">NO</label>
                                             <input type="radio" style="display:none;" id="DrillNo" name="DRILL"
-                                                value="N" >
+                                                value="N">
                                         </div>
                                     </div>
                                 </div>
@@ -1173,7 +1232,7 @@ function loadForm() {
 
                     </button>
 
-                    <button type="button" name="nextPageBtn" class="button-configure" onclick="nextPage()"
+                    <button type="button" name="nextPageBtn" class="button-configure" onclick="Configure()"
                         data-qa-selector="continue">Configure</button>
 
                     <button class="button-nextpage" onclick="formForward()">
@@ -1197,6 +1256,11 @@ function loadForm() {
     </div>
 </div>
 `
+
+    return form;
+}
+
+function toggleAccordion() {
     //At least one input needs to be loaded in initially to get the title.
     $('#ROOT_0').hide()
 
@@ -1205,468 +1269,406 @@ function loadForm() {
     //Hides the outputs
     $('#accordion1406547076').hide()
     $("#accordion1094153584").hide()//Hides the global data for JDE
-   // $("#accordion9757245").hide() //section bundle
-    // $("#accordion321627220").hide() //Glazing code
-    // $("#accordion1892755284").hide() //Scheduling code
+    $("#accordion9757245").hide() //section bundle
+    //  $("#accordion321627220").hide() //Glazing code
+    //$("#accordion1892755284").hide() //Scheduling code
+}
 
-    //Here is where we add the HTML
-    $('.concept-ui-form.scrollable').append(form)
-    $('.concept-ui-form.scrollable').removeClass('concept-ui-form scrollable')
-
-    loadUI();
+function populateCarousel() {
 
 
-    //loadWeightNodes()
+    if ($(".button-set.right").length > 0) {
+        $(".button-set.right").hide();
+    }
 
-    createNode("NEXT_PAGE_BTN_0", function () {
-        if (!isFormValid())
-            this.setAttribute("disabled", 'true')
-        else
-            this.removeAttribute("disabled")
-    }, "container", $("button[name=nextPageBtn]")[0], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
+    const observerPosition = new MutationObserver((mutations, obs) => {
 
-    createNode("NEXT_PAGE_BTN_1", function () {
-        if (!isFormValid())
-            this.setAttribute("disabled", 'true')
-        else
-            this.removeAttribute("disabled")
-    }, "container", $("button[name=nextPageBtn]")[1], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
+        const checkedWindowOption = $('.combined-button-container-inner input[type="radio"]:checked').val();
 
-    //The save button isn't compatible with a single page configurator
-    $("div.button-set.button-2.location-border button")[0].remove()
-    $("button[onclick='nextPage()']").text("Configure")
+        if ($(".window-position-container").length > 0) {
+            const $targetButton = $("#WINDOW_POSITION_3");
+            const $targetWrapper = $targetButton.closest('.rw-button');
+            const $windowsSelected = $("#WINDOWS_1");
 
+            if (isHiddenPosition($targetWrapper) && $windowsSelected.prop("checked") && $targetButton.prop("checked")) {
+                document.querySelector('label[for="WINDOW_POSITION_0"]').click();
+            }
+        }
+    });
 
-    //Adding indicies to sections
-    $('#configurator section').each((index, e) => { e.setAttribute('index', index) })
-    //I just find this ugly.
-    $(`#collapse1159850199`).remove();
-    $(`#section_select`).on('change', (evt) => {
-        showSection(Number(evt.target.value))
-    })
-
-    //Load the caching system.
-    rw_init('configurator')
-    loadGlobalNodes()
-    //loadTrussSchedule()
-    //loadPriceDrivers()
-
-    //Needed for some minor layout
-    //$('#displayMain').css('margin-bottom', '24px')
-    //$('#displayMain').css('padding', '0 100px')
-
-    //populatePrecons()
-
-    //All warnings default to hidden
-    $('.rw-warning').hide()
-    $("#DEFAULTS_PLUGIN").html(DEFAULTS_PLUGIN.load("1825206974"))
-    $('#configurator button').on("click", evt => evt.preventDefault())
-    $('#LOAD_DEFAULTS').on('click', applyDefaults)
-    $("#LIFT_TYPE").change((e) => $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display")))
-    if ($("#INPUT_JSON").val() === '')
-        applyDefaults()
-    else {
-        loadInputValues("configurator");
+    observerPosition.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'style']
+    });
 
 
-        $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display"))
+    // Observer for color changes
+    const observer = new MutationObserver((mutations, obs) => {
+        if ($(".color-button").length > 0) {
+            obs.disconnect(); // stops the observer
+
+            setupRadioSelectionTwoButtons("DRILL");
+            setupRadioSelectionTwoButtons("EndCaps");
+            setupRadioSelectionTwoButtons("DOOROPT");
+            setupRadioSelectionTwoButtons("SPRINGTYPE");
+            setupRadioSelectionTwoButtons("EXTRA_TRUSS");
+            setupRadioSelectionTwoButtons("SHAFT");
+            setupRadioSelectionTwoButtons("SPRINGCYCLE");
+            setupRadioSelectionTwoButtons("INCLINEDTRACK");
+
+
+
+            function updatedColorSelection() {
+                $(".color-button-container").removeClass("selected");
+                $(".door-color-text").removeClass("selected");
+                const $selected = $("input[name='COLOR']:checked");
+                $selected.closest(".color-button-container").addClass("selected");
+                $selected.siblings(".door-color-text").addClass("selected");
+            }
+
+            updatedColorSelection();
+
+            $("input[name='COLOR']").on("change", updatedColorSelection);
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
+    // Carousel Data for Hardware
+    const operatorData = {
+
+        0: {
+            id: "operator_none",
+            name: "None",
+            value: "PS",
+            img: "/HTML/products/162059085/images/Operators_none.png",
+            maxDoorHeight: 1000,
+            isHiLiftCompatible: true,
+            style: ""
+        },
+        1: {
+            id: "operator_jackshaft",
+            name: "98022 - Jackshaft",
+            value: "8500W",
+            img: "/HTML/products/162059085/images/EW-LM-8500W.jpg",
+            maxDoorHeight: 1000,
+            isHiLiftCompatible: true,
+            style: ""
+        },
+        2: {
+            id: "operator_belt",
+            name: "87504-267 -Belt",
+            value: "87504-267",
+            img: "/HTML/products/162059085/images/87504-267.png",
+            maxDoorHeight: 120,
+            isHiLiftCompatible: false,
+            style: ""
+        },
+        3: {
+            id: "operator_chain",
+            name: "83650-267 - Chain",
+            value: "8365W-267",
+            img: "/HTML/products/162059085/images/EW-LM-8365W-267.jpg",
+            maxDoorHeight: 120,
+            isHiLiftCompatible: false,
+            style: ""
+        },
+        4: {
+            id: "operator_chain_2",
+            name: "81650 - Chain",
+            value: "8165W",
+            img: "/HTML/products/162059085/images/EW-LM-8165.jpg",
+            maxDoorHeight: 120,
+            isHiLiftCompatible: false,
+            style: ""
+        },
+        5: {
+            id: "operator_belt_2",
+            name: "81550 - Belt",
+            value: "8155B",
+            img: "/HTML/products/162059085/images/EW-LM-8155B.jpg",
+            maxDoorHeight: 120,
+            isHiLiftCompatible: false,
+            style: ""
+        }
+
+
+    }
+    // Data and default start index
+    const operatorDataArray = Object.values(operatorData);
+    let currentOperatorIndex = 1;
+    let firstTimeLoading = true;
+
+    // Creates the HTML for operator
+    function createOperatorDiv(operator, activeStatus = false) {
+        const operatorItem = document.createElement('div');
+        operatorItem.classList.add('carousel-operator-item');
+
+        if (activeStatus) {
+            operatorItem.classList.add('active');
+        }
+
+        // First make sure images get loaded
+        let retryLoading = false;
+        let retryCounter = 0;
+
+        const image = document.createElement('img');
+        image.src = operator.img;
+
+        if (operator.img === "") {
+            image.style.visibility = 'hidden';
+        } else {
+            image.onload = () => {
+                image.style.visibility = 'visible';
+            }
+
+            image.onerror = () => {
+
+                if (retryCounter < 5) {
+                    retryCounter++;
+                    setTimeout(() => {
+                        image.src = operator.img + '?retry=' + Date.now();
+                    }, 1000);
+                } else {
+                    image.style.visibility = 'hidden';
+                }
+            }
+        }
+
+        const operatorInnerDiv = document.createElement('div');
+        operatorInnerDiv.classList.add('carousel-operator-image');
+        operatorInnerDiv.appendChild(image);
+
+        const operatorHeader = document.createElement('h3');
+        operatorHeader.textContent = operator.name;
+
+
+        operatorItem.appendChild(operatorInnerDiv);
+        operatorItem.appendChild(operatorHeader);
+
+        return operatorItem;
     }
 
 
-    $(function () {
+    // Creates the carousel with the data (temporary needs changing for innf scrolling)
+    function operatorCarouselLoad(indexCurrent) {
+        const content = document.getElementById('operator-carousel-container');
+        const operatorInput = document.getElementById('OPERATOR');
 
-        if ($(".button-set.right").length > 0) {
-            $(".button-set.right").hide();
-        }
+        content.innerHTML = '';
 
-        const observerPosition = new MutationObserver((mutations, obs) => {
-
-            const checkedWindowOption = $('.combined-button-container-inner input[type="radio"]:checked').val();
-
-            if ($(".window-position-container").length > 0) {
-                const $targetButton = $("#WINDOW_POSITION_3");
-                const $targetWrapper = $targetButton.closest('.rw-button');
-                const $windowsSelected = $("#WINDOWS_1");
-
-                if (isHiddenPosition($targetWrapper) && $windowsSelected.prop("checked") && $targetButton.prop("checked")) {
-                    document.querySelector('label[for="WINDOW_POSITION_0"]').click();
-                }
-            }
+        content.appendChild(createOperatorDiv(operatorDataArray[operatorDataArray.length - 1]));
+        operatorDataArray.forEach((operator, index) => {
+            const operatorItemList = createOperatorDiv(operator, index === indexCurrent);
+            content.appendChild(operatorItemList);
         });
+        //content.insertBefore(createOperatorDiv(operatorDataArray[operatorDataArray.length-1]), operatorDataArray[0]);
+        content.appendChild(createOperatorDiv(operatorDataArray[0]));
+    }
 
-        observerPosition.observe(document.body, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['class', 'style']
+
+    function updateActiveOperator(index) {
+        const items = document.querySelectorAll('.carousel-operator-item');
+
+        // First set the active tag
+        items.forEach((item, i) => {
+            item.classList.toggle('active', i === index);
         });
 
 
-        // Observer for color changes
-        const observer = new MutationObserver((mutations, obs) => {
-            if ($(".color-button").length > 0) {
-                obs.disconnect(); // stops the observer
-
-                setupRadioSelectionTwoButtons("DRILL");
-                setupRadioSelectionTwoButtons("EndCaps");
-                setupRadioSelectionTwoButtons("DOOROPT");
-                setupRadioSelectionTwoButtons("SPRINGTYPE");
-                setupRadioSelectionTwoButtons("EXTRA_TRUSS");
-                setupRadioSelectionTwoButtons("SHAFT");
-                setupRadioSelectionTwoButtons("SPRINGCYCLE");
-                setupRadioSelectionTwoButtons("INCLINEDTRACK");
+        // Due to clones we need to move the index so it it not out of bounds
+        let dataIndex = index - 1;
 
 
-
-                function updatedColorSelection() {
-                    $(".color-button-container").removeClass("selected");
-                    $(".door-color-text").removeClass("selected");
-                    const $selected = $("input[name='COLOR']:checked");
-                    $selected.closest(".color-button-container").addClass("selected");
-                    $selected.siblings(".door-color-text").addClass("selected");
-                }
-
-                updatedColorSelection();
-
-                $("input[name='COLOR']").on("change", updatedColorSelection);
-            }
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-
-        // Carousel Data for Hardware
-        const operatorData = {
-
-            0: {
-                id: "operator_none",
-                name: "None",
-                value: "PS",
-                img: "/HTML/products/162059085/images/Operators_none.png",
-                maxDoorHeight: 1000,
-                isHiLiftCompatible: true,
-                style: ""
-            },
-            1: {
-                id: "operator_jackshaft",
-                name: "98022 - Jackshaft",
-                value: "8500W",
-                img: "/HTML/products/162059085/images/EW-LM-8500W.jpg",
-                maxDoorHeight: 1000,
-                isHiLiftCompatible: true,
-                style: ""
-            },
-            2: {
-                id: "operator_belt",
-                name: "87504-267 -Belt",
-                value: "87504-267",
-                img: "/HTML/products/162059085/images/87504-267.png",
-                maxDoorHeight: 120,
-                isHiLiftCompatible: false,
-                style: ""
-            },
-            3: {
-                id: "operator_chain",
-                name: "83650-267 - Chain",
-                value: "8365W-267",
-                img: "/HTML/products/162059085/images/EW-LM-8365W-267.jpg",
-                maxDoorHeight: 120,
-                isHiLiftCompatible: false,
-                style: ""
-            },
-            4: {
-                id: "operator_chain_2",
-                name: "81650 - Chain",
-                value: "8165W",
-                img: "/HTML/products/162059085/images/EW-LM-8165.jpg",
-                maxDoorHeight: 120,
-                isHiLiftCompatible: false,
-                style: ""
-            },
-            5: {
-                id: "operator_belt_2",
-                name: "81550 - Belt",
-                value: "8155B",
-                img: "/HTML/products/162059085/images/EW-LM-8155B.jpg",
-                maxDoorHeight: 120,
-                isHiLiftCompatible: false,
-                style: ""
-            }
-
-
-        }
-        // Data and default start index
-        const operatorDataArray = Object.values(operatorData);
-        let currentOperatorIndex = 1;
-        let firstTimeLoading = true;
-
-        // Creates the HTML for operator
-        function createOperatorDiv(operator, activeStatus = false) {
-            const operatorItem = document.createElement('div');
-            operatorItem.classList.add('carousel-operator-item');
-
-            if (activeStatus) {
-                operatorItem.classList.add('active');
-            }
-
-            // First make sure images get loaded
-            let retryLoading = false;
-            let retryCounter = 0;
-
-            const image = document.createElement('img');
-            image.src = operator.img;
-
-            if (operator.img === "") {
-                image.style.visibility = 'hidden';
-            } else {
-                image.onload = () => {
-                    image.style.visibility = 'visible';
-                }
-
-                image.onerror = () => {
-
-                    if (retryCounter < 5) {
-                        retryCounter++;
-                        setTimeout(() => {
-                            image.src = operator.img + '?retry=' + Date.now();
-                        }, 1000);
-                    } else {
-                        image.style.visibility = 'hidden';
-                    }
-                }
-            }
-
-            const operatorInnerDiv = document.createElement('div');
-            operatorInnerDiv.classList.add('carousel-operator-image');
-            operatorInnerDiv.appendChild(image);
-
-            const operatorHeader = document.createElement('h3');
-            operatorHeader.textContent = operator.name;
-
-
-            operatorItem.appendChild(operatorInnerDiv);
-            operatorItem.appendChild(operatorHeader);
-
-            return operatorItem;
+        if (dataIndex < 0) {
+            dataIndex = operatorDataArray.length - 1;
+        } else if (dataIndex >= operatorDataArray.length) {
+            dataIndex = 0;
         }
 
+        const currentOperator = operatorDataArray[dataIndex];
+        const operatorInput = document.getElementById('OPERATOR');
+        operatorInput.name = currentOperator.name;
+        operatorInput.value = currentOperator.value;
+        !!nodeset['OPERATOR'] ? nodeset['OPERATOR'].value = currentOperator.value : ""
+        !!rw ? rw(getNode("OPERATOR")) : ""
+        operatorInput.dataset.maxDoorHeight = currentOperator.maxDoorHeight;
+        operatorInput.dataset.isHiLiftCompatible = currentOperator.isHiLiftCompatible;
+    }
 
-        // Creates the carousel with the data (temporary needs changing for innf scrolling)
-        function operatorCarouselLoad(indexCurrent) {
-            const content = document.getElementById('operator-carousel-container');
-            const operatorInput = document.getElementById('OPERATOR');
+    function updateCarouselPosition(index) {
+        const carousel = document.getElementById('operator-carousel-container');
 
-            content.innerHTML = '';
-
-            content.appendChild(createOperatorDiv(operatorDataArray[operatorDataArray.length - 1]));
-            operatorDataArray.forEach((operator, index) => {
-                const operatorItemList = createOperatorDiv(operator, index === indexCurrent);
-                content.appendChild(operatorItemList);
-            });
-            //content.insertBefore(createOperatorDiv(operatorDataArray[operatorDataArray.length-1]), operatorDataArray[0]);
-            content.appendChild(createOperatorDiv(operatorDataArray[0]));
-        }
-
-
-        function updateActiveOperator(index) {
-            const items = document.querySelectorAll('.carousel-operator-item');
-
-            // First set the active tag
-            items.forEach((item, i) => {
-                item.classList.toggle('active', i === index);
-            });
-
-
-            // Due to clones we need to move the index so it it not out of bounds
-            let dataIndex = index - 1;
-
-
-            if (dataIndex < 0) {
-                dataIndex = operatorDataArray.length - 1;
-            } else if (dataIndex >= operatorDataArray.length) {
-                dataIndex = 0;
-            }
-
-            const currentOperator = operatorDataArray[dataIndex];
-            const operatorInput = document.getElementById('OPERATOR');
-            operatorInput.name = currentOperator.name;
-            operatorInput.value = currentOperator.value;
-            !!nodeset['OPERATOR'] ? nodeset['OPERATOR'].value = currentOperator.value : ""
-            !!rw ? rw(getNode("OPERATOR")) : ""
-            operatorInput.dataset.maxDoorHeight = currentOperator.maxDoorHeight;
-            operatorInput.dataset.isHiLiftCompatible = currentOperator.isHiLiftCompatible;
-        }
-
-        function updateCarouselPosition(index) {
-            const carousel = document.getElementById('operator-carousel-container');
-
-            // Prevents slide affect first load
-            if (firstTimeLoading) {
-                carousel.classList.add('no-transition');
-                carousel.style.transform = `translateX(-${index * 100}%)`;
-                firstTimeLoading = false;
-
-                requestAnimationFrame(() => {
-                    carousel.classList.remove('no-transition');
-                });
-            } else {
-                carousel.style.transform = `translateX(-${index * 100}%)`;
-            }
-        }
-
-        // // Check if carousel buttons are added
-        // let buttonsAdded = false;
-
-        // // Setup carousel when tab 2 is clicked
-        // const observerTab2 = new MutationObserver((mutations, obs) => {      
-        //   const $tab3 = $('#tab_3');
-        //   if ($tab3) {
-        //     obs.disconnect();
-
-        //     $('#tab_3').on('click', function () {
-
-        //       const carouselContainer = document.getElementById('operator-carousel-container');
-
-        //       if (carouselContainer) {
-        //         operatorCarouselLoad(currentOperatorIndex);
-        //         updateSelectedOperator(currentOperatorIndex);
-
-        //         if (!buttonsAdded) {
-
-        //           buttonsAdded = true;
-
-        //           $('#nextButtonOperator').on('click', () => {
-        //             if (currentOperatorIndex > operatorDataArray.length) return;
-        //             currentOperatorIndex++;
-        //             updateSelectedOperator(currentOperatorIndex);
-        //           });
-
-        //           $('#prevButtonOperator').on('click', () => {
-        //             if (currentOperatorIndex <= 0) return;
-        //             currentOperatorIndex--;
-        //             updateSelectedOperator(currentOperatorIndex);
-        //           });
-
-
-        //           carouselContainer.addEventListener('transitionend', () => {
-
-        //             if (currentOperatorIndex > operatorDataArray.length) {
-        //               indexCorrectionList(carouselContainer, 1);
-        //             }
-
-        //             if (currentOperatorIndex <= 0) {
-        //               indexCorrectionList(carouselContainer, operatorDataArray.length);
-        //             }
-        //           });
-        //         }
-        //       } else {
-        //         console.log('Observer missing');
-        //       }
-        //     });
-        //   }
-        // });
-
-        // observerTab2.observe(document.body, {
-        //   childList: true,
-        //   subtree: true
-        // });
-
-
-        function initOperatorCarousel() {
-
-            const container = document.getElementById('operator-carousel-container');
-
-            if (!container || container.dataset.loaded) return;
-
-            console.log("✅ init operator carousel");
-
-            operatorCarouselLoad(currentOperatorIndex);
-            updateSelectedOperator(currentOperatorIndex);
-
-            container.dataset.loaded = "true";
-
-            // Buttons (only once)
-            $('#nextButtonOperator').off().on('click', () => {
-                if (currentOperatorIndex > operatorDataArray.length) return;
-                currentOperatorIndex++;
-                updateSelectedOperator(currentOperatorIndex);
-            });
-
-            $('#prevButtonOperator').off().on('click', () => {
-                if (currentOperatorIndex <= 0) return;
-                currentOperatorIndex--;
-                updateSelectedOperator(currentOperatorIndex);
-            });
-
-            // Infinite loop fix
-            container.addEventListener('transitionend', () => {
-                if (currentOperatorIndex > operatorDataArray.length) {
-                    indexCorrectionList(container, 1);
-                }
-
-                if (currentOperatorIndex <= 0) {
-                    indexCorrectionList(container, operatorDataArray.length);
-                }
-            });
-        }
-
-        // Update data list selection and update positioning
-        function updateSelectedOperator(index) {
-            updateCarouselPosition(index);
-            updateActiveOperator(index);
-        }
-
-        // Move to the correct index for infinite loop
-        function indexCorrectionList(container, index) {
-            container.style.transition = 'none';
-            currentOperatorIndex = index;
-            updateSelectedOperator(currentOperatorIndex);
+        // Prevents slide affect first load
+        if (firstTimeLoading) {
+            carousel.classList.add('no-transition');
+            carousel.style.transform = `translateX(-${index * 100}%)`;
+            firstTimeLoading = false;
 
             requestAnimationFrame(() => {
-                container.style.transition = 'transform 0.3s ease';
+                carousel.classList.remove('no-transition');
             });
+        } else {
+            carousel.style.transform = `translateX(-${index * 100}%)`;
         }
+    }
+
+    // // Check if carousel buttons are added
+    // let buttonsAdded = false;
+
+    // // Setup carousel when tab 2 is clicked
+    // const observerTab2 = new MutationObserver((mutations, obs) => {      
+    //   const $tab3 = $('#tab_3');
+    //   if ($tab3) {
+    //     obs.disconnect();
+
+    //     $('#tab_3').on('click', function () {
+
+    //       const carouselContainer = document.getElementById('operator-carousel-container');
+
+    //       if (carouselContainer) {
+    //         operatorCarouselLoad(currentOperatorIndex);
+    //         updateSelectedOperator(currentOperatorIndex);
+
+    //         if (!buttonsAdded) {
+
+    //           buttonsAdded = true;
+
+    //           $('#nextButtonOperator').on('click', () => {
+    //             if (currentOperatorIndex > operatorDataArray.length) return;
+    //             currentOperatorIndex++;
+    //             updateSelectedOperator(currentOperatorIndex);
+    //           });
+
+    //           $('#prevButtonOperator').on('click', () => {
+    //             if (currentOperatorIndex <= 0) return;
+    //             currentOperatorIndex--;
+    //             updateSelectedOperator(currentOperatorIndex);
+    //           });
 
 
+    //           carouselContainer.addEventListener('transitionend', () => {
 
-        // Helper function to check if parent child exists
-        function isHiddenPosition($btn) {
-            return $btn.length === 0 || $btn[0].offsetParent === null;
-        }
+    //             if (currentOperatorIndex > operatorDataArray.length) {
+    //               indexCorrectionList(carouselContainer, 1);
+    //             }
 
-        // Adding selector (temporary)
-        function setupRadioSelectionTwoButtons(radioName) {
-            function updateSelection() {
-                // Remove selected from all containers of this group
-                $(`input[name="${radioName}"]`).each(function () {
-                    $(this).closest(".rw-sliding-button").removeClass("selected");
-                });
+    //             if (currentOperatorIndex <= 0) {
+    //               indexCorrectionList(carouselContainer, operatorDataArray.length);
+    //             }
+    //           });
+    //         }
+    //       } else {
+    //         console.log('Observer missing');
+    //       }
+    //     });
+    //   }
+    // });
 
-                // Add selected to the currently checked one
-                const $selected = $(`input[name="${radioName}"]:checked`);
-                $selected.closest(".rw-sliding-button").addClass("selected");
-            }
+    // observerTab2.observe(document.body, {
+    //   childList: true,
+    //   subtree: true
+    // });
 
-            updateSelection();
 
-            $(`input[name="${radioName}"]`).on("change", updateSelection);
-        }
+    function initOperatorCarousel() {
 
-        // ✅ Load carousel when navigating pages
-        $(document).on('click', '.button-nextpage, #NAVIGATION_SPC', function () {
+        const container = document.getElementById('operator-carousel-container');
 
-            setTimeout(() => {
+        if (!container || container.dataset.loaded) return;
 
-                if ($("#OPERATOR_OPTIONS").is(':visible')) {
-                    initOperatorCarousel();
-                }
+        console.log("✅ init operator carousel");
 
-            }, 100);
+        operatorCarouselLoad(currentOperatorIndex);
+        updateSelectedOperator(currentOperatorIndex);
+
+        container.dataset.loaded = "true";
+
+        // Buttons (only once)
+        $('#nextButtonOperator').off().on('click', () => {
+            if (currentOperatorIndex > operatorDataArray.length) return;
+            currentOperatorIndex++;
+            updateSelectedOperator(currentOperatorIndex);
         });
 
+        $('#prevButtonOperator').off().on('click', () => {
+            if (currentOperatorIndex <= 0) return;
+            currentOperatorIndex--;
+            updateSelectedOperator(currentOperatorIndex);
+        });
+
+        // Infinite loop fix
+        container.addEventListener('transitionend', () => {
+            if (currentOperatorIndex > operatorDataArray.length) {
+                indexCorrectionList(container, 1);
+            }
+
+            if (currentOperatorIndex <= 0) {
+                indexCorrectionList(container, operatorDataArray.length);
+            }
+        });
+    }
+
+    // Update data list selection and update positioning
+    function updateSelectedOperator(index) {
+        updateCarouselPosition(index);
+        updateActiveOperator(index);
+    }
+
+    // Move to the correct index for infinite loop
+    function indexCorrectionList(container, index) {
+        container.style.transition = 'none';
+        currentOperatorIndex = index;
+        updateSelectedOperator(currentOperatorIndex);
+
+        requestAnimationFrame(() => {
+            container.style.transition = 'transform 0.3s ease';
+        });
+    }
+
+
+
+    // Helper function to check if parent child exists
+    function isHiddenPosition($btn) {
+        return $btn.length === 0 || $btn[0].offsetParent === null;
+    }
+
+    // Adding selector (temporary)
+    function setupRadioSelectionTwoButtons(radioName) {
+        function updateSelection() {
+            // Remove selected from all containers of this group
+            $(`input[name="${radioName}"]`).each(function () {
+                $(this).closest(".rw-sliding-button").removeClass("selected");
+            });
+
+            // Add selected to the currently checked one
+            const $selected = $(`input[name="${radioName}"]:checked`);
+            $selected.closest(".rw-sliding-button").addClass("selected");
+        }
+
+        updateSelection();
+
+        $(`input[name="${radioName}"]`).on("change", updateSelection);
+    }
+
+    // ✅ Load carousel when navigating pages
+    $(document).on('click', '.button-nextpage, #NAVIGATION_SPC', function () {
+
+        setTimeout(() => {
+
+            if ($("#OPERATOR_OPTIONS").is(':visible')) {
+                initOperatorCarousel();
+            }
+
+        }, 100);
     });
+
+
 }
 
 function applyDefaults() {
@@ -1688,8 +1690,8 @@ function loadUI() {
     //hide the footer buttons
     $(".bottom-buttons").hide();
 
-    appendDrpData();
-    toggleSwitch();
+    // appendDrpData();
+    // toggleSwitch();
     // appendAvailableColors();
     // appendAvailableFrameColors();  
     appendAvailableColorsTo("#AvaialbleColorsSection");
@@ -1714,6 +1716,10 @@ function loadUI() {
 
 function clickHandler() {
     // Attach to all radios except color radios
+
+    appendDrpData();
+    toggleSwitch();
+
 
     $("input[type='radio']")
         .not("input[name='AVAILABLE_COLOR'], input[name='OPTIONAL_COLOR']")
@@ -1769,10 +1775,14 @@ function clickHandler() {
         if ($(this).data('checked')) {
             $(this).prop('checked', false);
             $(this).data('checked', false);
+            $(this).parent().removeClass("btn-checked");
+            setState("GLASS_SHAPE", '');
         } else {
             $('input[name="GLASS_SHAPE"]').data('checked', false);
             $(this).data('checked', true);
             $(this).prop('checked', true);
+            $(this).parent().addClass("btn-checked");
+            setState("GLASS_SHAPE", $(this).val());
         }
 
     });
@@ -2123,52 +2133,137 @@ function generateOptionsFromArray(arr) {
     return arr.map(val => `<option value="${val}">${val}</option>`).join('');
 }
 
+function updateDoorWidthInches(feet) {
+    const select = document.getElementById("DOOR_WIDTH_INCHES");
+    if (!select) return;
+
+    let minInches = 0;
+    let maxInches = 11;
+
+    if (feet === 4) {
+        minInches = 2;
+        maxInches = 11;
+    } else if (feet === 20) {
+        minInches = 0;
+        maxInches = 2;
+    }
+
+    // Clear old options
+    select.options.length = 0;
+
+    // Add new options
+    for (let i = minInches; i <= maxInches; i++) {
+        select.add(new Option(String(i), String(i)));
+    }
+
+    // IMPORTANT:
+    // Set selected index after DOM finishes updating options
+    setTimeout(() => {
+        if (select.options.length > 0) {
+            select.selectedIndex = 0;
+            select.options[0].selected = true;
+            select.value = select.options[0].value;
+        }
+
+        console.log("updateDoorWidthInches =>", {
+            feet,
+            value: select.value,
+            selectedIndex: select.selectedIndex
+        });
+
+    }, 0);
+}
+
 function appendDrpData() {
 
-    // 1️⃣ Populate Door Width Feet (4–20)
+    // Populate Door Width Feet (4–20)
     $("#DOOR_WIDTH_FEET").html(generateOptions(4, 20));
-    $("#DOOR_WIDTH_FEET").val(16);
+    $("#DOOR_WIDTH_FEET").val("16");
 
-    // 2️⃣ Populate initial Door Width Inches (0–11)
-    $("#DOOR_WIDTH_INCHES").html(generateOptions(0, 11));
+    // Populate initial Door Width Inches based on default width feet
+    updateDoorWidthInches(16);
 
-    // 3️⃣ Update inches dynamically based on feet selection
-    $("#DOOR_WIDTH_FEET").on("change", function () {
-        const feet = parseInt($(this).val(), 10);
+    // Prevent duplicate bindings, then bind width feet change
+    $("#DOOR_WIDTH_FEET")
+        .off("change.doorWidth")
+        .on("change.doorWidth", function () {
+            const feet = parseInt($(this).val(), 10);
+            updateDoorWidthInches(feet);
+        });
 
-        const maxInches = feet === 20 ? 2 : 11; // limit inches for 20 feet
-        $("#DOOR_WIDTH_INCHES").html(generateOptions(0, maxInches));
-    });
-
-    // Populate Door height Feet (6–14)
+    // Populate Door Height Feet (6–14)
     $("#DOOR_HEIGHT_FEET").html(generateOptions(6, 14));
-    // $("#DOOR_HEIGHT_FEET").val(7);
+    $("#DOOR_HEIGHT_FEET").val("7");
 
     refreshHeightInches(7);
 
-    $("#DOOR_HEIGHT_FEET").on("change", function () {
-        const feet = parseInt($(this).val(), 10);
-        refreshHeightInches(feet);
-    });
-
-
+    $("#DOOR_HEIGHT_FEET")
+        .off("change.doorHeight")
+        .on("change.doorHeight", function () {
+            const feet = parseInt($(this).val(), 10);
+            refreshHeightInches(feet);
+        });
 }
+
 
 function refreshHeightInches(feet) {
+    let select = document.getElementById("DOOR_HEIGHT_INCHES");
+    if (!select) return;
+
     const inches = (feet === 14) ? [0] : [0, 3, 6, 9];
-    $("#DOOR_HEIGHT_INCHES").html(generateOptionsFromArray(inches));
+
+    // Save current selected value before rebuilding
+    const previousValue = select.value;
+
+    // Clear old options
+    select.options.length = 0;
+
+    // Add new options
+    inches.forEach(val => {
+        select.add(new Option(String(val), String(val)));
+    });
+
+    setTimeout(() => {
+        if (!select.options.length) return;
+
+        // Preserve previous value if still valid
+        if (inches.map(String).includes(String(previousValue))) {
+            select.value = String(previousValue);
+        } else {
+            // Otherwise reset to first option
+            select.selectedIndex = 0;
+            select.options[0].selected = true;
+            select.value = select.options[0].value;
+        }
+
+        console.log("refreshHeightInches =>", {
+            feet,
+            previousValue,
+            value: select.value,
+            selectedIndex: select.selectedIndex
+        });
+    }, 0);
 }
+
 
 
 //function to show and hide door width and door height dropdown
 function toggleSwitch() {
-    $('#customSwitch').change(function () {
+
+    $('#customSwitch').off("change").on("change", function () {
 
         if ($(this).is(':checked')) {
             toggle_Switch = 1;
             $("#customSwitch").val("on");
             $('.custom-dimension-container').slideDown();
-            $('#DOOR_HEIGHT_FEET', '#DOOR_HEIGHT_INCHES', '#DOOR_WIDTH_FEET', '#DOOR_WIDTH_INCHES').prop('selectedIndex', 0).trigger('change');;
+            // $('#DOOR_HEIGHT_FEET', '#DOOR_HEIGHT_INCHES', '#DOOR_WIDTH_FEET', '#DOOR_WIDTH_INCHES').prop('selectedIndex', 0).trigger('change');
+            let width = getState("DOOR_WIDTH_FEET");
+            let height = getState("DOOR_HEIGHT_FEET");
+
+            // Rebuild inches dropdowns
+            updateDoorWidthInches(width);
+            refreshHeightInches(height);
+
 
             $(`input[name='SIZE']`).each((i, radio) => {
                 $(radio).prop("checked", false).removeAttr("checked");
@@ -2317,7 +2412,6 @@ function initAppEvents() {
 
             const panel_style = this.value;
 
-            // re-render optional colors
             appendOptionalColors(panel_style);
 
             // re-select first color after render

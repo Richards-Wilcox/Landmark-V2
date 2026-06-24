@@ -471,7 +471,20 @@ function addSlimUi() {
 
 function getCanvasMousePosFromEvent(event) {
 	const canvas = $("#CONFIG_CANVAS")[0];
+
+	if (!canvas) {
+		return [0, 0];
+	}
+
 	const rect = canvas.getBoundingClientRect();
+
+	// Fallback when no event is provided
+	if (!event) {
+		const mouse_x = canvas_mouse.x * (canvas.width / rect.width);
+		const mouse_y = canvas_mouse.y * (canvas.height / rect.height);
+
+		return [mouse_x, mouse_y];
+	}
 
 	const mouse_x = (event.clientX - rect.left) * (canvas.width / rect.width);
 	const mouse_y = (event.clientY - rect.top) * (canvas.height / rect.height);

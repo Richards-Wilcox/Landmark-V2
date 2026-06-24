@@ -1,13 +1,18 @@
 function loadStyles() {
   const styles = `
 
-// #accordion1094153584,
+// #ROOT_0,
 // #accordion935516314,
 // #accordion991246024,
 // #accordion1406547076,
+// #accordion1094153584,
 // #accordion9757245,
-// #accordion321627220, #accordion1892755284 {
+// #accordion321627220,
+// #accordion1892755284 {
 //     display: none !important;
+//     visibility: hidden !important;
+//     height: 0 !important;
+//     overflow: hidden !important;
 // }
 
 

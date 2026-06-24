@@ -292,7 +292,31 @@ function loadDrivenInputEvents() {
     this.value = $(`input[type="radio"][name="LIFT_TYPE"][checked]`).val()
   }, ["HARDWARE_SET", "SPRINGTYPE", "INCLINEDTRACK"])
 
-  
+  addLogic("PANEL_SPACING", function () {
+    const panel_style = getState("FACE");
+
+    //face style - C, R, F, V, M, panel_spacing - S
+    //face style -B, S, T, panel_spacing - C
+
+    //Recessed grooved Colonial - B
+
+    // F and V with colonial wind - C
+    // F and V with ranch wind - R        
+
+    const spacingSGroup = ["C", "R", "F", "V", "M"];
+    const spacingCGroup = ["B", "S", "T"];
+
+    if (spacingSGroup.includes(panel_style)) {
+      this.value = "S";
+    } else if (spacingCGroup.includes(panel_style)) {
+      this.value = "C";
+    } else {
+      this.value = ""; // fallback if unexpected value
+    }
+
+
+  }, ["FACE"])
+
   createNode(
     "GLASS_SHAPE_VISIBILITY",
     function () {
@@ -397,28 +421,6 @@ function loadDrivenInputEvents() {
         $(this).closest(".rw-button").toggle(show);
       });
 
-
-      // const $selected =
-      //   $("input[name='GLASS_SHAPE']:checked")
-      //     .closest(".rw-button");
-
-      // if ($selected.length && $selected.is(":hidden")) {
-
-      //   $("input[name='GLASS_SHAPE']")
-      //     .prop("checked", false);
-
-      //   const $firstVisible =
-      //     $("input[name='GLASS_SHAPE']")
-      //       .filter(function () {
-      //         return $(this).closest(".rw-button").is(":visible");
-      //       })
-      //       .first();
-
-      //   // $firstVisible
-      //   //   .prop("checked", true)
-      //   //   .trigger("change");
-      // }
-
       const $checked =
         $("input[name='GLASS_SHAPE']:checked");
 
@@ -443,6 +445,167 @@ function loadDrivenInputEvents() {
     $("#GLASS_SHAPE_VISIBILITY")[0],
     ["DOOR_MODEL", "FACE", "WIDTH", "COLOR"]
   );
+
+  createNode(
+    "GLASS_INSERT_VISIBILITY",
+    function () {
+      const glass_shape = getState("GLASS_SHAPE");
+      const width = Number(getState("WIDTH"));
+      const panel_spacing = getState("PANEL_SPACING");
+      const panel_style = getState("FACE");
+
+      //colonial face, colonial glass and panel spacing S
+      const allowedColonial = [
+        "stockton_colonial",
+        "waterton_colonial",
+        "prairie",
+        "cascade_colonial",
+        "alum_stockton_4",
+        "alum_stockton_6",
+        "alum_prairie",
+        "square_bar_stockton_4",
+        "square_bar_stockton_6",
+        "square_bar_prairie",
+        "round_bar_stockton_4",
+        "round_bar_stockton_6",
+        "round_bar_prairie"
+      ];
+
+      //panel spacing S
+      const allowedRanch = [
+        "cascade_ranch",
+        "stockton_ranch",
+        "waterton_ranch",
+        "stockbridge",
+        "prairie",
+        "square_bar_stockton_10",
+        "square_bar_prairie",
+        "round_bar_stockton_10",
+        "round_bar_prairie",
+
+        "alum_stockton_10", // LT 243
+        "alum_prairie", // LT 243
+
+        "arched_stockton", //GTE 95 LT 143
+        "arched_stockbridge", // GTE 95 LT143
+
+        "arched_stockbridge_3", //GTE 143 LT 190
+        "arched_stockton_3", //GTE 143
+
+        "arched_stockton_4", //GTE 192 LT236
+        "arched_stockbridge_4" //GTE 192 LT 236
+
+      ]
+
+
+      function getAllowedRanchByWidthColStd(width) {
+        return allowedRanch.filter((item) => {
+          if (["alum_stockton_10", "alum_prairie"].includes(item)) {
+            return width < 243;
+          }
+
+          if (["arched_stockton", "arched_stockbridge"].includes(item)) {
+            return width >= 95 && width < 143;
+          }
+
+          if (["arched_stockbridge_3", "arched_stockton_3"].includes(item)) {
+            return width >= 143 && width < 190;
+          }
+
+          if (["arched_stockton_4", "arched_stockbridge_4"].includes(item)) {
+            return width >= 192 && width < 236;
+          }
+
+          return true;
+        });
+      }
+
+      function getAllowedRanchByWidthRanchStd(width) {
+        return allowedRanch.filter((item) => {
+          if (["alum_stockton_10", "alum_prairie"].includes(item)) {
+            return width < 259;
+          }
+
+          if (["arched_stockton", "arched_stockbridge"].includes(item)) {
+            return width >= 96 && width < 143;
+          }
+          if (["arched_stockbridge_3", "arched_stockton_3"].includes(item)) {
+            return width >= 143 && width < 190;
+          }
+
+          if (["arched_stockton_4", "arched_stockbridge_4", "arched_stockton", "arched_stockbridge"].includes(item)) {
+            return width >= 190 && width < 236;
+          }
+          return true;
+        });
+      }
+
+
+
+      const filteredAllowedRanch = getAllowedRanchByWidthColStd(width);
+      const filterRanchStd = getAllowedRanchByWidthRanchStd(width);
+
+      $("input[name='GLASS_INSERT']").each(function () {
+        const insertValue = String($(this).val() || "");
+        let show = false;
+
+        if (glass_shape === "colonial") { //show colonial 
+          show = width >= 49 && allowedColonial.includes(insertValue);
+
+        }
+
+        if (glass_shape === 'ranch' && panel_style === 'C') {
+          show = width >= 49 && filteredAllowedRanch.includes(insertValue);
+        }
+
+        if (glass_shape === 'ranch' && panel_style === 'R') {
+          show = width >= 49 && filterRanchStd.includes(insertValue);
+        }
+
+        if (glass_shape === 'ranch' && (panel_style === 'F' || panel_style === 'V')) {
+          show = width >= 72 && filterRanchStd.includes(insertValue);
+        }
+
+
+        $(this).closest(".rw-button").toggle(show);
+      });
+
+      const $checked = $("input[name='GLASS_INSERT']:checked");
+
+      if (
+        $checked.length &&
+        !$checked.closest(".rw-button").is(":visible")
+      ) {
+        $checked
+          .prop("checked", false)
+          .data("checked", false);
+
+        $checked
+          .closest(".rw-button")
+          .removeClass("selected btn-checked");
+
+        setState("GLASS_INSERT", "");
+      }
+    },
+    "",
+    $("#GLASS_INSERT_VISIBILITY")[0],
+    ["GLASS_SHAPE", "WIDTH", "PANEL_SPACING", "FACE"]
+  );
+
+  // addLogic("GLASS_TYPE", function () {
+  //   const glass_shape = getState("GLASS_SHAPE");
+  //   const currentGlassType = getState("GLASS_TYPE");
+
+  //   console.log("currentGlass", currentGlassType);
+  //   if (!glass_shape) {
+  //     this.value = "";
+  //     return;
+  //   }
+
+  //   if (!currentGlassType) {
+  //     // this.value = "CLEAR"; // replace with your actual value
+  //   }
+  // }, ["GLASS_SHAPE"]);
 
 }
 

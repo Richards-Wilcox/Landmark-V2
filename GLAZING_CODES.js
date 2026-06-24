@@ -82,31 +82,6 @@ function addGlazingCodeLogic() {
 
     }, ["DOOR_MODEL"])
 
-    addLogic("PANEL_SPACING", function () {
-        const panel_style = getState("FACE");
-
-        //face style - C, R, F, V, M, panel_spacing - S
-        //face style -B, S, T, panel_spacing - C
-
-        //Recessed grooved Colonial - B
-
-        // F and V with colonial wind - C
-        // F and V with ranch wind - R        
-
-        const spacingSGroup = ["C", "R", "F", "V", "M"];
-        const spacingCGroup = ["B", "S", "T"];
-
-        if (spacingSGroup.includes(panel_style)) {
-            this.value = "S";
-        } else if (spacingCGroup.includes(panel_style)) {
-            this.value = "C";
-        } else {
-            this.value = ""; // fallback if unexpected value
-        }
-
-
-    }, ["FACE"])
-
 
     addLogic("WINDOW_1", function () {
 

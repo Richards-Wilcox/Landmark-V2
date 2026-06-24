@@ -68,20 +68,27 @@ function loadGlobalNodes() {
     }
   }, ["customSwitch", "SIZE"])
 
-  addLogic("DOOR_HEIGHT_FEET", function () {
-    let toggle_Switch = getState("customSwitch");
-    if (toggle_Switch === "off") {
-      this.value = getDoorHeightFeetFromSize();
-    }
-  }, ["customSwitch", "SIZE"])
-
   addLogic("DOOR_WIDTH_INCHES", function () {
     let toggle_Switch = getState("customSwitch");
     if (toggle_Switch === "off") {
       this.value = 0;
+    } else this.value = $("#DOOR_WIDTH_INCHES").val()
+  }, ["customSwitch", "DOOR_WIDTH_FEET"])
+
+  addLogic("DOOR_HEIGHT_FEET", function () {
+    let toggle_Switch = getState("customSwitch");
+    if (toggle_Switch === "off") {
+      // this.value = getDoorHeightFeetFromSize();
+      this.value = getState("SIZE_HEIGHT");
     }
   }, ["customSwitch", "SIZE"])
 
+  addLogic("DOOR_HEIGHT_INCHES", function () {
+    let toggle_Switch = getState("customSwitch");
+    if (toggle_Switch === "off") {
+      this.value = 0;
+    } else this.value = $("#DOOR_HEIGHT_INCHES").val()
+  }, ["customSwitch", "DOOR_HEIGHT_FEET"])
 
   addLogic("LM_DOOR_MODEL", function () {
     this.value = getNode("DOOR_MODEL").getAttribute("id")
