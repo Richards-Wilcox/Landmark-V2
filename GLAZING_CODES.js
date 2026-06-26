@@ -56,14 +56,8 @@ function addGlazingCodeLogic() {
         "WINDOW_POSITION",
         "GLAZING_CODE",
         "WINDOW_1", "WINDOW_1_QTY",
-        "HEIGHT", "WIDTH", "NUM_OF_SEC", "LITE_LOCATION"
-        // "SB1_SPNUM", "SB2_SPNUM", "SB3_SPNUM", "SB4_SPNUM",
-        // "BUNDLE1_SC1_SPNUM", "BUNDLE1_SC2_SPNUM",
-        // "BUNDLE2_SC1_SPNUM", "BUNDLE2_SC2_SPNUM",
-        // "BUNDLE3_SC1_SPNUM", "BUNDLE3_SC2_SPNUM",
-        // "BUNDLE4_SC1_SPNUM", "BUNDLE4_SC2_SPNUM",
-        // "BUNDLE_1_HEIGHT", "BUNDLE_2_HEIGHT",
-        // "BUNDLE_3_HEIGHT", "BUNDLE_4_HEIGHT",
+        "HEIGHT", "WIDTH", "NUM_OF_SEC", "LITE_LOCATION",
+        "GLASS_TEMPERED"
     ];
 
     addLogic("DOOR_THICKNESS", function () {
@@ -91,10 +85,6 @@ function addGlazingCodeLogic() {
 
         let window_code = "";
 
-        // =========================
-        // STOP if nothing selected
-        // =========================
-
         if (!glass_shape || !glass_type) {
             this.value = "0";
             return;
@@ -118,7 +108,9 @@ function addGlazingCodeLogic() {
             "CLEAR_SINGLE": "005",
             "SATIN": "012",
             "OBSCURE_GLASS_PINHEAD": "006",
+            "OBSCURE_GLASS_SINGLE": "007",
             "DARK_TINT_SEALED": "014",
+            "DARK_TINT_SINGLE": "015",
             "BLACK_SATIN_SEALED": "016"
         };
 
@@ -141,7 +133,9 @@ function addGlazingCodeLogic() {
             "CLEAR_SINGLE": "505",
             "SATIN": "512",
             "OBSCURE_GLASS_PINHEAD": "506",
+            "OBSCURE_GLASS_SINGLE": "507",
             "DARK_TINT_SEALED": "514",
+            "DARK_TINT_SINGLE": "515",
             "BLACK_SATIN_SEALED": "516"
         };
 
@@ -180,13 +174,21 @@ function addGlazingCodeLogic() {
         const panel_style = getState("FACE");
         const spacing = getState("PANEL_SPACING") || "";
 
+        // const result = resolveLiteResult({
+        //     width,
+        //     panel_style,
+        //     glass_shape: "",
+        //     spacing,
+        //     mode: "early"
+        // });
+
         const result = resolveLiteResult({
-            width,
-            panel_style,
-            glass_shape: "",
-            spacing,
-            mode: "early"
+            width: getState("WIDTH"),
+            panel_style: getState("FACE"),
+            glass_shape: getState("GLASS_SHAPE") || "",
+            spacing: getState("PANEL_SPACING") || ""
         });
+
 
         this.value = result ? (result.center_hinge_code || "") : "";
     }, ["WIDTH", "FACE", "PANEL_SPACING"]);
@@ -232,9 +234,68 @@ function addGlazingCodeLogic() {
 
 
     addLogic("WINDOW_2", function () {
-        this.value = "0"; //use only when mix panel is selected
+        const door_model = getState("DOOR_MODEL");
+        const glass_shape = getState("GLASS_SHAPE") || "";
+        const glass_type = getState("GLASS_TYPE") || "";
+        const temp_glass = getState("GLASS_TEMPERED") || "";
 
-    }, ["FACE"])
+        let window_code = "";
+
+        if (!glass_shape || !glass_type || !temp_glass) {
+            this.value = "0";
+            return;
+        }
+
+
+        // Clear Single Tempered-009
+        // Clear Sealed Tempered-024
+        // Obscure Pinhead Single Tempered-027
+        // Obscure Pinhead Sealed Tempered-026
+        // Dark Tint Single Tempered-035
+        // Dark Tint Sealed Tempered-034
+
+        const glassTypeColonialMap = {
+            "CLEAR": "024",
+            "CLEAR_SINGLE": "009",
+            "OBSCURE_GLASS_PINHEAD": "026",
+            "OBSCURE_GLASS_SINGLE": "027",
+            "DARK_TINT_SEALED": "034",
+            "DARK_TINT_SINGLE": "035"
+        };
+
+        //Window type = ranch
+        // Clear Single Tempered - 509
+        // Clear Sealed Tempered - 524
+        // Obscure Pinhead Single Tempered - 527
+        // Obscure Pinhead Sealed Tempered - 526
+        // Dark Tint Single Tempered - 535
+        // Dark Tint Sealed Tempered - 534
+
+        const glassTypeRanchMap = {
+            "CLEAR": "524",
+            "CLEAR_SINGLE": "509",
+            "OBSCURE_GLASS_PINHEAD": "526",
+            "OBSCURE_GLASS_SINGLE": "527",
+            "DARK_TINT_SEALED": "534",
+            "DARK_TINT_SINGLE": "535",
+        };
+
+
+        if (glass_shape === "colonial") {
+            window_code = glassTypeColonialMap[glass_type] || "";
+        }
+        else if (glass_shape === 'ranch') {
+            window_code = glassTypeRanchMap[glass_type] || "";
+        }
+
+        if (!window_code) {
+            this.value = "0";
+            return;
+        }
+
+        this.value = `552-${window_code}`;
+
+    }, ["GLASS_SHAPE", "FRAME_COLOR", "DOOR_MODEL", "GLASS_TYPE", "GLASS_TEMPERED"]);
 
     addLogic("WINDOW_2_QTY", function () {
         this.value = 0; //use only when mix panel is selected
@@ -320,24 +381,51 @@ function addGlazingCodeLogic() {
 
     addLogic("GLAZING_CODE", function () {
 
-        const ext_frame_1 = getState("EXTERIOR_FRAME_1");
-        const int_frame_1 = getState("INTERIOR_FRAME_1");
-        const screw = getState("SCREWS");
-        const glass = getState("WINDOW_1");
-        const insert_1 = getState("INSERT_1");
-        const insert_1_qty = getState("INSERT_1_QTY");
-        const lite_location = getState("LITE_LOCATION");
-        const glass_shape = getState("GLASS_SHAPE");
-        // const insert_2 = getState("INSERT_2");
-        // const insert_2_qty = getState("INSERT_2_QTY");
 
-        if (!glass_shape) {
+        const glassShape = getState("GLASS_SHAPE");
+
+        if (!glassShape) {
             this.value = "";
             return;
         }
-        else this.value = `${ext_frame_1},${glass},${int_frame_1},${screw},${insert_1},${insert_1_qty},${lite_location}`;
+
+        this.value = generateGlazingCodeString("WINDOW_1");
+
+        // const ext_frame_1 = getState("EXTERIOR_FRAME_1");
+        // const int_frame_1 = getState("INTERIOR_FRAME_1");
+        // const screw = getState("SCREWS");
+        // const glass = getState("WINDOW_1");
+        // const insert_1 = getState("INSERT_1");
+        // const insert_1_qty = getState("INSERT_1_QTY");
+        // const lite_location = getState("LITE_LOCATION");
+        // const glass_shape = getState("GLASS_SHAPE");
+
+        // // const insert_2 = getState("INSERT_2");
+        // // const insert_2_qty = getState("INSERT_2_QTY");
+
+        // if (!glass_shape) {
+        //     this.value = "";
+        //     return;
+        // }
+        // else this.value = `${ext_frame_1},${glass},${int_frame_1},${screw},${insert_1},${insert_1_qty},${lite_location}`;
 
     }, ["EXTERIOR_FRAME_1", "WINDOW_1", "INTERIOR_FRAME_1", "INSERT_1", "INSERT_1_QTY", "SCREWS", "PANEL_SPACING", "LITE_LOCATION", "GLASS_SHAPE", "WINDOW_POSITION"]);
+
+    addLogic("GLAZING_CODE_TEMP", function () {
+
+
+        const tempGlass = getState("GLASS_TEMPERED");
+
+        if (!tempGlass) {
+            this.value = "";
+            return;
+        }
+
+        this.value = generateGlazingCodeString("WINDOW_2");
+
+
+    }, ["EXTERIOR_FRAME_1", "WINDOW_2", "INTERIOR_FRAME_1", "INSERT_1", "INSERT_1_QTY", "SCREWS", "PANEL_SPACING", "LITE_LOCATION", "GLASS_SHAPE", "WINDOW_POSITION", "GLASS_TEMPERED"]);
+
 
     addNode({
         id: "NO_GLAZING_CODE",
@@ -618,11 +706,13 @@ function findSBForSC(sc_part_no) {
 }
 
 
-function buildGlzCode(sectionIndex) {
+function buildGlzCode(sectionIndex, temp_glass_flg) {
     const window_position = getState("WINDOW_POSITION");
     const glazing_code = getState("GLAZING_CODE");
     const no_glz_code = getState("NO_GLAZING_CODE");
+    const glazing_code_temp = getState("GLAZING_CODE_TEMP");
     const total_sections = Number(getState("NUM_OF_SEC")) || 0;
+    const temp_glass = getState("GLASS_TEMPERED");
 
     if (!window_position) return "";
 
@@ -640,26 +730,100 @@ function buildGlzCode(sectionIndex) {
 
     const panel_identity = `SB-INT${sc_part_no.slice(-2)}`;
     const isTopSection = sectionIndex === total_sections;
+    console.log("isTopSection", isTopSection);
 
-    // --- Section 1 ---
-    if (sectionIndex === 1) {
-        // return window_position === "top"
-        //     ? `${sb_part_no},SB-BTM,${sc_part_no},${no_glz_code}`
-        //     : `${sb_part_no},SB-BTM,${sc_part_no},${glazing_code}`;
+    let finalCode = glazing_code; // default
 
-        return window_position === "top"
-            ? `${sb_part_no},${sc_part_no},${no_glz_code}`
-            : `${sb_part_no},${sc_part_no},${glazing_code}`;
+    // --- Section 1(Bottom section) ---
+    // if (sectionIndex === 1) {
+    //     return window_position === "top"
+    //         ? `${sb_part_no},${sc_part_no},${no_glz_code}`
+    //         : `${sb_part_no},${sc_part_no},${glazing_code}`;
+    // }
+
+    if (sectionIndex === 1 && window_position === "top") {
+        finalCode = no_glz_code;
+
+        return getGlazingCode(
+            sb_part_no,
+            panel_identity,
+            sc_part_no,
+            finalCode
+        );
     }
+
+
 
     // --- Other sections ---
-    if (window_position === "top") {
-        return isTopSection
-            ? getGlazingCode(sb_part_no, panel_identity, sc_part_no, glazing_code)
-            : getGlazingCode(sb_part_no, panel_identity, sc_part_no, no_glz_code);
+    // if (window_position === "top") {
+    //     return isTopSection
+    //         ? getGlazingCode(sb_part_no, panel_identity, sc_part_no, glazing_code)
+    //         : getGlazingCode(sb_part_no, panel_identity, sc_part_no, no_glz_code);
+    // }
+
+    // return getGlazingCode(sb_part_no, panel_identity, sc_part_no, glazing_code);
+
+    if (temp_glass === "all") {
+
+        if (window_position === "top") {
+            // only top section temp
+            finalCode = isTopSection
+                ? glazing_code_temp
+                : no_glz_code;
+        } else {
+            // all temp
+            finalCode = glazing_code_temp;
+        }
     }
 
-    return getGlazingCode(sb_part_no, panel_identity, sc_part_no, glazing_code);
+
+    else if (temp_glass === "bottom_1" || temp_glass === "bottom_2") {
+        if (window_position === "top") {
+            // ✅ ONLY TOP = glazing, others = no_glz
+            finalCode = isTopSection
+                ? glazing_code
+                : no_glz_code;
+        } else {
+            if (temp_glass === "bottom_1" && sectionIndex === 1) {
+                console.log("bottom 1")
+                finalCode = glazing_code_temp;
+            }
+            else if (temp_glass === "bottom_2" && (sectionIndex === 1 || sectionIndex === 2)) {
+                console.log("bottom 1 & 2")
+                // ✅ section 1 AND 2  ← FIX HERE
+                finalCode = glazing_code_temp;
+            }
+            else {
+                console.log("else")
+                finalCode = glazing_code;
+            }
+
+        }
+    }
+
+    // ✅ fallback
+    else {
+
+        if (window_position === "top") {
+            // ✅ ONLY TOP gets glazing
+            finalCode = isTopSection
+                ? glazing_code
+                : no_glz_code;
+        } else {
+            // ✅ Normal case
+            finalCode = glazing_code;
+        }
+
+    }
+
+    return getGlazingCode(
+        sb_part_no,
+        panel_identity,
+        sc_part_no,
+        finalCode
+    );
+
+
 }
 
 
@@ -756,46 +920,109 @@ function getLites(width, type) {
 // }
 
 
+// function resolveLiteResult(options) {
+//     const width = Number(options.width) || 0;
+//     const panel_style = options.panel_style || "";
+//     const glass_shape = options.glass_shape || "";
+//     const spacing = options.spacing || "";
+//     const mode = options.mode || "glazing"; // "early" or "glazing"
+
+//     if (!width || !panel_style) return null;
+
+//     let window_type = "";
+
+//     if (mode === "early") {
+//         // Early mode: only WIDTH + FACE
+//         if (panel_style === "C") {
+//             window_type = "colonial_std";
+//         } else if (panel_style === "R") {
+//             window_type = "ranch_std";
+//         }
+//         else if ((panel_style === "F" || panel_style === "V") && glass_shape === 'colonial') {
+//             window_type = "colonial_std";
+//         }
+//         else {
+//             return null;
+//         }
+//     } else {
+//         // Glazing mode: WIDTH + FACE + GLASS_SHAPE
+//         if (!glass_shape) return null;
+
+//         if (panel_style === "C") {
+//             if (glass_shape === "colonial") window_type = "colonial_std";
+//             else if (glass_shape === "ranch") window_type = "RanchOverColonialStd";
+//             else if (!glass_shape && spacing === "S") window_type = "colonial_std";
+//         }
+
+//         if (panel_style === "R") {
+//             if (glass_shape === "colonial") window_type = "ColonialOverRanchStd";
+//             else if (!glass_shape && spacing === "S") window_type = "ranch_std";
+//             else if (glass_shape === "ranch") window_type = "ranch_std";
+//         }
+
+//         if ((panel_style === "F" || panel_style === "V") && glass_shape === 'colonial') {
+//             window_type = "colonial_std"
+//         }
+
+//         if (!window_type) return null;
+//     }
+
+//     const cacheKey = `${mode}|${width}|${panel_style}|${glass_shape}|${spacing}`;
+
+//     if (LITE_RESULT_CACHE[cacheKey]) {
+//         return LITE_RESULT_CACHE[cacheKey];
+//     }
+
+//     const result = getLites(width, window_type) || null;
+//     LITE_RESULT_CACHE[cacheKey] = result;
+
+//     return result;
+// }
+
 function resolveLiteResult(options) {
     const width = Number(options.width) || 0;
     const panel_style = options.panel_style || "";
     const glass_shape = options.glass_shape || "";
     const spacing = options.spacing || "";
-    const mode = options.mode || "glazing"; // "early" or "glazing"
 
     if (!width || !panel_style) return null;
 
     let window_type = "";
 
-    if (mode === "early") {
-        // Early mode: only WIDTH + FACE
-        if (panel_style === "C") {
+    // FACE = C
+    if (panel_style === "C") {
+        if (glass_shape === "colonial") {
             window_type = "colonial_std";
-        } else if (panel_style === "R") {
-            window_type = "ranch_std";
-        } else {
-            return null;
+        } else if (glass_shape === "ranch") {
+            window_type = "RanchOverColonialStd";
+        } else if (!glass_shape) {
+            window_type = "colonial_std";
         }
-    } else {
-        // Glazing mode: WIDTH + FACE + GLASS_SHAPE
-        if (!glass_shape) return null;
-
-        if (panel_style === "C") {
-            if (glass_shape === "colonial") window_type = "colonial_std";
-            else if (glass_shape === "ranch") window_type = "RanchOverColonialStd";
-            else if (!glass_shape && spacing === "S") window_type = "colonial_std";
-        }
-
-        if (panel_style === "R") {
-            if (glass_shape === "colonial") window_type = "ColonialOverRanchStd";
-            else if (!glass_shape && spacing === "S") window_type = "ranch_std";
-            else if (glass_shape === "ranch") window_type = "ranch_std";
-        }
-
-        if (!window_type) return null;
     }
 
-    const cacheKey = `${mode}|${width}|${panel_style}|${glass_shape}|${spacing}`;
+    // FACE = R
+    else if (panel_style === "R") {
+        if (glass_shape === "colonial") {
+            window_type = "ColonialOverRanchStd";
+        } else if (glass_shape === "ranch") {
+            window_type = "ranch_std";
+        } else if (!glass_shape) {
+            window_type = "ranch_std";
+        }
+    }
+
+    // FACE = F or V
+    else if (panel_style === "F" || panel_style === "V") {
+        if (glass_shape === "colonial") {
+            window_type = "colonial_std";
+        } else if (glass_shape === "ranch") {
+            window_type = "ranch_std";
+        }
+    }
+
+    if (!window_type) return null;
+
+    const cacheKey = `${width}|${panel_style}|${glass_shape}|${spacing}`;
 
     if (LITE_RESULT_CACHE[cacheKey]) {
         return LITE_RESULT_CACHE[cacheKey];
@@ -808,38 +1035,28 @@ function resolveLiteResult(options) {
 }
 
 
-// function computeValue(field) {
-//     if (!hasLiteInputsReady(false)) {
-//         return 0;
-//     }
-
-//     const width = getState("WIDTH");
-//     const panel_style = getState("FACE");
-//     const glass_shape = getState("GLASS_SHAPE") || "";
-
-//     const result = CalculateLitesInsertQty(width, panel_style, glass_shape);
-
-//     if (!result || typeof result !== "object") {
-//         return 0;
-//     }
-
-//     return result[field] ?? 0;
-// }
-
-
 function computeValue(field) {
     const width = getState("WIDTH");
     const panel_style = getState("FACE");
     const glass_shape = getState("GLASS_SHAPE") || "";
     const spacing = getState("PANEL_SPACING") || "";
 
+    // const result = resolveLiteResult({
+    //     width,
+    //     panel_style,
+    //     glass_shape,
+    //     spacing,
+    //     mode: "glazing"
+    // });
+
     const result = resolveLiteResult({
-        width,
-        panel_style,
-        glass_shape,
-        spacing,
-        mode: "glazing"
+        width: getState("WIDTH"),
+        panel_style: getState("FACE"),
+        glass_shape: getState("GLASS_SHAPE") || "",
+        spacing: getState("PANEL_SPACING") || ""
     });
+
+
 
     return result ? (result[field] ?? 0) : 0;
 }
@@ -994,8 +1211,7 @@ function getAttributeValuesRaw(iName, iVal) {
         query += "&iVal=" + encodeURIComponent(iVal);
     }
 
-    const fullUrl = "/spr/Configuration/interface/api/beta/attribute?" + query;
-    console.log("FULL API URL:", fullUrl);
+    const fullUrl = "/spr/Configuration/interface/api/beta/attribute?" + query;    
 
     $.ajax({
         url: fullUrl,
@@ -1049,8 +1265,7 @@ function getAllRLLValuesForSmartcom(smartcomCode) {
     }
 
     // ✅ Cache by SMARTCOM code
-    if (RLL_CACHE_BY_SMARTCOM[smartcomCode]) {
-        console.log("Using cached RLL values for", smartcomCode);
+    if (RLL_CACHE_BY_SMARTCOM[smartcomCode]) {        
         return RLL_CACHE_BY_SMARTCOM[smartcomCode];
     }
 
@@ -1058,8 +1273,33 @@ function getAllRLLValuesForSmartcom(smartcomCode) {
     const rawData = getAttributeValuesRaw("RLL_VALUES", smartcomCode);
     const values = parseAllRLLValues(rawData);
 
-    RLL_CACHE_BY_SMARTCOM[smartcomCode] = values;
-    console.log("Cached RLL values:", smartcomCode, values);
+    RLL_CACHE_BY_SMARTCOM[smartcomCode] = values;    
 
     return values;
+}
+
+function generateGlazingCodeString(glassKey) {
+
+    const ext_frame_1 = getState("EXTERIOR_FRAME_1");
+    const int_frame_1 = getState("INTERIOR_FRAME_1");
+    const screw = getState("SCREWS");
+    const glass = getState(glassKey);
+    const insert_1 = getState("INSERT_1");
+    const insert_1_qty = getState("INSERT_1_QTY");
+    const lite_location = getState("LITE_LOCATION");
+    const glass_shape = getState("GLASS_SHAPE");
+    const liteLocation = getState("LITE_LOCATION");
+
+
+    return [
+        ext_frame_1,
+        glass,
+        int_frame_1,
+        screw,
+        insert_1,
+        insert_1_qty,
+        liteLocation
+    ].join(",");
+
+
 }

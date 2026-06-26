@@ -35,16 +35,6 @@ function loadDrivenInputEvents() {
     }
   }, [""])
 
-  //  addNode({
-  //   id: "FRAME_COLOR",
-  //   value: null,
-  // }, []);
-
-  // addNode({
-  //   id: "INSERT_COLOR",
-  //   value: null,
-  // }, []);
-
   addNode({
     id: "FRAME_COLOR",
     value: null,
@@ -75,34 +65,6 @@ function loadDrivenInputEvents() {
       }
     }
   }, ["COLOR"]);
-
-  //  addNode({
-  //   id: "FRAME_COLOR",
-  //   value: null,
-  //   logic: function () {
-  //     const doorColor = getNode("COLOR")?.value;
-  //     if (!frameColorUserOverride && doorColor?.value) {
-  //       const match = [...AvailableColorImages, ...OptionalColorImages]
-  //         .find(c => c.value === doorColor.value);
-  //       this.value = match ?? null;
-  //     }
-  //     // if user overrode, this.value stays as whatever setState last set
-  //   }
-  // }, ["COLOR"]);
-
-  // addNode({
-  //   id: "INSERT_COLOR",
-  //   value: null,
-  //   logic: function () {
-  //     const doorColor = getNode("COLOR")?.value;
-  //     if (!insertColorUserOverride && doorColor?.value) {
-  //       const match = [...AvailableColorImages, ...OptionalColorImages]
-  //         .find(c => c.value === doorColor.value);
-  //       this.value = match ?? null;
-  //     }
-  //   }
-  // }, ["COLOR"]);
-
 
   addLogic("MIXED", function () {
     if (getState("DOOR_MODEL") === "D" && getState("WIDTH") >= 96) {
@@ -293,29 +255,521 @@ function loadDrivenInputEvents() {
   }, ["HARDWARE_SET", "SPRINGTYPE", "INCLINEDTRACK"])
 
   addLogic("PANEL_SPACING", function () {
-    const panel_style = getState("FACE");
 
-    //face style - C, R, F, V, M, panel_spacing - S
-    //face style -B, S, T, panel_spacing - C
+    const panel_style = getState("FACE") || "";
+    const glass_shape = getState("GLASS_SHAPE") || "";
 
-    //Recessed grooved Colonial - B
+    // face style - C, R, M => S
+    // face style - B, S, T => C
 
-    // F and V with colonial wind - C
-    // F and V with ranch wind - R        
+    // special:
+    // F and V with colonial glass => S
+    // F and V with ranch glass => R
 
-    const spacingSGroup = ["C", "R", "F", "V", "M"];
+    const spacingSGroup = ["C", "R", "M"];
     const spacingCGroup = ["B", "S", "T"];
 
+
+    // Special cases first for F and V
+    if (panel_style === "F" || panel_style === "V") {
+      if (glass_shape === "colonial") {
+        this.value = "S";
+        return;
+      }
+
+      if (glass_shape === "ranch") {
+        this.value = "R";
+        return;
+      }
+
+    }
+
+    // General mappings
     if (spacingSGroup.includes(panel_style)) {
       this.value = "S";
     } else if (spacingCGroup.includes(panel_style)) {
       this.value = "C";
     } else {
-      this.value = ""; // fallback if unexpected value
+      this.value = "";
     }
 
+  }, ["FACE", "GLASS_SHAPE"])
 
-  }, ["FACE"])
+  // createNode(
+  //   "GLASS_SHAPE_VISIBILITY",
+  //   function () {
+
+  //     const door_model = getState("DOOR_MODEL");
+  //     const face = getState("FACE");
+  //     const width = Number(getState("WIDTH"));
+
+  //     const allowedFacesColonial = ["R", "C", "B", "F", "V", "M"];
+  //     const allowedFacesRanch = ["R", "C", "B", "S", "T", "F", "V"];
+  //     const allowedFacesSlim = ["F", "V"];
+
+  //     const doorColor = getState("COLOR")?.value;
+  //     const woodTones = ["X", "Y"];
+  //     const isWoodTone = woodTones.includes(doorColor);
+
+
+  //     $("input[name='GLASS_SHAPE']").each(function () {
+
+  //       const value = $(this).val();
+  //       const isGrandShape = value.startsWith("grand_");
+  //       const isColonial = value === "colonial";
+  //       const isRanch = value === "ranch";
+  //       const isSlim = value.startsWith("slim_");
+
+  //       let show = false;
+
+  //       //condition to show granview buttons only
+  //       if (door_model === "G" && isGrandShape) {
+  //         show = true;
+  //       }
+
+  //       //condition to show colonial glass
+  //       if (isColonial) {
+
+  //         // default hide
+  //         show = false;
+
+  //         // allowed only when NOT G
+  //         if (
+  //           door_model !== "G" &&
+  //           allowedFacesColonial.includes(face)
+  //         ) {
+
+  //           // Ranch special width restriction
+  //           if (face === "R") {
+
+  //             // hide between 76–95 6-4,7-11
+  //             show = !(width >= 76 && width < 95);
+  //           }
+
+  //           // M special width restriction
+  //           else if (face === "M") {
+
+  //             show = (width >= 96);
+  //           }
+
+  //           // other valid faces
+  //           else {
+
+  //             show = true;
+  //           }
+  //         }
+  //       }
+  //       else if (isRanch) {
+  //         if (allowedFacesRanch.includes(face) && door_model != 'G') {
+  //           switch (face) {
+  //             case "C":
+
+  //               show = isWoodTone
+  //                 ? width >= 95
+  //                 : !(width >= 76 && width < 95);
+
+  //               break;
+
+  //             case "B":
+
+  //               show = width >= 96;
+
+  //               break;
+
+  //             case "R":
+
+  //               show = isWoodTone
+  //                 ? width >= 76
+  //                 : true;
+
+  //               break;
+
+  //             default:
+
+  //               show = true;
+  //           }
+
+  //         }
+  //       } else if (isSlim) {
+  //         if (width > 96 && allowedFacesSlim.includes(face) && door_model != 'G') {
+  //           show = true;
+  //         }
+  //       }
+
+  //       $(this).closest(".rw-button").toggle(show);
+  //     });
+
+  //     const $checked =
+  //       $("input[name='GLASS_SHAPE']:checked");
+
+
+  //     if (
+  //       $checked.length &&
+  //       !$checked.closest(".rw-button").is(":visible")
+  //     ) {
+
+  //       $checked
+  //         .prop("checked", false)
+  //         .data("checked", false);
+
+  //       $checked
+  //         .closest(".rw-button")
+  //         .removeClass("selected btn-checked");
+
+  //       setState("GLASS_SHAPE", "");
+
+  //       $("input[name='GLASS_TYPE']:checked").prop("checked", false)
+  //         .data("checked", false);
+  //       $("input[name='GLASS_TYPE']:checked")
+  //         .closest(".rw-button")
+  //         .removeClass("selected btn-checked");
+  //       setState("GLASS_TYPE", "");
+
+  //     }
+
+  //   },
+  //   "",
+  //   $("#GLASS_SHAPE_VISIBILITY")[0],
+  //   ["DOOR_MODEL", "FACE", "WIDTH", "COLOR"]
+  // );
+
+  // createNode(
+  //   "GLASS_TYPE_VISIBILITY",
+  //   function () {
+
+  //     const door_model = getState("DOOR_MODEL");
+  //     const glass_shape = getState("GLASS_SHAPE");
+  //     const currentGlassType = getState("GLASS_TYPE");
+
+  //     console.log("node - glass shape", glass_shape);
+
+  //     const allowedAllGlass = [
+  //       "CLEAR", "CLEAR_SINGLE", "SATIN",
+  //       "OBSCURE_GLASS_PINHEAD", "OBSCURE_GLASS_SINGLE",
+  //       "DARK_TINT_SEALED", "DARK_TINT_SINGLE",
+  //       "BLACK_SATIN_SEALED"
+  //     ];
+
+  //     const allowedSlimGlassL138 = ["CLEAR", "SATIN"];
+  //     const allowedSlimGlassL200 = ["CLEAR", "SATIN", "BLACK_SATIN_SEALED"];
+
+  //     const slimShapes = ["slim_single", "slim_double"];
+
+  //     // ✅ STEP 1: HANDLE NULL SHAPE
+  //     if (glass_shape == null) {
+
+  //       console.log("glass shape missing → clearing GLASS_TYPE");
+
+  //       if (currentGlassType) {
+  //         setState("GLASS_TYPE", "");
+  //       }
+
+  //       // ✅ Remove ALL selection + default attribute
+  //       $("input[name='GLASS_TYPE']")
+  //         .prop("checked", false)
+  //         .removeAttr("checked");
+
+  //       $("input[name='GLASS_TYPE']")
+  //         .closest(".rw-button")
+  //         .removeClass("selected btn-checked");
+
+  //       return;
+  //     }
+
+  //     // ✅ STEP 2: Determine allowed list
+  //     let allowedList = allowedAllGlass;
+
+  //     if (door_model === "A" && slimShapes.includes(glass_shape)) {
+  //       allowedList = allowedSlimGlassL138;
+
+  //     } else if (door_model === "D" && slimShapes.includes(glass_shape)) {
+  //       allowedList = allowedSlimGlassL200;
+  //     }
+
+  //     // ✅ STEP 3: Toggle visibility
+  //     $("input[name='GLASS_TYPE']").each(function () {
+
+  //       const value = $(this).val();
+  //       const show = allowedList.includes(value);
+
+  //       $(this).closest(".rw-button").toggle(show);
+  //     });
+
+  //     // ✅ STEP 4: AUTO-SELECT DEFAULT (your missing piece)
+  //     if (!currentGlassType && allowedList.length) {
+
+  //       const defaultValue = allowedList.includes("CLEAR")
+  //         ? "CLEAR"
+  //         : allowedList[0];
+
+  //       console.log("setting default GLASS_TYPE →", defaultValue);
+
+  //       setState("GLASS_TYPE", defaultValue);
+
+  //       // ✅ Sync UI with state
+  //       $("input[name='GLASS_TYPE']").each(function () {
+
+  //         const value = $(this).val();
+
+  //         if (value === defaultValue) {
+  //           $(this)
+  //             .prop("checked", true)
+  //             .attr("checked", "checked");
+
+  //           $(this)
+  //             .closest(".rw-button")
+  //             .addClass("selected btn-checked");
+  //         } else {
+  //           $(this)
+  //             .prop("checked", false)
+  //             .removeAttr("checked");
+
+  //           $(this)
+  //             .closest(".rw-button")
+  //             .removeClass("selected btn-checked");
+  //         }
+  //       });
+
+  //       return;
+  //     }
+
+  //     // ✅ STEP 5: Fix invalid selection
+  //     if (currentGlassType && !allowedList.includes(currentGlassType)) {
+
+  //       console.log("invalid GLASS_TYPE → resetting");
+
+  //       const defaultValue = allowedList.includes("CLEAR")
+  //         ? "CLEAR"
+  //         : allowedList[0];
+
+  //       setState("GLASS_TYPE", defaultValue);
+
+  //       // ✅ Sync UI
+  //       $("input[name='GLASS_TYPE']").each(function () {
+
+  //         const value = $(this).val();
+
+  //         if (value === defaultValue) {
+  //           $(this)
+  //             .prop("checked", true)
+  //             .attr("checked", "checked");
+
+  //           $(this)
+  //             .closest(".rw-button")
+  //             .addClass("selected btn-checked");
+  //         } else {
+  //           $(this)
+  //             .prop("checked", false)
+  //             .removeAttr("checked");
+
+  //           $(this)
+  //             .closest(".rw-button")
+  //             .removeClass("selected btn-checked");
+  //         }
+  //       });
+  //     }
+
+  //   },
+  //   "",
+  //   $("#GLASS_TYPE_VISIBILITY")[0],
+  //   ["DOOR_MODEL", "GLASS_SHAPE", "FACE"]
+  // );
+
+  // createNode(
+  //   "GLASS_INSERT_VISIBILITY",
+  //   function () {
+
+  //     const glass_shape = getState("GLASS_SHAPE");
+  //     const width = Number(getState("WIDTH"));
+  //     const panel_style = getState("FACE");
+  //     const currentInsert = getState("GLASS_INSERT");
+
+  //     const $glassInsertSection = $("#glass_insert_section");
+  //     const $moreToggleRow = $("#more_glass_inserts_toggle_row");
+  //     const $moreContainer = $("#more_glass_inserts_container");
+  //     const $moreSwitch = $("#more_glass_inserts");
+
+  //     const allowedColonial = [
+  //       "stockton_colonial",
+  //       "waterton_colonial",
+  //       "prairie",
+  //       "cascade_colonial",
+  //       "alum_stockton_4",
+  //       "alum_stockton_6",
+  //       "alum_prairie",
+  //       "square_bar_stockton_4",
+  //       "square_bar_stockton_6",
+  //       "square_bar_prairie",
+  //       "round_bar_stockton_4",
+  //       "round_bar_stockton_6",
+  //       "round_bar_prairie"
+  //     ];
+
+  //     const allowedRanch = [
+  //       "cascade_ranch",
+  //       "stockton_ranch",
+  //       "waterton_ranch",
+  //       "stockbridge",
+  //       "prairie",
+  //       "square_bar_stockton_10",
+  //       "square_bar_prairie",
+  //       "round_bar_stockton_10",
+  //       "round_bar_prairie",
+  //       "alum_stockton_10",
+  //       "alum_prairie",
+  //       "arched_stockton",
+  //       "arched_stockbridge",
+  //       "arched_stockbridge_3",
+  //       "arched_stockton_3",
+  //       "arched_stockton_4",
+  //       "arched_stockbridge_4"
+  //     ];
+
+  //     function getAllowedRanchByWidthColStd(width) {
+  //       return allowedRanch.filter((item) => {
+  //         if (["alum_stockton_10", "alum_prairie"].includes(item)) {
+  //           return width < 243;
+  //         }
+  //         if (["arched_stockton", "arched_stockbridge"].includes(item)) {
+  //           return width >= 95 && width < 143;
+  //         }
+  //         if (["arched_stockbridge_3", "arched_stockton_3"].includes(item)) {
+  //           return width >= 143 && width < 190;
+  //         }
+  //         if (["arched_stockton_4", "arched_stockbridge_4"].includes(item)) {
+  //           return width >= 192 && width < 236;
+  //         }
+  //         return true;
+  //       });
+  //     }
+
+  //     function getAllowedRanchByWidthRanchStd(width) {
+  //       return allowedRanch.filter((item) => {
+  //         if (["alum_stockton_10", "alum_prairie"].includes(item)) {
+  //           return width < 259;
+  //         }
+  //         if (["arched_stockton", "arched_stockbridge"].includes(item)) {
+  //           return width >= 96 && width < 143;
+  //         }
+  //         if (["arched_stockbridge_3", "arched_stockton_3"].includes(item)) {
+  //           return width >= 143 && width < 190;
+  //         }
+  //         if (["arched_stockton_4", "arched_stockbridge_4"].includes(item)) {
+  //           return width >= 190 && width < 236;
+  //         }
+  //         return true;
+  //       });
+  //     }
+
+  //     const filteredAllowedRanch = getAllowedRanchByWidthColStd(width);
+  //     const filterRanchStd = getAllowedRanchByWidthRanchStd(width);
+
+  //     // ✅ STEP 1: FULL RESET if no GLASS_SHAPE
+  //     if (!glass_shape) {
+
+  //       console.log("resetting GLASS_INSERT due to missing shape");
+
+  //       if (currentInsert) {
+  //         setState("GLASS_INSERT", "");
+  //       }
+
+  //       $("input[name='GLASS_INSERT']")
+  //         .prop("checked", false)
+  //         .removeAttr("checked");
+
+  //       $("input[name='GLASS_INSERT']")
+  //         .closest(".rw-button")
+  //         .removeClass("selected btn-checked");
+
+  //       $glassInsertSection.hide();
+  //       $moreToggleRow.hide();
+  //       $moreContainer.hide();
+  //       $moreSwitch.prop("checked", false);
+
+  //       return;
+  //     }
+
+  //     // ✅ STEP 2: SHOW/HIDE OPTIONS
+  //     $("input[name='GLASS_INSERT']").each(function () {
+
+  //       const value = String($(this).val() || "");
+  //       let show = false;
+
+  //       if (glass_shape === "colonial") {
+  //         show = width >= 49 && allowedColonial.includes(value);
+  //       }
+
+  //       if (glass_shape === "ranch" && panel_style === "C") {
+  //         show = width >= 49 && filteredAllowedRanch.includes(value);
+  //       }
+
+  //       if (glass_shape === "ranch" && panel_style === "R") {
+  //         show = width >= 49 && filterRanchStd.includes(value);
+  //       }
+
+  //       if (glass_shape === "ranch" && (panel_style === "F" || panel_style === "V")) {
+  //         show = width >= 72 && filterRanchStd.includes(value);
+  //       }
+
+  //       $(this).closest(".rw-button").toggle(show);
+  //     });
+
+  //     // ✅ STEP 3: REMOVE INVALID SELECTION
+  //     if (currentInsert) {
+
+  //       const $selected = $(`input[name='GLASS_INSERT'][value='${currentInsert}']`);
+
+  //       if ($selected.length && !$selected.closest(".rw-button").is(":visible")) {
+
+  //         console.log("invalid GLASS_INSERT → resetting");
+
+  //         setState("GLASS_INSERT", "");
+
+  //         $("input[name='GLASS_INSERT']")
+  //           .prop("checked", false)
+  //           .removeAttr("checked");
+
+  //         $("input[name='GLASS_INSERT']")
+  //           .closest(".rw-button")
+  //           .removeClass("selected btn-checked");
+  //       }
+  //     }
+
+  //     // ✅ STEP 4: SECTION VISIBILITY
+  //     const visibleMainButtons = $("#glass_insert_section .rw-button").filter(function () {
+  //       return $(this).css("display") !== "none";
+  //     }).length;
+
+  //     const visibleMoreButtons = $("#more_glass_inserts_container .rw-button").filter(function () {
+  //       return $(this).css("display") !== "none";
+  //     }).length;
+
+  //     if (visibleMainButtons > 0) {
+  //       $glassInsertSection.show();
+  //     } else {
+  //       $glassInsertSection.hide();
+  //     }
+
+  //     if (visibleMoreButtons > 0) {
+  //       $moreToggleRow.show();
+  //     } else {
+  //       $moreToggleRow.hide();
+  //       $moreContainer.hide();
+  //       $moreSwitch.prop("checked", false);
+  //     }
+
+  //     if (visibleMoreButtons > 0 && $moreSwitch.is(":checked")) {
+  //       $moreContainer.show();
+  //     } else {
+  //       $moreContainer.hide();
+  //     }
+
+  //   },
+  //   "",
+  //   $("#GLASS_INSERT_VISIBILITY")[0],
+  //   ["GLASS_SHAPE", "WIDTH", "PANEL_SPACING", "FACE"]
+  // );
+
 
   createNode(
     "GLASS_SHAPE_VISIBILITY",
@@ -324,15 +778,12 @@ function loadDrivenInputEvents() {
       const door_model = getState("DOOR_MODEL");
       const face = getState("FACE");
       const width = Number(getState("WIDTH"));
+      const doorColor = getState("COLOR")?.value;
 
+      const isWoodTone = ["X", "Y"].includes(doorColor);
       const allowedFacesColonial = ["R", "C", "B", "F", "V", "M"];
       const allowedFacesRanch = ["R", "C", "B", "S", "T", "F", "V"];
       const allowedFacesSlim = ["F", "V"];
-
-      const doorColor = getState("COLOR")?.value;
-      const woodTones = ["X", "Y"];
-      const isWoodTone = woodTones.includes(doorColor);
-
 
       $("input[name='GLASS_SHAPE']").each(function () {
 
@@ -344,100 +795,48 @@ function loadDrivenInputEvents() {
 
         let show = false;
 
-        //condition to show granview buttons only
         if (door_model === "G" && isGrandShape) {
           show = true;
         }
 
-        //condition to show colonial glass
         if (isColonial) {
-
-          // default hide
-          show = false;
-
-          // allowed only when NOT G
-          if (
-            door_model !== "G" &&
-            allowedFacesColonial.includes(face)
-          ) {
-
-            // Ranch special width restriction
+          if (door_model !== "G" && allowedFacesColonial.includes(face)) {
             if (face === "R") {
-
-              // hide between 76–95 6-4,7-11
               show = !(width >= 76 && width < 95);
-            }
-
-            // M special width restriction
-            else if (face === "M") {
-
-              show = (width >= 96);
-            }
-
-            // other valid faces
-            else {
-
+            } else if (face === "M") {
+              show = width >= 96;
+            } else {
               show = true;
             }
           }
-        }
-        else if (isRanch) {
-          if (allowedFacesRanch.includes(face) && door_model != 'G') {
+        } else if (isRanch) {
+          if (door_model !== "G" && allowedFacesRanch.includes(face)) {
             switch (face) {
               case "C":
-
-                show = isWoodTone
-                  ? width >= 95
-                  : !(width >= 76 && width < 95);
-
+                show = isWoodTone ? width >= 95 : !(width >= 76 && width < 95);
                 break;
-
               case "B":
-
                 show = width >= 96;
-
                 break;
-
               case "R":
-
-                show = isWoodTone
-                  ? width >= 76
-                  : true;
-
+                show = isWoodTone ? width >= 76 : true;
                 break;
-
               default:
-
                 show = true;
             }
-
           }
         } else if (isSlim) {
-          if (width > 96 && allowedFacesSlim.includes(face) && door_model != 'G') {
-            show = true;
-          }
+          show = width > 96 && allowedFacesSlim.includes(face) && door_model !== "G";
         }
 
         $(this).closest(".rw-button").toggle(show);
       });
 
-      const $checked =
-        $("input[name='GLASS_SHAPE']:checked");
-
-      if (
-        $checked.length &&
-        !$checked.closest(".rw-button").is(":visible")
-      ) {
-
-        $checked
-          .prop("checked", false)
-          .data("checked", false);
-
-        $checked
-          .closest(".rw-button")
-          .removeClass("selected btn-checked");
-
-        setState("GLASS_SHAPE", "");
+      // If the currently-selected shape is now hidden, deselect it and clear glass type too
+      const $checked = $("input[name='GLASS_SHAPE']:checked");
+      if ($checked.length && !$checked.closest(".rw-button").is(":visible")) {
+        clearRadio("GLASS_SHAPE");
+        clearRadio("GLASS_TYPE");
       }
 
     },
@@ -446,166 +845,204 @@ function loadDrivenInputEvents() {
     ["DOOR_MODEL", "FACE", "WIDTH", "COLOR"]
   );
 
+  // ─── GLASS_TYPE_VISIBILITY ────────────────────────────────────────────────────
+
+  createNode(
+    "GLASS_TYPE_VISIBILITY",
+    function () {
+
+      const door_model = getState("DOOR_MODEL");
+      const glass_shape = getState("GLASS_SHAPE");
+      const currentGlassType = getState("GLASS_TYPE");
+
+      console.log("node - glass shape", glass_shape);
+
+      const allowedAllGlass = [
+        "CLEAR", "CLEAR_SINGLE", "SATIN",
+        "OBSCURE_GLASS_PINHEAD", "OBSCURE_GLASS_SINGLE",
+        "DARK_TINT_SEALED", "DARK_TINT_SINGLE",
+        "BLACK_SATIN_SEALED"
+      ];
+      const allowedSlimGlassL138 = ["CLEAR", "SATIN"];
+      const allowedSlimGlassL200 = ["CLEAR", "SATIN", "BLACK_SATIN_SEALED"];
+      const slimShapes = ["slim_single", "slim_double"];
+
+      // STEP 1: No shape selected → clear everything and bail
+      if (glass_shape == null) {
+        console.log("glass shape missing → clearing GLASS_TYPE");
+        clearRadio("GLASS_TYPE");
+        return;
+      }
+
+      // STEP 2: Determine which glass types are allowed
+      let allowedList = allowedAllGlass;
+      if (door_model === "A" && slimShapes.includes(glass_shape)) {
+        allowedList = allowedSlimGlassL138;
+      } else if (door_model === "D" && slimShapes.includes(glass_shape)) {
+        allowedList = allowedSlimGlassL200;
+      }
+
+      // STEP 3: Toggle button visibility
+      $("input[name='GLASS_TYPE']").each(function () {
+        $(this).closest(".rw-button").toggle(allowedList.includes($(this).val()));
+      });
+
+      // STEP 4 & 5: Auto-select default or fix an invalid selection
+      const needsDefault = !currentGlassType && allowedList.length;
+      const needsReset = currentGlassType && !allowedList.includes(currentGlassType);
+
+      if (needsDefault || needsReset) {
+        const defaultValue = allowedList.includes("CLEAR") ? "CLEAR" : allowedList[0];
+        console.log("setting default GLASS_TYPE →", defaultValue);
+        setState("GLASS_TYPE", defaultValue);
+        syncRadioUI("GLASS_TYPE", defaultValue);
+      }
+
+    },
+    "",
+    $("#GLASS_TYPE_VISIBILITY")[0],
+    ["DOOR_MODEL", "GLASS_SHAPE", "FACE"]
+  );
+
+  // ─── GLASS_INSERT_VISIBILITY ──────────────────────────────────────────────────
   createNode(
     "GLASS_INSERT_VISIBILITY",
     function () {
+
       const glass_shape = getState("GLASS_SHAPE");
       const width = Number(getState("WIDTH"));
-      const panel_spacing = getState("PANEL_SPACING");
       const panel_style = getState("FACE");
+      const currentInsert = getState("GLASS_INSERT");
 
-      //colonial face, colonial glass and panel spacing S
+      const $glassInsertSection = $("#glass_insert_section");
+      const $moreToggleRow = $("#more_glass_inserts_toggle_row");
+      const $moreContainer = $("#more_glass_inserts_container");
+      const $moreSwitch = $("#more_glass_inserts");
+
       const allowedColonial = [
-        "stockton_colonial",
-        "waterton_colonial",
-        "prairie",
-        "cascade_colonial",
-        "alum_stockton_4",
-        "alum_stockton_6",
-        "alum_prairie",
-        "square_bar_stockton_4",
-        "square_bar_stockton_6",
-        "square_bar_prairie",
-        "round_bar_stockton_4",
-        "round_bar_stockton_6",
+        "stockton_colonial", "waterton_colonial", "prairie",
+        "cascade_colonial", "alum_stockton_4", "alum_stockton_6",
+        "alum_prairie", "square_bar_stockton_4", "square_bar_stockton_6",
+        "square_bar_prairie", "round_bar_stockton_4", "round_bar_stockton_6",
         "round_bar_prairie"
       ];
 
-      //panel spacing S
       const allowedRanch = [
-        "cascade_ranch",
-        "stockton_ranch",
-        "waterton_ranch",
-        "stockbridge",
-        "prairie",
-        "square_bar_stockton_10",
-        "square_bar_prairie",
-        "round_bar_stockton_10",
-        "round_bar_prairie",
+        "cascade_ranch", "stockton_ranch", "waterton_ranch", "stockbridge",
+        "prairie", "square_bar_stockton_10", "square_bar_prairie",
+        "round_bar_stockton_10", "round_bar_prairie", "alum_stockton_10",
+        "alum_prairie", "arched_stockton", "arched_stockbridge",
+        "arched_stockbridge_3", "arched_stockton_3", "arched_stockton_4",
+        "arched_stockbridge_4"
+      ];
 
-        "alum_stockton_10", // LT 243
-        "alum_prairie", // LT 243
-
-        "arched_stockton", //GTE 95 LT 143
-        "arched_stockbridge", // GTE 95 LT143
-
-        "arched_stockbridge_3", //GTE 143 LT 190
-        "arched_stockton_3", //GTE 143
-
-        "arched_stockton_4", //GTE 192 LT236
-        "arched_stockbridge_4" //GTE 192 LT 236
-
-      ]
-
-
-      function getAllowedRanchByWidthColStd(width) {
+      // Width-based ranch filters — differ only in numeric thresholds
+      function getAllowedRanch(width, alumMax, arch1Min, arch1Max, arch3Min, arch3Max, arch4Min, arch4Max) {
         return allowedRanch.filter((item) => {
-          if (["alum_stockton_10", "alum_prairie"].includes(item)) {
-            return width < 243;
-          }
-
-          if (["arched_stockton", "arched_stockbridge"].includes(item)) {
-            return width >= 95 && width < 143;
-          }
-
-          if (["arched_stockbridge_3", "arched_stockton_3"].includes(item)) {
-            return width >= 143 && width < 190;
-          }
-
-          if (["arched_stockton_4", "arched_stockbridge_4"].includes(item)) {
-            return width >= 192 && width < 236;
-          }
-
+          if (["alum_stockton_10", "alum_prairie"].includes(item)) return width < alumMax;
+          if (["arched_stockton", "arched_stockbridge"].includes(item)) return width >= arch1Min && width < arch1Max;
+          if (["arched_stockbridge_3", "arched_stockton_3"].includes(item)) return width >= arch3Min && width < arch3Max;
+          if (["arched_stockton_4", "arched_stockbridge_4"].includes(item)) return width >= arch4Min && width < arch4Max;
           return true;
         });
       }
 
-      function getAllowedRanchByWidthRanchStd(width) {
-        return allowedRanch.filter((item) => {
-          if (["alum_stockton_10", "alum_prairie"].includes(item)) {
-            return width < 259;
-          }
+      const filteredAllowedRanch = getAllowedRanch(width, 243, 95, 143, 143, 190, 192, 236); // ColStd
+      const filterRanchStd = getAllowedRanch(width, 259, 96, 143, 143, 190, 190, 236); // RanchStd
 
-          if (["arched_stockton", "arched_stockbridge"].includes(item)) {
-            return width >= 96 && width < 143;
-          }
-          if (["arched_stockbridge_3", "arched_stockton_3"].includes(item)) {
-            return width >= 143 && width < 190;
-          }
-
-          if (["arched_stockton_4", "arched_stockbridge_4", "arched_stockton", "arched_stockbridge"].includes(item)) {
-            return width >= 190 && width < 236;
-          }
-          return true;
-        });
+      // STEP 1: No shape → full reset
+      if (!glass_shape) {
+        console.log("resetting GLASS_INSERT due to missing shape");
+        clearRadio("GLASS_INSERT");
+        $glassInsertSection.hide();
+        $moreToggleRow.hide();
+        $moreContainer.hide();
+        $moreSwitch.prop("checked", false);
+        return;
       }
 
-
-
-      const filteredAllowedRanch = getAllowedRanchByWidthColStd(width);
-      const filterRanchStd = getAllowedRanchByWidthRanchStd(width);
-
+      // STEP 2: Toggle individual insert options
       $("input[name='GLASS_INSERT']").each(function () {
-        const insertValue = String($(this).val() || "");
+
+        const value = String($(this).val() || "");
         let show = false;
 
-        if (glass_shape === "colonial") { //show colonial 
-          show = width >= 49 && allowedColonial.includes(insertValue);
-
+        if (glass_shape === "colonial") {
+          show = width >= 49 && allowedColonial.includes(value);
+        } else if (glass_shape === "ranch") {
+          switch (panel_style) {
+            case "C":
+              show = width >= 49 && filteredAllowedRanch.includes(value);
+              break;
+            case "R":
+              show = width >= 49 && filterRanchStd.includes(value);
+              break;
+            case "F":
+            case "V":
+              show = width >= 72 && filterRanchStd.includes(value);
+              break;
+          }
         }
-
-        if (glass_shape === 'ranch' && panel_style === 'C') {
-          show = width >= 49 && filteredAllowedRanch.includes(insertValue);
-        }
-
-        if (glass_shape === 'ranch' && panel_style === 'R') {
-          show = width >= 49 && filterRanchStd.includes(insertValue);
-        }
-
-        if (glass_shape === 'ranch' && (panel_style === 'F' || panel_style === 'V')) {
-          show = width >= 72 && filterRanchStd.includes(insertValue);
-        }
-
 
         $(this).closest(".rw-button").toggle(show);
       });
 
-      const $checked = $("input[name='GLASS_INSERT']:checked");
-
-      if (
-        $checked.length &&
-        !$checked.closest(".rw-button").is(":visible")
-      ) {
-        $checked
-          .prop("checked", false)
-          .data("checked", false);
-
-        $checked
-          .closest(".rw-button")
-          .removeClass("selected btn-checked");
-
-        setState("GLASS_INSERT", "");
+      // STEP 3: Clear selection if it's now hidden
+      if (currentInsert) {
+        const $selected = $(`input[name='GLASS_INSERT'][value='${currentInsert}']`);
+        if ($selected.length && !$selected.closest(".rw-button").is(":visible")) {
+          console.log("invalid GLASS_INSERT → resetting");
+          clearRadio("GLASS_INSERT");
+        }
       }
+
+      // STEP 4: Show/hide the insert section and "more" toggle based on visible button counts
+      const visibleMain = $("#glass_insert_section .rw-button").filter(function () {
+        return $(this).css("display") !== "none";
+      }).length;
+
+      const visibleMore = $("#more_glass_inserts_container .rw-button").filter(function () {
+        return $(this).css("display") !== "none";
+      }).length;
+
+      $glassInsertSection.toggle(visibleMain > 0);
+
+      if (visibleMore > 0) {
+        $moreToggleRow.show();
+        $moreContainer.toggle($moreSwitch.is(":checked"));
+      } else {
+        $moreToggleRow.hide();
+        $moreContainer.hide();
+        $moreSwitch.prop("checked", false);
+      }
+
     },
     "",
     $("#GLASS_INSERT_VISIBILITY")[0],
     ["GLASS_SHAPE", "WIDTH", "PANEL_SPACING", "FACE"]
   );
 
-  // addLogic("GLASS_TYPE", function () {
-  //   const glass_shape = getState("GLASS_SHAPE");
-  //   const currentGlassType = getState("GLASS_TYPE");
-
-  //   console.log("currentGlass", currentGlassType);
-  //   if (!glass_shape) {
-  //     this.value = "";
-  //     return;
-  //   }
-
-  //   if (!currentGlassType) {
-  //     // this.value = "CLEAR"; // replace with your actual value
-  //   }
-  // }, ["GLASS_SHAPE"]);
 
 }
 
+function syncRadioUI(name, value) {
+  $(`input[name='${name}']`).each(function () {
+    const isMatch = $(this).val() === value;
+    $(this)
+      .prop("checked", isMatch)
+    [isMatch ? "attr" : "removeAttr"]("checked", "checked");
+    $(this)
+      .closest(".rw-button")
+      .toggleClass("selected btn-checked", isMatch);
+  });
+}
+
+//Fully clears a radio-button group (UI + state).
+function clearRadio(name) {
+  $(`input[name='${name}']`)
+    .prop("checked", false)
+    .removeAttr("checked")
+    .closest(".rw-button")
+    .removeClass("selected btn-checked");
+  setState(name, "");
+}

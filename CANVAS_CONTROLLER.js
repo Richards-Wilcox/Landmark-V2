@@ -233,16 +233,16 @@ function addRenderNode() {
 		this.value = JSON.stringify(getState("RENDER"))
 	}, ["RENDER"]);
 
-	$(`input[name="FACE"]`).on('change', function () {
-		const face = $(this).val();
-		if (face == 'C') {
-			$(`#GLASS_SHAPE_COLONIAL`).click();
-			setState("GLASS_SHAPE", "colonial");
-		} else if (face == 'R') {
-			$(`#GLASS_SHAPE_RANCH`).click();
-			setState("GLASS_SHAPE", "ranch");
-		}
-	});
+	// $(`input[name="FACE"]`).on('change', function () {
+	// 	const face = $(this).val();
+	// 	if (face == 'C') {
+	// 		$(`#GLASS_SHAPE_COLONIAL`).click();
+	// 		setState("GLASS_SHAPE", "colonial");
+	// 	} else if (face == 'R') {
+	// 		$(`#GLASS_SHAPE_RANCH`).click();
+	// 		setState("GLASS_SHAPE", "ranch");
+	// 	}
+	// });
 
 
 	$(document).off('click.canvasFix');
