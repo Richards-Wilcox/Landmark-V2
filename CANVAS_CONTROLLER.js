@@ -288,11 +288,14 @@ function addRenderNode() {
 
 			if (changed) break;
 		}
-
+	
 		if (changed) {
 			CANVAS_PLUGIN.draw(getDoorInfo());
 
-			$(`input[name='WINDOW_POSITION']`).prop("checked", false);
+			$(`input[name='WINDOW_POSITION']`).prop("checked", false).removeAttr("checked")
+				.closest(".rw-button")
+				.removeClass("selected btn-checked");
+			setState("WINDOW_POSITION", "");
 		} else {
 			// console.log("❌ NO PANEL HIT");
 		}

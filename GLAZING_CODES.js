@@ -730,7 +730,6 @@ function buildGlzCode(sectionIndex, temp_glass_flg) {
 
     const panel_identity = `SB-INT${sc_part_no.slice(-2)}`;
     const isTopSection = sectionIndex === total_sections;
-    console.log("isTopSection", isTopSection);
 
     let finalCode = glazing_code; // default
 
@@ -785,16 +784,13 @@ function buildGlzCode(sectionIndex, temp_glass_flg) {
                 : no_glz_code;
         } else {
             if (temp_glass === "bottom_1" && sectionIndex === 1) {
-                console.log("bottom 1")
                 finalCode = glazing_code_temp;
             }
             else if (temp_glass === "bottom_2" && (sectionIndex === 1 || sectionIndex === 2)) {
-                console.log("bottom 1 & 2")
                 // ✅ section 1 AND 2  ← FIX HERE
                 finalCode = glazing_code_temp;
             }
             else {
-                console.log("else")
                 finalCode = glazing_code;
             }
 
@@ -1137,11 +1133,35 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
         const HEIGHTS = buildArray(num_of_windows, 13.625);
         const LOC_Y = buildArray(num_of_windows, location_y);
 
-        // ✅ Read already-fetched values for this section
-        const sectionRLL = SECTION_RLL_VALUES[sectionIndex - 1] || Array(15).fill(0);
 
-        // CNC currently uses first 10 only
-        const RLL = Array.from({ length: MAX_WINDOWS }, (_, i) => sectionRLL[i] || 0);
+
+        const sections = getSectionInfo();
+
+        // ✅ Get enabled array for correct section
+        const enabledArr =
+            Array.isArray(sections[sectionIndex - 1]?.enabled)
+                ? sections[sectionIndex - 1].enabled
+                : [];
+
+        // ✅ Get RLL values (1X → nX)
+        const sectionRLL =
+            SECTION_RLL_VALUES[sectionIndex - 1] || Array(15).fill(0);
+
+        // ✅ Apply enabled mask
+        const RLL = Array.from({ length: MAX_WINDOWS }, (_, i) => {
+            return enabledArr[i]
+                ? Number(sectionRLL[i]) || 0
+                : 0;
+        });
+
+
+        // ✅ Debug logs (optional but recommended)
+        console.log("sectionIndex:", sectionIndex);
+        console.log("sectionRLL:", sectionRLL);
+        console.log("enabled:", enabledArr);
+        console.log("final RLL:", RLL);
+
+
 
         let cnc = `${sc_part_no},${door_thickness},${lite_location},${rp_width},${section_height},LR`;
 
@@ -1211,7 +1231,7 @@ function getAttributeValuesRaw(iName, iVal) {
         query += "&iVal=" + encodeURIComponent(iVal);
     }
 
-    const fullUrl = "/spr/Configuration/interface/api/beta/attribute?" + query;    
+    const fullUrl = "/spr/Configuration/interface/api/beta/attribute?" + query;
 
     $.ajax({
         url: fullUrl,
@@ -1265,7 +1285,8 @@ function getAllRLLValuesForSmartcom(smartcomCode) {
     }
 
     // ✅ Cache by SMARTCOM code
-    if (RLL_CACHE_BY_SMARTCOM[smartcomCode]) {        
+    if (RLL_CACHE_BY_SMARTCOM[smartcomCode]) {
+        console.log("Using cached RLL values for", smartcomCode);
         return RLL_CACHE_BY_SMARTCOM[smartcomCode];
     }
 
@@ -1273,10 +1294,12 @@ function getAllRLLValuesForSmartcom(smartcomCode) {
     const rawData = getAttributeValuesRaw("RLL_VALUES", smartcomCode);
     const values = parseAllRLLValues(rawData);
 
-    RLL_CACHE_BY_SMARTCOM[smartcomCode] = values;    
+    RLL_CACHE_BY_SMARTCOM[smartcomCode] = values;
+    console.log("Cached RLL values:", smartcomCode, values);
 
     return values;
 }
+
 
 function generateGlazingCodeString(glassKey) {
 
@@ -1302,4 +1325,9 @@ function generateGlazingCodeString(glassKey) {
     ].join(",");
 
 
+}
+
+
+function getSectionInfo() {
+    return [...getDoorInfo().sections].reverse();
 }

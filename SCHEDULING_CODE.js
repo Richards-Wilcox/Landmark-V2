@@ -11,9 +11,7 @@ function addSchedulingCodeLogic() {
     addLogic("SECTION_09_SC_CODE", createSectionScCodeLogic(8), ["SECTION_09", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "EndCaps"]);
 }
 
-function getSectionInfo() {
-    return [...getDoorInfo().sections].reverse();
-}
+
 
 function generateScCode(glazed, btm_retainer, panel_seq, section_height, sc_code) {
 
