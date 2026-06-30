@@ -906,9 +906,11 @@ async function drawWindows(ctx, section, info, hints) {
 		}
 		if (hints) {
 			if (section.slim_one) {
+				
 				if (!section.selected) continue;
+				
 				const size = 10;
-				const [mouse_x, mouse_y] = getCanvasMousePos();
+				const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
 				const x = px + pW/2;
 
 				ctx.save();
@@ -937,7 +939,7 @@ async function drawWindows(ctx, section, info, hints) {
 			const section_intersects = section.slim_one && isMouseIntersect(info.xpos, section.ypos*info.scale+info.ypos,
 				info.door_width*info.scale, section.height*info.scale);
 			if (section_intersects) {
-				const [mouse_x, mouse_y] = getCanvasMousePos();
+				const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
 				const x = mouse_x - pW/2;
 				const size = 10;
 

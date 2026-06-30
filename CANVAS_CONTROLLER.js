@@ -92,6 +92,8 @@ function addRenderNode() {
 			const width = getState("WIDTH");
 
 			const state = this.value;
+			console.log("state value", this.value);
+
 			const sections = state.sections;
 			const num_add = Math.abs(sections.length)
 
@@ -127,8 +129,14 @@ function addRenderNode() {
 
 				let positions = getPanelPositions(shape, width);
 
+
+				// ✅ Reset enabled if glass_shape is deselected
+				if (!glass_shape) {
+					section.enabled = Array(positions.length).fill(false);
+				}
 				const section_enabled = section.enabled;
 				const section_glass = section_enabled.some(x => x == true);
+
 				if (section_glass && special) {
 					shape = glass_shape;
 				}
@@ -142,6 +150,8 @@ function addRenderNode() {
 				if (["slim_single", "slim_double"].includes(glass_shape)) {
 					if (section.shape.includes("slim")) {
 						shape = section.shape;
+						// shape = glass_shape;
+
 					}
 
 					if (slim_one) {
@@ -160,8 +170,6 @@ function addRenderNode() {
 
 				// const enabled = (section_enabled.length != positions.length) ?
 				// Array(positions.length).fill(false) : Array.from(section_enabled);
-
-
 
 				let enabled;
 
@@ -197,6 +205,21 @@ function addRenderNode() {
 	addLogic("WINDOW_POSITION", function () {
 		const glass_shape = getState("GLASS_SHAPE");
 		const special = getState("SPECIAL_FACE");
+
+
+		// reset when glass shape is empty
+		if (!glass_shape) {
+
+			$("input[name='WINDOW_POSITION']")
+				.prop("checked", false)
+				.closest(".rw-button")
+				.removeClass("selected btn-checked");
+
+			this.value = "";
+			return;
+		}
+
+
 		let position = $("input[name='WINDOW_POSITION']:checked").val() ?? "";
 
 		const should_disable = special || glass_shape.includes("grand");
@@ -279,16 +302,31 @@ function addRenderNode() {
 					mouse_y >= py &&
 					mouse_y <= py + panel_height;
 
+				// if (hit) {
+				// 	section.enabled[i] = !section.enabled[i];
+				// 	changed = true;
+				// 	break;
+				// }
 				if (hit) {
-					section.enabled[i] = !section.enabled[i];
+
+					if (section.slim_one) {
+						// ✅ ONLY ONE window allowed
+						section.enabled.fill(false);   // clear all
+						section.enabled[i] = true;     // enable only clicked one
+					} else {
+						// ✅ normal behavior
+						section.enabled[i] = !section.enabled[i];
+					}
+
 					changed = true;
 					break;
 				}
+
 			}
 
 			if (changed) break;
 		}
-	
+
 		if (changed) {
 			CANVAS_PLUGIN.draw(getDoorInfo());
 
@@ -315,153 +353,178 @@ function addRenderNode() {
 
 }
 
-function addSlimUi() {
-	$(`[data-id="section_slim_temp"]`).remove();
-	const glass_shape = getState("GLASS_SHAPE") ?? "";
+// function addSlimUi() {
+// 	$(`[data-id="section_slim_temp"]`).remove();
+// 	const glass_shape = getState("GLASS_SHAPE") ?? "";
 
-	const windows = getState("WINDOW_STATE");
-	if (!glass_shape.includes("slim")) {
-		$(`#slim_spacing_container`).remove();
-		windows.sections.forEach(section => {
-			section.selected = false;
-			section.slim_one = false;
-		});
-		return;
-	}
+// 	const windows = getState("WINDOW_STATE");
+// 	if (!glass_shape.includes("slim")) {
+// 		$(`#slim_spacing_container`).remove();
+// 		windows.sections.forEach(section => {
+// 			section.selected = false;
+// 			section.slim_one = false;
+// 		});
+// 		return;
+// 	}
 
-	const door_width = getState("WIDTH");
-	const door_height = getState("HEIGHT");
-	const scale = getScale(door_width, door_height);
-	const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
-	const canvas = $("#CONFIG_CANVAS")[0];
-	const canvas_pos = $("#CONFIG_CANVAS").offset();
-	const rect = canvas.getBoundingClientRect();
-	const cx = door_width * scale + canvas_x;
-	const menu_y = canvas_pos.top + (canvas_y + door_height * scale / 2) * (rect.height / canvas.height);
+// 	const door_width = getState("WIDTH");
+// 	const door_height = getState("HEIGHT");
+// 	const scale = getScale(door_width, door_height);
+// 	const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
+// 	const canvas = $("#CONFIG_CANVAS")[0];
+// 	const canvas_pos = $("#CONFIG_CANVAS").offset();
+// 	const rect = canvas.getBoundingClientRect();
+// 	const cx = door_width * scale + canvas_x;
+// 	const menu_y = canvas_pos.top + (canvas_y + door_height * scale / 2) * (rect.height / canvas.height);
 
-	const num_sections = getState("NUM_OF_SEC");
-	const section_heights = getSectionHeights(door_height, num_sections);
-	for (const [i, section] of windows.sections.entries()) {
-		const ypos = section_heights.slice(0, i).reduce((acc, val) => acc + val, 0);
-		const cy = (ypos + section_heights[i] / 2) * scale + canvas_y;
-		const x = cx * rect.width / canvas.width + canvas_pos.left;
-		const y = cy * rect.height / canvas.height + canvas_pos.top;
+// 	const num_sections = getState("NUM_OF_SEC");
+// 	const section_heights = getSectionHeights(door_height, num_sections);
+// 	for (const [i, section] of windows.sections.entries()) {
+// 		const ypos = section_heights.slice(0, i).reduce((acc, val) => acc + val, 0);
+// 		const cy = (ypos + section_heights[i] / 2) * scale + canvas_y;
+// 		const x = cx * rect.width / canvas.width + canvas_pos.left;
+// 		const y = cy * rect.height / canvas.height + canvas_pos.top;
 
-		$(`
-			<div class="rw-button-container-inner" data-id="section_slim_temp">
-				<div class="rw-sliding-button">
-					<i class="fas fa-pencil"></i>
-					<input type="radio" style="display:none;" id="section_slim_single_${i}" name="section_slim_${i}"
-						value="slim_single" />
-				</div>
-			</div>`)
-			.css({
-				'position': 'absolute',
-				'left': `${x}px`,
-				'top': `${y}px`,
-				'transform': 'translate(0%, -50%)',
-				'min-width': '0',
-				'width': '40px',
-			}).appendTo('body')
-			.on('click', function (event) {
-				event.stopPropagation();
-				$(`[data-id="section_slim_temp"]`).removeClass('selected');
-				$(this).addClass('selected');
-				$("#slim_spacing_container").remove();
-				$(`
-			   <div class="slim-options-container" id="slim_spacing_container">
-					 <div class="rw-button" id="SLIM_WINDOW_LITES_ONE" >
-					   <label for="SLIM_WINDOW_LITES_ONE">One Lite</label>
-					   <input type="radio" style="display:none;" name="SLIM_WINDOW_LITES" desc="One Lite" value="one" code="one" checked >
-					 </div>
-					 <div class="rw-button" id="SLIM_WINDOW_LITES_MORE" >
-					   <label for="SLIM_WINDOW_LITES_MORE">More than One</label>
-					   <input type="radio" style="display:none;"  name="SLIM_WINDOW_LITES" desc="More than One" value="more" code="more" >
-					 </div>
-					 <div class="rw-button" id="SLIM_WINDOW_SPACING_EVEN" >
-					   <label for="SLIM_WINDOW_SPACING_EVEN">Evenly Spaced</label>
-					   <input type="radio" style="display:none;" name="SLIM_WINDOW_SPACING" desc="Evenly Spaced" value="even" code="even" checked >
-					 </div>
-					 <div class="rw-button" id="SLIM_WINDOW_SPACING_FIXED" >
-					   <label for="SLIM_WINDOW_SPACING_FIXED">Fixed End</label>
-					   <input type="radio" style="display:none;" name="SLIM_WINDOW_SPACING" desc="Evenly Spaced Fixed End" value="fixed" code="fixed" >
-					 </div>
+// 		$(`
+// 			<div class="rw-button-container-inner" data-id="section_slim_temp">
+// 				<div class="rw-sliding-button">
+// 					<i class="fas fa-pencil"></i>
+// 					<input type="radio" style="display:none;" id="section_slim_single_${i}" name="section_slim_${i}"
+// 						value="slim_single" />
+// 				</div>
+// 			</div>`)
+// 			.css({
+// 				'position': 'absolute',
+// 				'left': `${x}px`,
+// 				'top': `${y}px`,
+// 				'transform': 'translate(0%, -50%)',
+// 				'min-width': '0',
+// 				'width': '40px',
+// 			}).appendTo('body')
+// 			.on('click', function (event) {
+// 				event.stopPropagation();
+// 				$(`[data-id="section_slim_temp"]`).removeClass('selected');
+// 				$(this).addClass('selected');
+// 				$("#slim_spacing_container").remove();
+// 				$(`
+// 			   <div class="slim-options-container" id="slim_spacing_container">
+// 					 <div class="rw-button" id="SLIM_WINDOW_LITES_ONE" >
+// 					   <label for="SLIM_WINDOW_LITES_ONE">One Lite</label>
+// 					   <input type="radio" style="display:none;" name="SLIM_WINDOW_LITES" id="SLIM_WINDOW_LITES_ONE_INPUT" desc="One Lite" value="one" code="one" checked >
+// 					 </div>
+// 					 <div class="rw-button" id="SLIM_WINDOW_LITES_MORE" >
+// 					   <label for="SLIM_WINDOW_LITES_MORE">More than One</label>
+// 					   <input type="radio" style="display:none;"  name="SLIM_WINDOW_LITES" id="SLIM_WINDOW_LITES_MORE_INPUT" desc="More than One" value="more" code="more" >
+// 					 </div>
+// 					 <div class="rw-button" id="SLIM_WINDOW_SPACING_EVEN" >
+// 					   <label for="SLIM_WINDOW_SPACING_EVEN">Evenly Spaced</label>
+// 					   <input type="radio" style="display:none;" name="SLIM_WINDOW_SPACING" desc="Evenly Spaced" value="even" code="even" checked >
+// 					 </div>
+// 					 <div class="rw-button" id="SLIM_WINDOW_SPACING_FIXED" >
+// 					   <label for="SLIM_WINDOW_SPACING_FIXED">Fixed End</label>
+// 					   <input type="radio" style="display:none;" name="SLIM_WINDOW_SPACING" desc="Evenly Spaced Fixed End" value="fixed" code="fixed" >
+// 					 </div>
 
-					<div class="rw-button panel-button" id="SLIM_WINDOW_SINGLE">
-						<label for="GLASS_SHAPE_3">Slim Single</label>
-						<input type="radio" id="GLASS_SHAPE_3" name="GLASS_SHAPE" value="slim_single" >
-					</div>
+// 					<div class="rw-button panel-button" id="SLIM_WINDOW_SINGLE">
+// 						<label for="GLASS_SHAPE_SLIM_SGL">Slim Single</label>
+// 						<input type="radio" id="GLASS_SHAPE_SLIM_SGL" name="GLASS_SHAPE" value="slim_single" >
+// 					</div>
 
-					<div class="panel-layout" id="SLIM_WINDOW_DOUBLE">
-						<div class="rw-button panel-button">
-							<label for="GLASS_SHAPE_MORE_0">Slim Double</label>
-							<input type="radio" id="GLASS_SHAPE_MORE_0" name="GLASS_SHAPE" value="slim_double" >
-						</div>
-					</div>
-			   </div>`)
-					.css({
-						'position': 'absolute',
-						'left': `${x + 60}px`,
-						'top': `${menu_y}px`,
-						'transform': 'translate(0%, -50%)',
-					})
-					.appendTo('body');
+// 					<div class="panel-layout" id="SLIM_WINDOW_DOUBLE">
+// 						<div class="rw-button panel-button">
+// 							<label for="GLASS_SHAPE_MORE_0">Slim Double</label>
+// 							<input type="radio" id="GLASS_SHAPE_MORE_0" name="GLASS_SHAPE" value="slim_double" >
+// 						</div>
+// 					</div>
+// 			   </div>`)
+// 					.css({
+// 						'position': 'absolute',
+// 						'left': `${x + 60}px`,
+// 						'top': `${menu_y}px`,
+// 						'transform': 'translate(0%, -50%)',
+// 					})
+// 					.appendTo('body');
 
-				$(document).on('click.slim_menu', function (event) {
-					const $menu = $('#slim_spacing_container');
-					// If the click was NOT on the menu AND not on a child of the menu
-					if (!$menu.is(event.target) && $menu.has(event.target).length === 0) {
-						$menu.remove();
-						// $document.off('click.slim_menu');
-						$(document).off('click.slim_menu');
-					}
-				});
+// 				// $(document).on('click.slim_menu', function (event) {
+// 				// 	const $menu = $('#slim_spacing_container');
+// 				// 	// If the click was NOT on the menu AND not on a child of the menu
+// 				// 	if (!$menu.is(event.target) && $menu.has(event.target).length === 0) {
+// 				// 		$menu.remove();						
+// 				// 		$(document).off('click.slim_menu');
+// 				// 	}
+// 				// });
 
-				$("#SLIM_WINDOW_LITES_ONE").on('click', function () {
-					const state = getState("WINDOW_STATE");
-					state.sections[i].slim_one = true;
-					setState("SLIM_WINDOW_LITES", "one");
-				});
+// 				$(document).on('click.slim_menu', function (event) {
+// 					const $menu = $('#slim_spacing_container');
 
-				$("#SLIM_WINDOW_LITES_MORE").on('click', function () {
-					const state = getState("WINDOW_STATE");
-					state.sections[i].slim_one = false;
-					setState("SLIM_WINDOW_LITES", "more");
-				});
+// 					if (!$menu.is(event.target) && $menu.has(event.target).length === 0) {
+// 						$menu.remove();
+// 						$(document).off('click.slim_menu');
 
-				$("#SLIM_WINDOW_SPACING_EVEN").on('click', function () {
-					const state = getState("WINDOW_STATE");
-					state.sections[i].slim_spacing = 'even';
-					setState("SLIM_WINDOW_SPACING", "even");
-				});
+// 						// ✅ ONLY REMOVE SELECTION (DO NOT TOUCH hints)
+// 						const state = getState("WINDOW_STATE");
+// 						state.sections.forEach(section => {
+// 							section.selected = false;
+// 						});
 
-				$("#SLIM_WINDOW_SPACING_FIXED").on('click', function () {
-					const state = getState("WINDOW_STATE");
-					state.sections[i].slim_spacing = 'fixed';
-					setState("SLIM_WINDOW_SPACING", "fixed");
-				});
+// 						forceRedraw();
+// 					}
+// 				});
 
-				$("#SLIM_WINDOW_SINGLE").on('click', function () {
-					const state = getState("WINDOW_STATE");
-					state.sections[i].shape = "slim_single";
-					setState("GLASS_SHAPE", "slim_single");
-				});
 
-				$("#SLIM_WINDOW_DOUBLE").on('click', function () {
-					const state = getState("WINDOW_STATE");
-					state.sections[i].shape = "slim_double";
-					setState("GLASS_SHAPE", "slim_double");
-				});
+// 				$("#SLIM_WINDOW_LITES_ONE").on('click', function () {
+// 					const state = getState("WINDOW_STATE");
+// 					state.sections[i].slim_one = true;
+// 					setState("SLIM_WINDOW_LITES", "one");
+// 				});
 
-				const state = getState("WINDOW_STATE");
-				state.sections.forEach(section => {
-					section.selected = false;
-				});
-				state.sections[i].selected = true;
-				forceRedraw();
-			});
-	}
-}
+// 				$("#SLIM_WINDOW_LITES_MORE").on('click', function () {
+// 					const state = getState("WINDOW_STATE");
+// 					state.sections[i].slim_one = false;
+// 					setState("SLIM_WINDOW_LITES", "more");
+// 				});
+
+// 				$("#SLIM_WINDOW_SPACING_EVEN").on('click', function () {
+// 					const state = getState("WINDOW_STATE");
+// 					state.sections[i].slim_spacing = 'even';
+// 					setState("SLIM_WINDOW_SPACING", "even");
+// 				});
+
+// 				$("#SLIM_WINDOW_SPACING_FIXED").on('click', function () {
+// 					const state = getState("WINDOW_STATE");
+// 					state.sections[i].slim_spacing = 'fixed';
+// 					setState("SLIM_WINDOW_SPACING", "fixed");
+// 				});
+
+// 				// $("#SLIM_WINDOW_SINGLE").on('click', function () {
+// 				// 	const state = getState("WINDOW_STATE");
+// 				// 	state.sections[i].shape = "slim_single";
+// 				// 	console.log("state.sections[i].shape", state.sections[i].shape)
+// 				// 	setState("GLASS_SHAPE", "slim_single");
+// 				// });
+
+// 				$(document).off('click.slim_single').on('click.slim_single', '#SLIM_WINDOW_SINGLE', function () {
+// 					const state = getState("WINDOW_STATE");
+// 					state.sections[i].shape = "slim_single";
+// 					setState("GLASS_SHAPE", "slim_single");
+// 				});
+
+
+// 				$("#SLIM_WINDOW_DOUBLE").on('click', function () {
+// 					const state = getState("WINDOW_STATE");
+// 					state.sections[i].shape = "slim_double";
+// 					setState("GLASS_SHAPE", "slim_double");
+// 				});
+
+// 				const state = getState("WINDOW_STATE");
+// 				state.sections.forEach(section => {
+// 					section.selected = false;
+// 				});
+// 				state.sections[i].selected = true;
+// 				forceRedraw();
+// 			});
+// 	}
+// }
 
 // function getCanvasMousePos() {
 // 	const canvas = $("#CONFIG_CANVAS")[0];
@@ -471,6 +534,379 @@ function addSlimUi() {
 // 	const mouse_y = canvas_mouse.y * (canvas.height / rect.height);
 // 	return [mouse_x, mouse_y];
 // }
+
+// function addSlimUi() {
+// 	$(`[data-id="section_slim_temp"]`).remove();
+// 	const glass_shape = getState("GLASS_SHAPE") ?? "";
+
+// 	const windows = getState("WINDOW_STATE");
+
+// 	if (!glass_shape.includes("slim")) {
+// 		$("#slim_spacing_container").remove();
+// 		windows.sections.forEach(section => {
+// 			section.selected = false;
+// 			section.slim_one = false;
+// 		});
+// 		forceRedraw();
+// 		return;
+// 	}
+
+// 	const door_width = getState("WIDTH");
+// 	const door_height = getState("HEIGHT");
+// 	const scale = getScale(door_width, door_height);
+
+// 	const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
+// 	const canvas = $("#CONFIG_CANVAS")[0];
+// 	const canvas_pos = $("#CONFIG_CANVAS").offset();
+// 	const rect = canvas.getBoundingClientRect();
+
+// 	const cx = door_width * scale + canvas_x;
+// 	const menu_y = canvas_pos.top + (canvas_y + door_height * scale / 2) * (rect.height / canvas.height);
+
+// 	const num_sections = getState("NUM_OF_SEC");
+// 	const section_heights = getSectionHeights(door_height, num_sections);
+
+// 	for (const [i, section] of windows.sections.entries()) {
+
+// 		const ypos = section_heights.slice(0, i).reduce((a, b) => a + b, 0);
+// 		const cy = (ypos + section_heights[i] / 2) * scale + canvas_y;
+
+// 		const x = cx * rect.width / canvas.width + canvas_pos.left;
+// 		const y = cy * rect.height / canvas.height + canvas_pos.top;
+
+// 		$(`
+//         <div class="rw-button-container-inner" data-id="section_slim_temp">
+//             <div class="rw-sliding-button">
+//                 <i class="fas fa-pencil"></i>
+//             </div>
+//         </div>
+//         `)
+// 			.css({
+// 				position: 'absolute',
+// 				left: `${x}px`,
+// 				top: `${y}px`,
+// 				transform: 'translate(0%, -50%)',
+// 				width: '40px'
+// 			})
+// 			.appendTo('body')
+// 			.on('click', function (event) {
+
+// 				event.stopPropagation();
+
+// 				$(`[data-id="section_slim_temp"]`).removeClass('selected');
+// 				$(this).addClass('selected');
+
+// 				$("#slim_spacing_container").remove();
+
+// 				// ✅ Popup with all steps already inside
+// 				const $menu = $(`
+//                 <div class="slim-options-container show" id="slim_spacing_container">
+
+//                     <div class="slim-header">
+//                         <span>Configure</span>
+//                         <span class="slim-close">&times;</span>
+//                     </div>
+
+//                     <!-- ✅ STEP 1: SHAPE -->
+//                     <div id="STEP_SHAPE">
+//                         <div class="slim-step-title">Select Shape</div>
+//                         <div class="slim-option" data-step="shape" data-value="slim_single">Slim Single</div>
+//                         <div class="slim-option" data-step="shape" data-value="slim_double">Slim Double</div>
+//                     </div>
+
+//                     <!-- ✅ STEP 2: LITES -->
+//                     <div id="STEP_LITES" style="display:none;">
+//                         <div class="slim-step-title">Select Lites</div>
+//                         <div class="slim-option" data-step="lites" data-value="one">One Lite</div>
+//                         <div class="slim-option" data-step="lites" data-value="more">More than One</div>
+//                     </div>
+
+//                     <!-- ✅ STEP 3: SPACING -->
+//                     <div id="STEP_SPACING" style="display:none;">
+//                         <div class="slim-step-title">Select Spacing</div>
+//                         <div class="slim-option" data-step="spacing" data-value="even">Evenly Spaced</div>
+//                         <div class="slim-option" data-step="spacing" data-value="fixed">Fixed End</div>
+//                     </div>
+
+//                 </div>
+//             `)
+// 					.css({
+// 						left: `${x + 60}px`,
+// 						top: `${menu_y}px`,
+// 						transform: 'translate(0%, -50%)'
+// 					})
+// 					.appendTo('body');
+
+// 				// ✅ highlight
+// 				const state = getState("WINDOW_STATE");
+// 				// state.sections.forEach(sec => sec.selected = false);
+
+// 				// ✅ only update current selection
+// 				state.sections.forEach((sec, idx) => {
+// 					sec.selected = (idx === i);
+// 				});
+// 				// state.sections[i].selected = true;
+
+// 				forceRedraw();
+
+// 				$(document)
+// 					.off('click.keepPencil')
+// 					.on('click.keepPencil', '#slim_spacing_container', function (e) {
+// 						e.stopPropagation(); // ✅ prevents losing selection
+// 					});
+
+// 				// ✅ SINGLE HANDLER (no bugs)
+// 				$(document).off('click.slim').on('click.slim', '#slim_spacing_container .slim-option', function () {
+
+// 					const $el = $(this);
+// 					const step = $el.data("step");
+// 					const value = $el.data("value");
+
+// 					// highlight active
+// 					$el.siblings().removeClass('active');
+// 					$el.addClass('active');
+
+// 					const state = getState("WINDOW_STATE");
+
+// 					if (step === "shape") {
+// 						state.sections[i].shape = value;
+// 						setState("GLASS_SHAPE", value);
+
+// 						$("#STEP_LITES").fadeIn();
+// 					}
+
+// 					if (step === "lites") {
+// 						state.sections[i].slim_one = (value === "one");
+// 						setState("SLIM_WINDOW_LITES", value);
+
+
+// 						if (value === "one") {
+// 							// ✅ reset all previous enabled windows
+// 							state.sections[i].enabled.fill(false);
+// 						}
+
+
+
+// 						if (value === "more") {
+// 							$("#STEP_SPACING").fadeIn();
+// 						} else {
+// 							$("#STEP_SPACING").hide();
+// 						}
+// 					}
+
+// 					if (step === "spacing") {
+// 						state.sections[i].slim_spacing = value;
+// 						setState("SLIM_WINDOW_SPACING", value);
+// 					}
+// 				});
+
+// 				// ✅ CLOSE
+// 				$(document).off('click.slimClose').on('click.slimClose', '.slim-close', function () {
+// 					$('#slim_spacing_container').remove();
+
+// 					const state = getState("WINDOW_STATE");
+// 					state.sections.forEach(sec => sec.selected = false);
+// 					forceRedraw();
+
+// 					$(document).off('click.slim');
+// 				});
+// 			});
+// 	}
+// }
+
+function addSlimUi() {
+	$(`[data-id="section_slim_temp"]`).remove();
+
+	const glass_shape = getState("GLASS_SHAPE") ?? "";
+	const windows = getState("WINDOW_STATE");
+
+	// ✅ Exit condition
+	if (!glass_shape.includes("slim")) {
+		$("#slim_spacing_container").remove();
+
+		windows.sections.forEach(section => {
+			section.selected = false;
+			section.slim_one = false;
+		});
+
+		forceRedraw();
+		return;
+	}
+
+	const door_width = getState("WIDTH");
+	const door_height = getState("HEIGHT");
+	const scale = getScale(door_width, door_height);
+
+	const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
+
+	const canvas = $("#CONFIG_CANVAS")[0];
+	const canvas_pos = $("#CONFIG_CANVAS").offset();
+	const rect = canvas.getBoundingClientRect();
+
+	const cx = door_width * scale + canvas_x;
+	const menu_y =
+		canvas_pos.top +
+		(canvas_y + (door_height * scale) / 2) *
+		(rect.height / canvas.height);
+
+	const num_sections = getState("NUM_OF_SEC");
+	const section_heights = getSectionHeights(door_height, num_sections);
+
+	// ✅ IMPORTANT: get active from REAL state (no fake key)
+	const state = getState("WINDOW_STATE");
+	let activeIndex = state.sections.findIndex(s => s.selected);
+
+	for (const [i, section] of windows.sections.entries()) {
+
+		const ypos = section_heights.slice(0, i).reduce((a, b) => a + b, 0);
+		const cy = (ypos + section_heights[i] / 2) * scale + canvas_y;
+
+		const x = (cx * rect.width) / canvas.width + canvas_pos.left;
+		const y = (cy * rect.height) / canvas.height + canvas_pos.top;
+
+		const $btn = $(`
+        <div class="rw-button-container-inner" data-id="section_slim_temp">
+            <div class="rw-sliding-button">
+                <i class="fas fa-pencil"></i>
+            </div>
+        </div>
+        `);
+
+		// ✅ RESTORE ACTIVE HERE (THIS IS THE REAL FIX)
+		if (i === activeIndex) {
+			$btn.addClass('selected');
+		}
+
+		$btn
+			.css({
+				position: 'absolute',
+				left: `${x}px`,
+				top: `${y}px`,
+				transform: 'translate(0%, -50%)',
+				width: '40px'
+			})
+			.appendTo('body')
+			.on('click', function (event) {
+
+				event.stopPropagation();
+
+				// ✅ set active properly
+				state.sections.forEach((sec, idx) => {
+					sec.selected = (idx === i);
+				});
+
+				// ✅ update UI immediately
+				$(`[data-id="section_slim_temp"]`).removeClass('selected');
+				$(this).addClass('selected');
+
+				$("#slim_spacing_container").remove();
+
+				// ✅ popup
+				const $menu = $(`
+                <div class="slim-options-container show" id="slim_spacing_container">
+
+                    <div class="slim-header">
+                        <span>Configure</span>
+                        <span class="slim-close">&times;</span>
+                    </div>
+
+                    <div id="STEP_SHAPE">
+                        <div class="slim-step-title">Select Shape</div>
+                        <div class="slim-option" data-step="shape" data-value="slim_single">Slim Single</div>
+                        <div class="slim-option" data-step="shape" data-value="slim_double">Slim Double</div>
+                    </div>
+
+                    <div id="STEP_LITES" style="display:none;">
+                        <div class="slim-step-title">Select Lites</div>
+                        <div class="slim-option" data-step="lites" data-value="one">One Lite</div>
+                        <div class="slim-option" data-step="lites" data-value="more">More than One</div>
+                    </div>
+
+                    <div id="STEP_SPACING" style="display:none;">
+                        <div class="slim-step-title">Select Spacing</div>
+                        <div class="slim-option" data-step="spacing" data-value="even">Evenly Spaced</div>
+                        <div class="slim-option" data-step="spacing" data-value="fixed">Fixed End</div>
+                    </div>
+
+                </div>
+            `)
+					.css({
+						left: `${x + 60}px`,
+						top: `${menu_y}px`,
+						transform: 'translate(0%, -50%)'
+					})
+					.appendTo('body');
+
+				forceRedraw();
+
+				// ✅ prevent losing selection
+				$(document)
+					.off('click.keepPencil')
+					.on('click.keepPencil', '#slim_spacing_container', function (e) {
+						e.stopPropagation();
+					});
+
+				// ✅ option click
+				$(document).off('click.slim').on('click.slim', '#slim_spacing_container .slim-option', function () {
+
+					const $el = $(this);
+					const step = $el.data("step");
+					const value = $el.data("value");
+
+					// highlight active
+					$el.siblings().removeClass('active');
+					$el.addClass('active');
+
+					const state = getState("WINDOW_STATE");
+
+					if (step === "shape") {
+						state.sections[i].shape = value;
+						setState("GLASS_SHAPE", value);
+
+						$("#STEP_LITES").fadeIn();
+					}
+
+					if (step === "lites") {
+						state.sections[i].slim_one = (value === "one");
+						setState("SLIM_WINDOW_LITES", value);
+
+
+						if (value === "one") {
+							// ✅ reset all previous enabled windows
+							state.sections[i].enabled.fill(false);
+						}
+
+
+
+						if (value === "more") {
+							$("#STEP_SPACING").fadeIn();
+						} else {
+							$("#STEP_SPACING").hide();
+						}
+					}
+
+					if (step === "spacing") {
+						state.sections[i].slim_spacing = value;
+						setState("SLIM_WINDOW_SPACING", value);
+					}
+				});
+				// ✅ close
+				$(document)
+					.off('click.slimClose')
+					.on('click.slimClose', '.slim-close', function () {
+
+						$('#slim_spacing_container').remove();
+
+						state.sections.forEach(sec => sec.selected = false);
+
+						forceRedraw();
+
+						$(document).off('click.slim');
+					});
+			});
+	}
+}
+
 
 function getCanvasMousePosFromEvent(event) {
 	const canvas = $("#CONFIG_CANVAS")[0];

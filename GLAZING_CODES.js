@@ -713,9 +713,18 @@ function buildGlzCode(sectionIndex, temp_glass_flg) {
     const glazing_code_temp = getState("GLAZING_CODE_TEMP");
     const total_sections = Number(getState("NUM_OF_SEC")) || 0;
     const temp_glass = getState("GLASS_TEMPERED");
+    const glass_shape = getState("GLASS_SHAPE");
 
-    if (!window_position) return "";
+    if (!glass_shape) return "";
 
+    const sections = getSectionInfo();
+
+    // ✅ Get enabled array for correct section
+    const enabledArr =
+        Array.isArray(sections[sectionIndex - 1]?.enabled)
+            ? sections[sectionIndex - 1].enabled
+            : [];
+    
     const allSCs = getAllSCs();
 
     // ✅ Match SC by last 2 digits
@@ -733,84 +742,92 @@ function buildGlzCode(sectionIndex, temp_glass_flg) {
 
     let finalCode = glazing_code; // default
 
-    // --- Section 1(Bottom section) ---
-    // if (sectionIndex === 1) {
-    //     return window_position === "top"
-    //         ? `${sb_part_no},${sc_part_no},${no_glz_code}`
-    //         : `${sb_part_no},${sc_part_no},${glazing_code}`;
+
+    // ✅ CORE LOGIC USING enabledArr
+    const hasAnyEnabled = enabledArr.some(v => v === true);
+    const allDisabled = enabledArr.every(v => v === false);
+
+
+    //bottom section
+    // if (sectionIndex === 1 && window_position === "top") {
+    //     finalCode = no_glz_code;
+
+    //     return getGlazingCode(
+    //         sb_part_no,
+    //         panel_identity,
+    //         sc_part_no,
+    //         finalCode
+    //     );
     // }
 
-    if (sectionIndex === 1 && window_position === "top") {
+    // if (temp_glass === "all") {
+
+    //     if (window_position === "top") {
+    //         // only top section temp
+    //         finalCode = isTopSection
+    //             ? glazing_code_temp
+    //             : no_glz_code;
+    //     } else {
+    //         // all temp
+    //         finalCode = glazing_code_temp;
+    //     }
+    // }
+
+
+    // else if (temp_glass === "bottom_1" || temp_glass === "bottom_2") {
+    //     if (window_position === "top") {
+    //         // ✅ ONLY TOP = glazing, others = no_glz
+    //         finalCode = isTopSection
+    //             ? glazing_code
+    //             : no_glz_code;
+    //     } else {
+    //         if (temp_glass === "bottom_1" && sectionIndex === 1) {
+    //             finalCode = glazing_code_temp;
+    //         }
+    //         else if (temp_glass === "bottom_2" && (sectionIndex === 1 || sectionIndex === 2)) {
+    //             // ✅ section 1 AND 2  ← FIX HERE
+    //             finalCode = glazing_code_temp;
+    //         }
+    //         else {
+    //             finalCode = glazing_code;
+    //         }
+
+    //     }
+    // }
+
+    // // ✅ fallback
+    // else {
+
+    //     if (window_position === "top") {
+    //         // ✅ ONLY TOP gets glazing
+    //         finalCode = isTopSection
+    //             ? glazing_code
+    //             : no_glz_code;
+    //     } else {
+    //         // ✅ Normal case
+    //         finalCode = glazing_code;
+    //     }
+
+    // }
+
+
+    if (allDisabled) {
         finalCode = no_glz_code;
-
-        return getGlazingCode(
-            sb_part_no,
-            panel_identity,
-            sc_part_no,
-            finalCode
-        );
-    }
-
-
-
-    // --- Other sections ---
-    // if (window_position === "top") {
-    //     return isTopSection
-    //         ? getGlazingCode(sb_part_no, panel_identity, sc_part_no, glazing_code)
-    //         : getGlazingCode(sb_part_no, panel_identity, sc_part_no, no_glz_code);
-    // }
-
-    // return getGlazingCode(sb_part_no, panel_identity, sc_part_no, glazing_code);
-
-    if (temp_glass === "all") {
-
-        if (window_position === "top") {
-            // only top section temp
-            finalCode = isTopSection
-                ? glazing_code_temp
-                : no_glz_code;
-        } else {
-            // all temp
+    } else {
+        if (temp_glass === "all") {
             finalCode = glazing_code_temp;
         }
-    }
-
-
-    else if (temp_glass === "bottom_1" || temp_glass === "bottom_2") {
-        if (window_position === "top") {
-            // ✅ ONLY TOP = glazing, others = no_glz
-            finalCode = isTopSection
-                ? glazing_code
-                : no_glz_code;
-        } else {
-            if (temp_glass === "bottom_1" && sectionIndex === 1) {
-                finalCode = glazing_code_temp;
-            }
-            else if (temp_glass === "bottom_2" && (sectionIndex === 1 || sectionIndex === 2)) {
-                // ✅ section 1 AND 2  ← FIX HERE
-                finalCode = glazing_code_temp;
-            }
-            else {
-                finalCode = glazing_code;
-            }
-
+        else if (temp_glass === "bottom_1" && sectionIndex === 1) {
+            finalCode = glazing_code_temp;
         }
-    }
-
-    // ✅ fallback
-    else {
-
-        if (window_position === "top") {
-            // ✅ ONLY TOP gets glazing
-            finalCode = isTopSection
-                ? glazing_code
-                : no_glz_code;
-        } else {
-            // ✅ Normal case
+        else if (temp_glass === "bottom_2" && (sectionIndex === 1 || sectionIndex === 2)) {
+            finalCode = glazing_code_temp;
+        }
+        else {
             finalCode = glazing_code;
         }
-
     }
+
 
     return getGlazingCode(
         sb_part_no,
@@ -818,7 +835,6 @@ function buildGlzCode(sectionIndex, temp_glass_flg) {
         sc_part_no,
         finalCode
     );
-
 
 }
 
@@ -1155,14 +1171,6 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
         });
 
 
-        // ✅ Debug logs (optional but recommended)
-        console.log("sectionIndex:", sectionIndex);
-        console.log("sectionRLL:", sectionRLL);
-        console.log("enabled:", enabledArr);
-        console.log("final RLL:", RLL);
-
-
-
         let cnc = `${sc_part_no},${door_thickness},${lite_location},${rp_width},${section_height},LR`;
 
         cnc += "," + Array(14).fill(0).join(",");
@@ -1186,9 +1194,10 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
 
 function buildCncCode(sectionIndex) {
     const window_position = getState("WINDOW_POSITION");
+    const glass_shape = getState("GLASS_SHAPE");
     const total_sections = Number(getState("NUM_OF_SEC")) || 0;
 
-    if (!window_position) return "";
+    if (!glass_shape) return "";
 
     const match = getMatchingSC(sectionIndex);
     if (!match) return "";

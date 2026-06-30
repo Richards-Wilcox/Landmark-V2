@@ -854,9 +854,7 @@ function loadDrivenInputEvents() {
       const door_model = getState("DOOR_MODEL");
       const glass_shape = getState("GLASS_SHAPE");
       const currentGlassType = getState("GLASS_TYPE");
-
-      console.log("node - glass shape", glass_shape);
-
+      
       const allowedAllGlass = [
         "CLEAR", "CLEAR_SINGLE", "SATIN",
         "OBSCURE_GLASS_PINHEAD", "OBSCURE_GLASS_SINGLE",
@@ -868,8 +866,7 @@ function loadDrivenInputEvents() {
       const slimShapes = ["slim_single", "slim_double"];
 
       // STEP 1: No shape selected → clear everything and bail
-      if (glass_shape == null) {
-        console.log("glass shape missing → clearing GLASS_TYPE");
+      if (glass_shape == null) {        
         clearRadio("GLASS_TYPE");
         return;
       }
@@ -892,8 +889,7 @@ function loadDrivenInputEvents() {
       const needsReset = currentGlassType && !allowedList.includes(currentGlassType);
 
       if (needsDefault || needsReset) {
-        const defaultValue = allowedList.includes("CLEAR") ? "CLEAR" : allowedList[0];
-        console.log("setting default GLASS_TYPE →", defaultValue);
+        const defaultValue = allowedList.includes("CLEAR") ? "CLEAR" : allowedList[0];        
         setState("GLASS_TYPE", defaultValue);
         syncRadioUI("GLASS_TYPE", defaultValue);
       }
@@ -951,8 +947,7 @@ function loadDrivenInputEvents() {
       const filterRanchStd = getAllowedRanch(width, 259, 96, 143, 143, 190, 190, 236); // RanchStd
 
       // STEP 1: No shape → full reset
-      if (!glass_shape) {
-        console.log("resetting GLASS_INSERT due to missing shape");
+      if (!glass_shape) {        
         clearRadio("GLASS_INSERT");
         $glassInsertSection.hide();
         $moreToggleRow.hide();
@@ -990,8 +985,7 @@ function loadDrivenInputEvents() {
       // STEP 3: Clear selection if it's now hidden
       if (currentInsert) {
         const $selected = $(`input[name='GLASS_INSERT'][value='${currentInsert}']`);
-        if ($selected.length && !$selected.closest(".rw-button").is(":visible")) {
-          console.log("invalid GLASS_INSERT → resetting");
+        if ($selected.length && !$selected.closest(".rw-button").is(":visible")) {          
           clearRadio("GLASS_INSERT");
         }
       }
@@ -1021,7 +1015,6 @@ function loadDrivenInputEvents() {
     $("#GLASS_INSERT_VISIBILITY")[0],
     ["GLASS_SHAPE", "WIDTH", "PANEL_SPACING", "FACE"]
   );
-
 
 }
 

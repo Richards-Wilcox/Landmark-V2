@@ -871,7 +871,7 @@ function createForm() {
                                 <input type="radio" id="VL" name="LIFT_TYPE" value="VL">
                                 <label for="VL">Vertical Lift</label>
                             </div>
-                            <div class="rw-button panel-button lift-option" tabindex="0" id="opt-VL">
+                            <div class="rw-button panel-button lift-option" tabindex="0" id="opt-VL_HD">
                                 <input type="radio" id="LHR_VL" name="LIFT_TYPE" value="LHR_VL">
                                 <label for="LHR_VL">Vertical Lift Low Headroom</label>
                             </div>
@@ -1265,7 +1265,6 @@ function createForm() {
     </div>
 </div>
 `
-
     return form;
 }
 
@@ -1899,10 +1898,7 @@ function clickHandler() {
     // Glass type
     $(document).on("change", "input[name='GLASS_SHAPE']", function () {
         const glassShape = $("input[name='GLASS_SHAPE']:checked").val() || "";
-        const currentGlassType = getState("GLASS_TYPE") || "";
-
-        console.log("glass_shape", glassShape);
-        console.log("currentGlassType", currentGlassType);
+        const currentGlassType = getState("GLASS_TYPE") || "";       
         // if no shape, do nothing for now
         if (!glassShape) {
             return;
@@ -1926,22 +1922,7 @@ function clickHandler() {
 
 }
 
-
-
-function selectFirstColor($container) {
-    // const $items = $container.find(".color-button-container");
-
-    // if (!$items.length) return;
-
-    // $items.removeClass("selected");
-
-    // const $first = $items.first();
-    // $first.addClass("selected");
-
-    // $container.find("input[type='radio'][name='COLOR']").prop("checked", false);
-
-    // const $radio = $first.find("input[type='radio']");
-    // $radio.prop("checked", true).trigger("change");
+function selectFirstColor($container) {   
 
     const $items = $container.find(".color-button-container");
 
@@ -2093,22 +2074,7 @@ function appendOptionalColors(panel_style) {
     appendColorsTo("#OptionalColorsSection", OptionalColorImages, panel_style);
 }
 
-function registerColorEvents() {
-    // $(document).on("click", ".color-button-container", function () {
-    //   const $container = $(this).closest(".colorContainer");
-
-    //   // 1) Remove selected class from ALL color containers
-    //   $(".color-button-container").removeClass("selected");
-
-    //   // 2) Add selected class to clicked container
-    //   $(this).addClass("selected");
-    //   // 3) Uncheck all radios
-    //   $(`input[type='radio'][name='COLOR']`).prop("checked", false);
-
-    //   // 4) Check only clicked radio
-    //   $(this).find(`input[type='radio']`).prop("checked", true).trigger("change");
-    // });
-
+function registerColorEvents() {  
     $(document).on("click", ".color-button-container", function () {
         const $container = $(this).closest(".colorContainer");
 
@@ -2121,21 +2087,6 @@ function registerColorEvents() {
         $container.find(`input[type='radio'][name='${inputName}']`).prop("checked", false);
         $(this).find(`input[type='radio']`).prop("checked", true).trigger("change");
     });
-
-
-
-    // $(document)
-    //   .off("click.colorSelect")
-    //   .on("click.colorSelect", ".color-button-container", function () {
-
-    //     const $container = $(this).closest(".colorContainer");
-
-    //     $(".color-button-container", $container).removeClass("selected");
-    //     $(this).addClass("selected");
-
-    //     $("input[type='radio'][name='COLOR']").prop("checked", false);
-    //     $(this).find("input[type='radio']").prop("checked", true).trigger("change");
-    //   });
 }
 
 
@@ -2304,11 +2255,11 @@ function updateDoorWidthInches(feet) {
             select.value = select.options[0].value;
         }
 
-        console.log("updateDoorWidthInches =>", {
-            feet,
-            value: select.value,
-            selectedIndex: select.selectedIndex
-        });
+        // console.log("updateDoorWidthInches =>", {
+        //     feet,
+        //     value: select.value,
+        //     selectedIndex: select.selectedIndex
+        // });
 
     }, 0);
 }
@@ -2375,12 +2326,12 @@ function refreshHeightInches(feet) {
             select.value = select.options[0].value;
         }
 
-        console.log("refreshHeightInches =>", {
-            feet,
-            previousValue,
-            value: select.value,
-            selectedIndex: select.selectedIndex
-        });
+        // console.log("refreshHeightInches =>", {
+        //     feet,
+        //     previousValue,
+        //     value: select.value,
+        //     selectedIndex: select.selectedIndex
+        // });
     }, 0);
 }
 
@@ -2654,14 +2605,6 @@ function getCounterVal(toggle_Switch) {
     return toggle_Switch;
 }
 
-// function toggleHardwareSection(door_option) {
-//     if (door_option === "DOORFACE") {
-//         disableSection("Hardware Options")
-//     }
-//     else {
-//         enableSection("Hardware Options")
-//     }
-// }
 
 function increaseValue(button, limit) {
     const $num = $(button).closest('.quantity-field').find('.number');

@@ -595,7 +595,7 @@ input:checked + .slider:before {
 	height: var(--height--button);
 	min-width: var(--min-width--button);
      border:1px solid black;
-	border-radius: 13px;
+	border-radius: 15px;
      box-shadow: var(--box-shadow--primary-button);
 
 	& label{
@@ -767,15 +767,98 @@ div.radio-layout{
 	 }
 }
 
+// .slim-options-container {
+// 	display: flex;
+// 	justify-content: center;
+// 	align-items: center;
+// 	flex-direction: column;
+// 	padding: 4px;
+// 	background:white;
+// 	gap: 2px;
+//      border:1px solid black;
+// }
+
+/* ✅ Popup Container */
 .slim-options-container {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
-	padding: 4px;
-	background:white;
-	gap: 2px;
-     border:1px solid black;
+    position: absolute;
+    width: 150px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    padding: 16px;
+    z-index: 9999;
+
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    transition: all 0.25s ease;
+}
+
+.slim-options-container.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* ✅ Header */
+.slim-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* ✅ Close button */
+.slim-close {
+    cursor: pointer;
+    font-size: 16px;
+    color: #888;
+}
+.slim-close:hover {
+    color: #000;
+}
+
+/* ✅ Step title */
+.slim-step-title {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+/* ✅ Buttons */
+.slim-option {
+    padding: 8px 10px;
+    border-radius: 15px;
+    border: 1px solid #000;
+    cursor: pointer;
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+    font-size: 13px;
+}
+
+.slim-option:hover {
+    background: #E4E4E4;
+    border-color: #000;
+}
+
+.slim-option.active {
+    background: #000;
+    color: white;
+    border-color: #000;
+}
+
+/* ✅ Fade step animation */
+.slim-step {
+    display: none;
+    animation: fadeIn 0.25s ease;
+}
+
+.slim-step.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 
@@ -1119,7 +1202,7 @@ height:100%;
 .config-option-title-style {
 	font-size: 1.1rem;
 	line-height: 1.5rem;
-	font-style: italic;
+	//font-style: italic;
 }
 
 .config-option-label-style {
@@ -1647,18 +1730,65 @@ option--disabled {
 }
 
 .rw-button-container-inner {
-	   display: flex;
-	   justify-content: center;
-	   align-items: center;
-	   padding: 5px;
-	   background-color: #fff;
-	   border-radius: 13px;
-		border: 1px solid black;
+	  //  display: flex;
+	  //  justify-content: center;
+	  //  align-items: center;
+	  //  padding: 5px;
+	  //  background-color: #fff;
+	  //  border-radius: 13px;
+		// border: 1px solid black;
+
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* ✅ Use relative sizing */
+    width: 2.5rem;
+    height: 2.2rem;
+
+    margin-left: 0.6rem;
+
+    background-color: #ffffff;
+    border-radius: 999px;
+
+    border: 1px solid #d0d0d0;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+
 }
 
-.rw-button-container-inner.selected {
-	background-color: yellow;
+
+.rw-button-container-inner i,
+.rw-button-container-inner svg  {
+    font-size: 0.75rem;
+    color: #444;   
 }
+
+
+.rw-button-container-inner:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px) scale(1.05);
+}
+
+
+.rw-button-container-inner.selected {
+	// background-color: yellow;
+  
+ 
+    background: linear-gradient(135deg, #e21f2e, #c01824, #9f101b);
+    border-color: #c01824;
+
+}
+
+
+.rw-button-container-inner.selected i {
+    color: #ffffff;
+}
+
 
 
 @media (min-width: 1600px) and (max-width: 2600px) {
