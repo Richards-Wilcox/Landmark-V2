@@ -1,14 +1,14 @@
 function addSchedulingCodeLogic() {
 
-    addLogic("SECTION_01_SC_CODE", createSectionScCodeLogic(0), ["SECTION_01", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "EndCaps"]);
-    addLogic("SECTION_02_SC_CODE", createSectionScCodeLogic(1), ["SECTION_02", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "EndCaps"]);
-    addLogic("SECTION_03_SC_CODE", createSectionScCodeLogic(2), ["SECTION_03", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "EndCaps"]);
-    addLogic("SECTION_04_SC_CODE", createSectionScCodeLogic(3), ["SECTION_04", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "EndCaps"]);
-    addLogic("SECTION_05_SC_CODE", createSectionScCodeLogic(4), ["SECTION_05", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "EndCaps"]);
-    addLogic("SECTION_06_SC_CODE", createSectionScCodeLogic(5), ["SECTION_06", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "EndCaps"]);
-    addLogic("SECTION_07_SC_CODE", createSectionScCodeLogic(6), ["SECTION_07", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "EndCaps"]);
-    addLogic("SECTION_08_SC_CODE", createSectionScCodeLogic(7), ["SECTION_08", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "EndCaps"]);
-    addLogic("SECTION_09_SC_CODE", createSectionScCodeLogic(8), ["SECTION_09", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "EndCaps"]);
+    addLogic("SECTION_01_SC_CODE", createSectionScCodeLogic(0), ["SECTION_01", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_02_SC_CODE", createSectionScCodeLogic(1), ["SECTION_02", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_03_SC_CODE", createSectionScCodeLogic(2), ["SECTION_03", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_04_SC_CODE", createSectionScCodeLogic(3), ["SECTION_04", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_05_SC_CODE", createSectionScCodeLogic(4), ["SECTION_05", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_06_SC_CODE", createSectionScCodeLogic(5), ["SECTION_06", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_07_SC_CODE", createSectionScCodeLogic(6), ["SECTION_07", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_08_SC_CODE", createSectionScCodeLogic(7), ["SECTION_08", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_09_SC_CODE", createSectionScCodeLogic(8), ["SECTION_09", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
 }
 
 
@@ -21,7 +21,7 @@ function generateScCode(glazed, btm_retainer, panel_seq, section_height, sc_code
     const door_color = getState("COLOR")?.value;
     const drill = getState("DRILL");
     let drill_code = `${panel_style}${getState("PANEL_SPACING")}`;
-    let end_caps = getState("EndCaps") === 'Y' ? 1 : 0;
+    let end_caps = getState("END_CAPS") === 'Y' ? 1 : 0;
     let width_code = `${section_height}-R${door_color}`;
     let panel_per_sb = 1;
 

@@ -17,8 +17,9 @@ const liteCodeMap = {
 };
 
 
-const LITE_RESULT_CACHE = {};
+
 const DEBUG = false;
+var glassMapperRunning = false;
 
 const SECTION_RLL_VALUES = [];
 const RLL_CACHE_BY_SMARTCOM = {};
@@ -59,6 +60,16 @@ function addGlazingCodeLogic() {
         "HEIGHT", "WIDTH", "NUM_OF_SEC", "LITE_LOCATION",
         "GLASS_TEMPERED"
     ];
+
+
+    const GLASS_QTY_DEPS = [
+        "WINDOW_POSITION",
+        "GLASS_SHAPE",
+        "GLASS_TYPE",
+        ...BUNDLE_DEPS
+    ]
+
+
 
     addLogic("DOOR_THICKNESS", function () {
         let door_model = getState("LM_DOOR_MODEL");
@@ -139,6 +150,29 @@ function addGlazingCodeLogic() {
             "BLACK_SATIN_SEALED": "516"
         };
 
+        const L138SingleSlim = {
+            "CLEAR": "54S-101",
+            "SATIN": "54S-111",
+            "BLACK_SATIN_SEALED": "54S-121",
+        }
+
+        const L138DoubleSlim = {
+            "CLEAR": "54L-101",
+            "SATIN": "54L-111",
+            "BLACK_SATIN_SEALED": "54L-121",
+        }
+
+        const L200SingleSlim = {
+            "CLEAR": "55S-201",
+            "SATIN": "55S-211",
+            "BLACK_SATIN_SEALED": "55S-221",
+        }
+
+        const L200DoubleSlim = {
+            "CLEAR": "55L-201",
+            "SATIN": "55L-211",
+            "BLACK_SATIN_SEALED": "55L-221",
+        }
 
         if (glass_shape === "colonial") {
             window_code = glassTypeColonialMap[glass_type] || "";
@@ -147,12 +181,30 @@ function addGlazingCodeLogic() {
             window_code = glassTypeRanchMap[glass_type] || "";
         }
 
+        if (glass_shape === 'slim_single') {
+            if (door_model === "A") {
+                window_code = L138SingleSlim[glass_type] || "";
+            } else if (door_model === "D") {
+                window_code = L200SingleSlim[glass_type] || "";
+            }
+
+        } else if (glass_shape === 'slim_double') {
+            if (door_model === "A") {
+                window_code = L138DoubleSlim[glass_type] || "";
+            } else if (door_model === "D") {
+                window_code = L200DoubleSlim[glass_type] || "";
+            }
+        }
+
         if (!window_code) {
-            this.value = "0";
+            this.value = "None";
             return;
         }
 
-        this.value = `552-${window_code}`;
+        if (glass_shape.includes("slim")) {
+            this.value = `${window_code}`;
+        }
+        else this.value = `552-${window_code}`;
 
     }, ["GLASS_SHAPE", "FRAME_COLOR", "DOOR_MODEL", "GLASS_TYPE"]);
 
@@ -168,36 +220,15 @@ function addGlazingCodeLogic() {
         this.value = computeValue("lites");
     }, ["WIDTH", "FACE", "GLASS_SHAPE", "GLASS_TYPE", "PANEL_SPACING"]);
 
-
-    addLogic("CENTER_HINGE_CODE", function () {
-        const width = getState("WIDTH");
-        const panel_style = getState("FACE");
-        const spacing = getState("PANEL_SPACING") || "";
-
-        // const result = resolveLiteResult({
-        //     width,
-        //     panel_style,
-        //     glass_shape: "",
-        //     spacing,
-        //     mode: "early"
-        // });
-
-        const result = resolveLiteResult({
-            width: getState("WIDTH"),
-            panel_style: getState("FACE"),
-            glass_shape: getState("GLASS_SHAPE") || "",
-            spacing: getState("PANEL_SPACING") || ""
-        });
-
-
-        this.value = result ? (result.center_hinge_code || "") : "";
-    }, ["WIDTH", "FACE", "PANEL_SPACING"]);
-
+    addLogic("CENTER_HINGE_QTY", function () {
+        this.value = getState("CENTER_HINGE_CODE");
+    }, ["CENTER_HINGE_CODE"])
 
     addLogic("LITE_LOCATION", function () {
         const glass_shape = getState("GLASS_SHAPE") || "";
         const window_1_qty = getState("WINDOW_1_QTY") || 0;
         const liteCode = liteCodeMap[glass_shape] ?? "";
+
         this.value = liteCode.repeat(window_1_qty);
 
 
@@ -315,7 +346,7 @@ function addGlazingCodeLogic() {
         const color = getState("FRAME_COLOR").value;
 
         if (!glass_shape) {
-            this.value = "";
+            this.value = "None";
             return;
         }
         if (glass_shape === 'colonial') this.value = `550-601${color}`;
@@ -328,7 +359,7 @@ function addGlazingCodeLogic() {
         const glass_shape = getState("GLASS_SHAPE") || "";
 
         if (!glass_shape) {
-            this.value = "";
+            this.value = "None";
             return;
         }
         //colonial window
@@ -377,7 +408,6 @@ function addGlazingCodeLogic() {
 
 
     }, ["GLASS_SHAPE"])
-
 
     addLogic("GLAZING_CODE", function () {
 
@@ -534,90 +564,253 @@ function addGlazingCodeLogic() {
         this.value = glz ? buildCncCode(9) : "";
     }, ["GLZ_CODE_SECTION_09", "SECTION_09_SMARTCOM_CODE"]);
 
+    addLogic("GLASS_QTY_B1_SC1", function () {
+        const bundle = getBundles()[0];
+        const sections = getDoorInfo().sections.slice().reverse();
 
+        this.value =
+            bundle?.indexes?.[0]
+                ? Number(sections[bundle.indexes[0] - 1]?.glass_qty) || 0
+                : 0;
+    }, GLASS_QTY_DEPS);
+
+    addLogic("GLASS_QTY_B1_SC2", function () {
+        const bundle = getBundles()[0];
+        const sections = getDoorInfo().sections.slice().reverse();
+
+        this.value =
+            bundle?.indexes?.[1]
+                ? Number(sections[bundle.indexes[1] - 1]?.glass_qty) || 0
+                : 0;
+    }, GLASS_QTY_DEPS);
+
+
+    addLogic("GLASS_QTY_B2_SC1", function () {
+        const bundle = getBundles()[1];
+        const sections = getDoorInfo().sections.slice().reverse();
+
+        this.value =
+            bundle?.indexes?.[0]
+                ? Number(sections[bundle.indexes[0] - 1]?.glass_qty) || 0
+                : 0;
+    }, GLASS_QTY_DEPS);
+
+    addLogic("GLASS_QTY_B2_SC2", function () {
+        const bundle = getBundles()[1];
+        const sections = getDoorInfo().sections.slice().reverse();
+
+        this.value =
+            bundle?.indexes?.[1]
+                ? Number(sections[bundle.indexes[1] - 1]?.glass_qty) || 0
+                : 0;
+    }, GLASS_QTY_DEPS);
+
+    addLogic("GLASS_QTY_B3_SC1", function () {
+        const bundle = getBundles()[2];
+        const sections = getDoorInfo().sections.slice().reverse();
+
+        this.value =
+            bundle?.indexes?.[0]
+                ? Number(sections[bundle.indexes[0] - 1]?.glass_qty) || 0
+                : 0;
+    }, GLASS_QTY_DEPS);
+
+    addLogic("GLASS_QTY_B3_SC2", function () {
+        const bundle = getBundles()[2];
+        const sections = getDoorInfo().sections.slice().reverse();
+
+        this.value =
+            bundle?.indexes?.[1]
+                ? Number(sections[bundle.indexes[1] - 1]?.glass_qty) || 0
+                : 0;
+    }, GLASS_QTY_DEPS);
+
+    addLogic("GLASS_QTY_B4_SC1", function () {
+        const bundle = getBundles()[3];
+        const sections = getDoorInfo().sections.slice().reverse();
+
+        this.value =
+            bundle?.indexes?.[0]
+                ? Number(sections[bundle.indexes[0] - 1]?.glass_qty) || 0
+                : 0;
+    }, GLASS_QTY_DEPS);
+
+    addLogic("GLASS_QTY_B4_SC2", function () {
+        const bundle = getBundles()[3];
+        const sections = getDoorInfo().sections.slice().reverse();
+
+        this.value =
+            bundle?.indexes?.[1]
+                ? Number(sections[bundle.indexes[1] - 1]?.glass_qty) || 0
+                : 0;
+    }, GLASS_QTY_DEPS);
+
+    addLogic("GLASS_QTY_B5_SC1", function () {
+        const bundle = getBundles()[4];
+        const sections = getDoorInfo().sections.slice().reverse();
+
+        this.value =
+            bundle?.indexes?.[0]
+                ? Number(sections[bundle.indexes[0] - 1]?.glass_qty) || 0
+                : 0;
+    }, GLASS_QTY_DEPS);
+
+
+    addLogic("GLASS_QTY_B6_SC1", function () {
+        const bundle = getBundles()[5];
+        const sections = getDoorInfo().sections.slice().reverse();
+
+        this.value =
+            bundle?.indexes?.[0]
+                ? Number(sections[bundle.indexes[0] - 1]?.glass_qty) || 0
+                : 0;
+    }, GLASS_QTY_DEPS);
+
+
+    addLogic("GLASS_QTY_B7_SC1", function () {
+        const bundle = getBundles()[6];
+        const sections = getDoorInfo().sections.slice().reverse();
+
+        this.value =
+            bundle?.indexes?.[0]
+                ? Number(sections[bundle.indexes[0] - 1]?.glass_qty) || 0
+                : 0;
+    }, GLASS_QTY_DEPS);
+
+
+    addLogic("GLASS_QTY_B8_SC1", function () {
+        const bundle = getBundles()[7];
+        const sections = getDoorInfo().sections.slice().reverse();
+
+        this.value =
+            bundle?.indexes?.[0]
+                ? Number(sections[bundle.indexes[0] - 1]?.glass_qty) || 0
+                : 0;
+    }, GLASS_QTY_DEPS);
+
+
+    addLogic("GLASS_QTY_B9_SC1", function () {
+        const bundle = getBundles()[8];
+        const sections = getDoorInfo().sections.slice().reverse();
+
+        this.value =
+            bundle?.indexes?.[0]
+                ? Number(sections[bundle.indexes[0] - 1]?.glass_qty) || 0
+                : 0;
+    }, GLASS_QTY_DEPS);
+
+    addLogic("PUNCH_CODE_SECTION_01", function () {
+        setPunchCode.call(this, 1);
+    }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
+
+    addLogic("PUNCH_CODE_SECTION_02", function () {
+        setPunchCode.call(this, 2);
+    }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
+
+    addLogic("PUNCH_CODE_SECTION_03", function () {
+        setPunchCode.call(this, 3);
+    }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
+
+     addLogic("PUNCH_CODE_SECTION_04", function () {
+        setPunchCode.call(this, 4);
+    }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
+
+     addLogic("PUNCH_CODE_SECTION_05", function () {
+        setPunchCode.call(this, 5);
+    }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
+
+     addLogic("PUNCH_CODE_SECTION_06", function () {
+        setPunchCode.call(this, 6);
+    }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
+
+     addLogic("PUNCH_CODE_SECTION_07", function () {
+        setPunchCode.call(this, 7);
+    }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
+
+     addLogic("PUNCH_CODE_SECTION_08", function () {
+        setPunchCode.call(this, 8);
+    }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
+
+    addLogic("PUNCH_CODE_SECTION_09", function () {
+        setPunchCode.call(this, 9);
+    }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
 
 }
 
-function getScForSection(sectionIndex) {
-    // Each bundle has 2 SCs
-    // Section 1 → B1_SC1
-    // Section 2 → B1_SC2 if exists, else B2_SC1
-    // Section 3 → B2_SC1 or B2_SC2, etc.
+function setPunchCode(sectionNumber) {
 
-    const bundles = [
-        {
-            sb: "SB1_SPNUM",
-            sc1: "BUNDLE1_SC1_SPNUM",
-            sc2: "BUNDLE1_SC2_SPNUM",
-            height: "BUNDLE_1_HEIGHT",
-            sc1_height: "BUNDLE1_SC1_HEIGHT",
-            sc2_height: "BUNDLE1_SC2_HEIGHT"
-        },
-        {
-            sb: "SB2_SPNUM",
-            sc1: "BUNDLE2_SC1_SPNUM",
-            sc2: "BUNDLE2_SC2_SPNUM",
-            height: "BUNDLE_2_HEIGHT",
-            sc1_height: "BUNDLE2_SC1_HEIGHT",
-            sc2_height: "BUNDLE2_SC2_HEIGHT"
-        },
-        {
-            sb: "SB3_SPNUM",
-            sc1: "BUNDLE3_SC1_SPNUM",
-            sc2: "BUNDLE3_SC2_SPNUM",
-            height: "BUNDLE_3_HEIGHT",
-            sc1_height: "BUNDLE3_SC1_HEIGHT",
-            sc2_height: "BUNDLE3_SC2_HEIGHT"
-        },
-        {
-            sb: "SB4_SPNUM",
-            sc1: "BUNDLE4_SC1_SPNUM",
-            sc2: "BUNDLE4_SC2_SPNUM",
-            height: "BUNDLE_4_HEIGHT",
-            sc1_height: "BUNDLE4_SC1_HEIGHT",
-            sc2_height: "BUNDLE4_SC2_HEIGHT"
-        },
-        {
-            sb: "SB5_SPNUM",
-            sc1: "BUNDLE5_SC1_SPNUM",
-            height: "BUNDLE_5_HEIGHT",
-            sc1_height: "BUNDLE5_SC1_HEIGHT"
-        },
-        {
-            sb: "SB6_SPNUM",
-            sc1: "BUNDLE6_SC1_SPNUM",
-            height: "BUNDLE_6_HEIGHT",
-            sc1_height: "BUNDLE6_SC1_HEIGHT"
-        },
-        {
-            sb: "SB7_SPNUM",
-            sc1: "BUNDLE7_SC1_SPNUM",
-            height: "BUNDLE_7_HEIGHT",
-            sc1_height: "BUNDLE7_SC1_HEIGHT"
-        },
-        {
-            sb: "SB8_SPNUM",
-            sc1: "BUNDLE8_SC1_SPNUM",
-            height: "BUNDLE_8_HEIGHT",
-            sc1_height: "BUNDLE8_SC1_HEIGHT"
-        },
-        {
-            sb: "SB9_SPNUM",
-            sc1: "BUNDLE9_SC1_SPNUM",
-            height: "BUNDLE_9_HEIGHT",
-            sc1_height: "BUNDLE9_SC1_HEIGHT"
-        },
-    ];
+    const enabledArr =
+        getSectionInfo()[sectionNumber - 1]?.enabled || [];
 
-    // Flatten into ordered SC slots: [B1SC1, B1SC2, B2SC1, B2SC2, ...]
-    const slots = [];
-    bundles.forEach(b => {
-        slots.push({ sb: b.sb, sc: b.sc1, height: b.height, sc1_height: b.sc1_height });
-        slots.push({ sb: b.sb, sc: b.sc2, height: b.height, sc2_height: b.sc2_height });
+    const punchCode = enabledArr
+        .slice()
+        .reverse()
+        .map(v => v ? 0 : 1);
+
+    this.value = punchCode.join(",");
+}
+
+function setGlassQtyToSCInputs() {
+
+    // Bottom -> Top order
+    var sections = getDoorInfo().sections.slice().reverse();
+
+    var bundles = getBundles();
+    // Reset all fields
+    BUNDLES.forEach(function (bundle, bIndex) {
+
+        bundle.scs.forEach(function (scKey, scIndex) {
+
+            var field =
+                "GLASS_QTY_B" +
+                (bIndex + 1) +
+                "_SC" +
+                (scIndex + 1);
+
+            if (getNode(field)) {
+                setState(field, 0);
+            }
+        });
     });
 
-    return slots[sectionIndex - 1]; // 1-based
+    // Map glass qty to bundle slots
+    bundles.forEach(function (bundle, bundleIndex) {
+
+        var sortedIndexes = bundle.indexes
+            .slice()
+            .sort(function (a, b) {
+                return a - b;
+            });
+
+        for (var i = 0; i < sortedIndexes.length; i++) {
+
+            var sectionIndex = sortedIndexes[i] - 1;
+
+            var section = sections[sectionIndex];
+
+            var qty = Number(section?.glass_qty) || 0;
+
+            var field =
+                "GLASS_QTY_B" +
+                (bundleIndex + 1) +
+                "_SC" +
+                (i + 1);
+
+
+
+            if (getNode(field)) {
+
+                if (getState(field) !== qty) {
+                    setState(field, qty);
+                }
+            }
+        }
+    });
+
+
 }
+
+
 
 // function buildGlzCode(sectionIndex) {
 //     const window_position = getState("WINDOW_POSITION");
@@ -724,7 +917,7 @@ function buildGlzCode(sectionIndex, temp_glass_flg) {
         Array.isArray(sections[sectionIndex - 1]?.enabled)
             ? sections[sectionIndex - 1].enabled
             : [];
-    
+
     const allSCs = getAllSCs();
 
     // ✅ Match SC by last 2 digits
@@ -849,57 +1042,6 @@ function getGlazingCode(sb_part_no, panel_identity, sc_part_no, glazing_code) {
     return `${sb_part_no},${sc_part_no},${glazing_code}`;
 }
 
-function getLites(width, type) {
-    const ranges = {
-        colonial_std: [
-            { min: 48, max: 71, lites: 2, center_hinge_code: "B" },
-            { min: 72, max: 94, lites: 3, center_hinge_code: "C" },
-            { min: 95, max: 118, lites: 4, center_hinge_code: "B" },
-            { min: 119, max: 142, lites: 5, center_hinge_code: "C" },
-            { min: 143, max: 165, lites: 6, center_hinge_code: "C" },
-            { min: 166, max: 189, lites: 7, center_hinge_code: "E" },
-            { min: 190, max: 227, lites: 8, center_hinge_code: "D" },
-            { min: 228, max: 235, lites: 9, center_hinge_code: "E" },
-            { min: 236, max: 258, lites: 10, center_hinge_code: "F" },
-            { min: 259, max: 281, lites: 11, center_hinge_code: "G" },
-            { min: 282, max: 287, lites: 12, center_hinge_code: "F" }
-        ],
-        ranch_std: [
-            { min: 48, max: 94, lites: 1, center_hinge_code: "B" },
-            { min: 95, max: 142, lites: 2, center_hinge_code: "C" },
-            { min: 143, max: 189, lites: 3, center_hinge_code: "C" },
-            { min: 190, max: 235, lites: 4, center_hinge_code: "D" },
-            { min: 236, max: 281, lites: 5, center_hinge_code: "E" },
-            { min: 282, max: 287, lites: 6, center_hinge_code: "F" }
-        ],
-        RanchOverColonialStd: [
-            { min: 48, max: 75, lites: 1 },
-            { min: 76, max: 76, lites: 0 },
-            { min: 77, max: 119, lites: 2 },
-            { min: 120, max: 178, lites: 3 },
-            { min: 179, max: 228, lites: 4 },
-            { min: 229, max: 259, lites: 5 },
-            { min: 260, max: 282, lites: 6 }
-        ],
-        ColonialOverRanchStd: [
-            { min: 48, max: 75, lites: 2 },
-            { min: 76, max: 76, lites: 0 },
-            { min: 77, max: 119, lites: 4 },
-            { min: 120, max: 178, lites: 6 },
-            { min: 179, max: 228, lites: 8 },
-            { min: 229, max: 259, lites: 10 },
-            { min: 260, max: 282, lites: 12 }
-        ]
-    };
-
-    const table = ranges[type];
-    if (!table) return null;
-
-    return table.find(function (r) {
-        return width >= r.min && width <= r.max;
-    }) || null;
-}
-
 // function CalculateLitesInsertQty(width, panel_style, glass_shape) {
 //     const spacing = getState("PANEL_SPACING");
 //     let window_type = "";
@@ -991,111 +1133,6 @@ function getLites(width, type) {
 //     return result;
 // }
 
-function resolveLiteResult(options) {
-    const width = Number(options.width) || 0;
-    const panel_style = options.panel_style || "";
-    const glass_shape = options.glass_shape || "";
-    const spacing = options.spacing || "";
-
-    if (!width || !panel_style) return null;
-
-    let window_type = "";
-
-    // FACE = C
-    if (panel_style === "C") {
-        if (glass_shape === "colonial") {
-            window_type = "colonial_std";
-        } else if (glass_shape === "ranch") {
-            window_type = "RanchOverColonialStd";
-        } else if (!glass_shape) {
-            window_type = "colonial_std";
-        }
-    }
-
-    // FACE = R
-    else if (panel_style === "R") {
-        if (glass_shape === "colonial") {
-            window_type = "ColonialOverRanchStd";
-        } else if (glass_shape === "ranch") {
-            window_type = "ranch_std";
-        } else if (!glass_shape) {
-            window_type = "ranch_std";
-        }
-    }
-
-    // FACE = F or V
-    else if (panel_style === "F" || panel_style === "V") {
-        if (glass_shape === "colonial") {
-            window_type = "colonial_std";
-        } else if (glass_shape === "ranch") {
-            window_type = "ranch_std";
-        }
-    }
-
-    if (!window_type) return null;
-
-    const cacheKey = `${width}|${panel_style}|${glass_shape}|${spacing}`;
-
-    if (LITE_RESULT_CACHE[cacheKey]) {
-        return LITE_RESULT_CACHE[cacheKey];
-    }
-
-    const result = getLites(width, window_type) || null;
-    LITE_RESULT_CACHE[cacheKey] = result;
-
-    return result;
-}
-
-
-function computeValue(field) {
-    const width = getState("WIDTH");
-    const panel_style = getState("FACE");
-    const glass_shape = getState("GLASS_SHAPE") || "";
-    const spacing = getState("PANEL_SPACING") || "";
-
-    // const result = resolveLiteResult({
-    //     width,
-    //     panel_style,
-    //     glass_shape,
-    //     spacing,
-    //     mode: "glazing"
-    // });
-
-    const result = resolveLiteResult({
-        width: getState("WIDTH"),
-        panel_style: getState("FACE"),
-        glass_shape: getState("GLASS_SHAPE") || "",
-        spacing: getState("PANEL_SPACING") || ""
-    });
-
-
-
-    return result ? (result[field] ?? 0) : 0;
-}
-
-
-function getCenterHingeCodeEarly() {
-    const width = Number(getState("WIDTH")) || 0;
-    const panel_style = getState("FACE");
-
-    if (!width || !panel_style) {
-        return "";
-    }
-
-    // Default table by FACE so it can compute before glazing is selected
-    let type = "";
-
-    if (panel_style === "C") {
-        type = "colonial_std";
-    } else if (panel_style === "R") {
-        type = "ranch_std";
-    } else {
-        return "";
-    }
-
-    const result = getLites(width, type);
-    return result ? (result.center_hinge_code || "") : "";
-}
 
 
 function createSmartcomLogic(sectionField) {
@@ -1134,22 +1171,8 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
         const door_thickness = getState("DOOR_THICKNESS");
         const lite_location = getState("LITE_LOCATION");
         const rp_width = getState("WIDTH");
-        const num_of_windows = Number(getState("WINDOW_1_QTY")) || 0;
-
-        const location_y = LOC_Y_MAP[section_height] ?? 0;
-
-        const buildArray = (count, value) =>
-            Array.from({ length: MAX_WINDOWS }, (_, i) => (i < count ? value : 0));
-
-        const buildCharArray = (count, char) =>
-            Array.from({ length: MAX_WINDOWS }, (_, i) => (i < count ? char : 0));
-
-        const WC = buildCharArray(num_of_windows, "C");
-        const WIDTHS = buildArray(num_of_windows, 18.8125);
-        const HEIGHTS = buildArray(num_of_windows, 13.625);
-        const LOC_Y = buildArray(num_of_windows, location_y);
-
-
+        const glass_shape = getState("GLASS_SHAPE");
+        const total_punches = Number(getState("WINDOW_1_QTY")) || 0;
 
         const sections = getSectionInfo();
 
@@ -1158,6 +1181,7 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
             Array.isArray(sections[sectionIndex - 1]?.enabled)
                 ? sections[sectionIndex - 1].enabled
                 : [];
+
 
         // ✅ Get RLL values (1X → nX)
         const sectionRLL =
@@ -1170,6 +1194,44 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
                 : 0;
         });
 
+        const num_of_windows = enabledArr.filter(v => v === true).length;
+
+
+
+        const location_y = LOC_Y_MAP[section_height] ?? 0;
+
+        const buildArray = (count, value) =>
+            Array.from({ length: MAX_WINDOWS }, (_, i) => (i < count ? value : 0));
+
+        const buildCharArray = (count, char) =>
+            Array.from({ length: MAX_WINDOWS }, (_, i) => (i < count ? char : 0));
+
+        const WIDTHS = Array.from(
+            { length: MAX_WINDOWS },
+            (_, i) => enabledArr[i] ? 18.8125 : 0
+        );
+
+        const HEIGHTS = Array.from(
+            { length: MAX_WINDOWS },
+            (_, i) => enabledArr[i] ? 13.625 : 0
+        );
+
+        const LOC_Y = Array.from(
+            { length: MAX_WINDOWS },
+            (_, i) => enabledArr[i] ? location_y : 0
+        );
+
+        const WC = Array.from(
+            { length: MAX_WINDOWS },
+            (_, i) => {
+                if (!enabledArr[i]) return 0;
+
+                if (glass_shape === "ranch") return "R";
+                if (glass_shape === "colonial") return "C";
+
+                return 0;
+            }
+        );
 
         let cnc = `${sc_part_no},${door_thickness},${lite_location},${rp_width},${section_height},LR`;
 
@@ -1177,11 +1239,13 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
         cnc += `,${num_of_windows}`;
 
         for (let i = 0; i < MAX_WINDOWS; i++) {
-            if (i < num_of_windows) {
+
+            if (enabledArr[i]) {
                 cnc += `,${WC[i]},${WIDTHS[i]},${HEIGHTS[i]},${RLL[i]},${LOC_Y[i]}`;
             } else {
                 cnc += `,0,0,0,0,0`;
             }
+
         }
 
         return cnc;
@@ -1220,7 +1284,7 @@ function buildCncCode(sectionIndex) {
 
     if (!glz_code_section) return "";
 
-    // ✅ Only fetch/cache this section’s SMARTCOM values
+    // Only fetch/cache this section’s SMARTCOM values
     const smartcomCode = getState(`SECTION_0${sectionIndex}_SMARTCOM_CODE`);
     SECTION_RLL_VALUES[sectionIndex - 1] = getAllRLLValuesForSmartcom(smartcomCode);
 
@@ -1295,7 +1359,7 @@ function getAllRLLValuesForSmartcom(smartcomCode) {
 
     // ✅ Cache by SMARTCOM code
     if (RLL_CACHE_BY_SMARTCOM[smartcomCode]) {
-        console.log("Using cached RLL values for", smartcomCode);
+        // console.log("Using cached RLL values for", smartcomCode);
         return RLL_CACHE_BY_SMARTCOM[smartcomCode];
     }
 
@@ -1304,7 +1368,7 @@ function getAllRLLValuesForSmartcom(smartcomCode) {
     const values = parseAllRLLValues(rawData);
 
     RLL_CACHE_BY_SMARTCOM[smartcomCode] = values;
-    console.log("Cached RLL values:", smartcomCode, values);
+    // console.log("Cached RLL values:", smartcomCode, values);
 
     return values;
 }

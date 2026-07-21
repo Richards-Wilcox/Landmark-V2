@@ -1,45 +1,48 @@
 var sectionBundleDriversAdded = false;
 var configureInProgress = false;
 
-function showConfigureLoader() {
-    var $loader = $("#canvas-loader");
 
-    if (!$loader.length) {
-        console.warn("Loader element #canvas-loader not found");
-        return;
-    }
+function finalvalidation(options) {
+    options = options || {};
 
-    $loader.show();
-
-    // Force reflow so browser applies display change immediately
-    $loader[0].offsetHeight;
-}
-
-function hideConfigureLoader() {
-    var $loader = $("#canvas-loader");
-
-    if ($loader.length) {
-        $loader.hide();
-    }
-}
-
-function finalvalidation() {
+    const isConfigureClick = options.isConfigureClick === true;
     const renderNode = getNode("RENDER");
-    const render_fn = renderNode.logic;
 
-    renderNode.logic = function () { };
+    renderSuspended = true;
 
-    return forceInitialValidation()
+    console.log("finalvalidation: calling forceInitialValidation()");
+
+    return forceInitialValidationLM()
         .then(function (res) {
-            renderNode.logic = render_fn;
-            rw(renderNode);
-            render_fn();
+            console.log("finalvalidation: forceInitialValidation resolved", res);
+            renderSuspended = false;
+
+            // ✅ Only manually trigger final render when Configure button was clicked
+            if (isConfigureClick && renderNode && typeof renderNode.logic === "function") {
+                console.log("finalvalidation: calling renderNode.logic()");
+                return Promise.resolve(renderNode.logic.call(renderNode))
+                    .then(function () {
+                        console.log("finalvalidation: renderNode.logic() resolved");
+                        return res;
+                    });
+            }
+
             return res;
         })
         .catch(function (e) {
-            renderNode.logic = render_fn;
-            rw(renderNode);
-            render_fn();
+            console.error("finalvalidation: forceInitialValidation REJECTED:", e);
+            renderSuspended = false;
+
+            if (isConfigureClick && renderNode && typeof renderNode.logic === "function") {
+                return Promise.resolve(renderNode.logic.call(renderNode))
+                    .catch(function (renderError) {
+                        console.error("Render after validation error failed:", renderError);
+                    })
+                    .then(function () {
+                        throw e;
+                    });
+            }
+
             throw e;
         });
 }
@@ -47,10 +50,15 @@ function finalvalidation() {
 function loadTestResults(json) {
     $("#INPUT_JSON").val(json);
     loadInputValues();
-    return finalvalidation();
+
+    // ✅ No configure loader/render behavior during load/test restore
+    return finalvalidation({
+        isConfigureClick: false
+    });
 }
 
 function Configure() {
+
     if (configureInProgress) {
         return false;
     }
@@ -58,32 +66,47 @@ function Configure() {
     configureInProgress = true;
     showConfigureLoader();
 
-    // Give browser time to actually paint loader before EW heavy work starts
     setTimeout(function () {
+
         try {
+
             if (!sectionBundleDriversAdded) {
                 addSectionBundleDrivers();
-				addGlazingCodeLogic();
-				addSchedulingCodeLogic();
+                addGlazingCodeLogic();
+                addSchedulingCodeLogic();
+                addHardwareDrivers();
+               // addTrackDrivers();
+                addOperatorEvents();
                 sectionBundleDriversAdded = true;
             }
 
-            finalvalidation()
+            console.log("Configure: calling finalvalidation()");
+
+            finalvalidation({
+                isConfigureClick: true
+            })
                 .then(function () {
+                    console.log("Configure: finalvalidation resolved, calling nextPage()");
                     nextPage();
                 })
                 .catch(function (e) {
                     console.error("Configure error:", e);
-                    hideConfigureLoader();
+                })
+                .finally(function () {
+                    console.log("Configure: finally block, hiding loader");
                     configureInProgress = false;
+                    hideConfigureLoader();
                 });
 
         } catch (e) {
+
             console.error("Configure sync error:", e);
-            hideConfigureLoader();
             configureInProgress = false;
+            hideConfigureLoader();
+
         }
-    }, 20); // 20ms is usually enough to paint loader
+
+    }, 20);
 
     return false;
 }

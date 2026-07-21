@@ -1,5 +1,4 @@
-// const src_path = "/HTML/products/210005530/";
-const src_path = "/HTML/products/162059085/";
+const src_path = "/HTML/products/210005530/";
 
 const AvailableColorImages = [
     { url: "images/White_2.jpg", value: "W", colorName: "White", hex: "#fdf6ee", desc: "Wht" },
@@ -25,8 +24,7 @@ const woodTones = ["X", "Y"];
 let toggle_Switch = 0;
 let frameColorUserOverride = false;
 let insertColorUserOverride = false;
-let currentOperatorIndex = 1;
-let operatorDataArray = [];
+
 
 
 function loadForm() {
@@ -97,11 +95,8 @@ function createForm() {
             <div id="NAVIGATION_SPC"></div>
 
             <div class="postion-container" style="display:none;" id="window_position_container">
-
-                <div class="window-position-title">
-                    <span>Window Position</span>
+                <div style="text-align: center; padding-bottom: 5px;" class="config-option-title-style">Window Position
                 </div>
-
                 <div class="window-position-container">
                     <div class="rw-button" tabindex="0">
                         <label for="WINDOW_POSITION_TOP">Top</label>
@@ -131,7 +126,7 @@ function createForm() {
                 </div>
             </div>
 
-            <div id="CANVAS_PLUGIN">
+            <div id="CANVAS_PLUGIN" style="display:flex;justify-content:center;">
             </div>
             <!-- Loader -->
             <div class="canvas-loader" id="canvas-loader" style="display:none; position:absolute; top:50%; left:50%;
@@ -158,7 +153,7 @@ function createForm() {
             <!-- DOOR MODEL SECTION STARTS -->
 
             <section id="DIMENSIONS" data-title="Door Model" class="rw-configurator__page" enabled="true" face="true"
-                hardware="true" data-icon="fas fa-garage">
+                hardware="true">
                 <div class="dropdown-container">
                     <!-- door model element -->
                     <div class="dropdown-item">
@@ -323,16 +318,6 @@ function createForm() {
                         </div>
                     </div>
 
-                    <!-- Mix Panel Design code-->
-                    <div class="dropdown-item" class="mix-panel-layout" style="width:50%">
-                        <h3>Design Code</h3>
-                        <div>
-                            <select id="DESIGN_CODE" name="DESIGN_CODE">
-                            </select>
-                        </div>
-                    </div>
-
-
                     <!--Door colour -->
                     <div class="dropdown-item" data-id="COLOR">
                         <h3>Colour</h3>
@@ -390,7 +375,7 @@ function createForm() {
 
             <!-- glazing section -->
             <section face="false" hardware="true" enabled="true" id="GLAZING" class="rw-configurator__page"
-                data-title="Glazing" data-icon="fas fa-window-frame">
+                data-title="Glazing">
 
                 <!-- glass shapes -->
 
@@ -508,10 +493,10 @@ function createForm() {
                             <input type="radio" id="OBSCURE_GLASS_PINHEAD" name="GLASS_TYPE"
                                 value="OBSCURE_GLASS_PINHEAD" glazingtype='double'>
                         </div>
-                        <div class="rw-button panel-button" tabindex="0">
+                         <div class="rw-button panel-button" tabindex="0">
                             <label for="OBSCURE_GLASS_SINGLE">Obscure Pinhead Single</label>
-                            <input type="radio" id="OBSCURE_GLASS_SINGLE" name="GLASS_TYPE" value="OBSCURE_GLASS_SINGLE"
-                                glazingtype='single'>
+                            <input type="radio" id="OBSCURE_GLASS_SINGLE" name="GLASS_TYPE"
+                                value="OBSCURE_GLASS_SINGLE" glazingtype='single'>
                         </div>
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="DARK_TINT_SEALED">Dark Tint - Sealed</label>
@@ -551,19 +536,18 @@ function createForm() {
                         <div class="rw-button panel-button" tabindex="0" style="display:none;">
                             <label for="GLASS_INSERT_3">Stockton</label>
                             <input type="radio" class="rw-button-toggle" id="GLASS_INSERT_3" name="GLASS_INSERT"
-                                value="stockton_ranch" insertCode='550-313'>
+                                value="stockton_ranch">
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_4">Waterton</label>
                             <input type="radio" class="rw-button-toggle" id="GLASS_INSERT_4" name="GLASS_INSERT"
-                                value="waterton_ranch" insertCode='550-347'>
+                                value="waterton_ranch">
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_0">Prairie</label>
-                            <input type="radio" id="GLASS_INSERT_MORE_0" name="GLASS_INSERT" value="prairie"
-                                insertCode='550-451'>
+                            <input type="radio" id="GLASS_INSERT_MORE_0" name="GLASS_INSERT" value="prairie" insertCode='550-451'>
                         </div>
 
                     </div>
@@ -578,35 +562,30 @@ function createForm() {
                 </div>
 
                 <div class="dropdown-item custom-panel-item-container" id="more_glass_inserts_container">
-                    <div class="panel-layout">
+                    <div class="panel-layout">                        
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_1">Cascade</label>
-                            <input type="radio" id="GLASS_INSERT_MORE_1" name="GLASS_INSERT" value="cascade_colonial"
-                                insertCode='550-317'>
+                            <input type="radio" id="GLASS_INSERT_MORE_1" name="GLASS_INSERT" value="cascade_colonial" insertCode='550-317'>
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_25">Cascade</label>
-                            <input type="radio" id="GLASS_INSERT_MORE_25" name="GLASS_INSERT" value="cascade_ranch" 
-                            insertCode='550-321'>
+                            <input type="radio" id="GLASS_INSERT_MORE_25" name="GLASS_INSERT" value="cascade_ranch">
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_2">Arched Stockton</label>
-                            <input type="radio" id="GLASS_INSERT_MORE_2" name="GLASS_INSERT" value="arched_stockton" 
-                            insertCode ='550-341'>
+                            <input type="radio" id="GLASS_INSERT_MORE_2" name="GLASS_INSERT" value="arched_stockton">
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_3">Stockbridge</label>
-                            <input type="radio" id="GLASS_INSERT_MORE_3" name="GLASS_INSERT" value="stockbridge"
-                            insertCode = '550-456'>
+                            <input type="radio" id="GLASS_INSERT_MORE_3" name="GLASS_INSERT" value="stockbridge">
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_4">Arched Stockbridge</label>
-                            <input type="radio" id="GLASS_INSERT_MORE_4" name="GLASS_INSERT" value="arched_stockbridge" 
-                            insertCode = '550-396'>
+                            <input type="radio" id="GLASS_INSERT_MORE_4" name="GLASS_INSERT" value="arched_stockbridge">
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
@@ -678,26 +657,24 @@ function createForm() {
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_17">Arched Stockton 3pc Set</label>
-                            <input type="radio" id="GLASS_INSERT_MORE_17" name="GLASS_INSERT" value="arched_stockton_3"
-                            insertCode = '550-341'>
+                            <input type="radio" id="GLASS_INSERT_MORE_17" name="GLASS_INSERT" value="arched_stockton_3">
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_18">Arched Stockbridge 3pc Set</label>
                             <input type="radio" id="GLASS_INSERT_MORE_18" name="GLASS_INSERT"
-                                value="arched_stockbridge_3" insertCode='550-396' >
+                                value="arched_stockbridge_3">
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_19">Berkshire</label>
-                            <input type="radio" id="GLASS_INSERT_MORE_19" name="GLASS_INSERT" value="arched_stockton_4"
-                            insertCode='550-341'>
+                            <input type="radio" id="GLASS_INSERT_MORE_19" name="GLASS_INSERT" value="arched_stockton_4">
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_20">Breckenridge</label>
                             <input type="radio" id="GLASS_INSERT_MORE_20" name="GLASS_INSERT"
-                                value="arched_stockbridge_4" insertCode='550-396'>
+                                value="arched_stockbridge_4">
                         </div>
                     </div>
                 </div>
@@ -797,13 +774,13 @@ function createForm() {
 
             <!-- HARDWARE SECTION -->
             <section face="false" hardware="true" enabled="true" id="HARDWARE" class="rw-configurator__page"
-                data-title="Hardware" data-icon="fas fa-tools">
+                data-title="Hardware">
                 <div class="dropdown-container">
                     <div class="dropdown-item">
                         <h3>Hardware Set</h3>
                         <div class="dimension-layout">
                             <div class="rw-button" tabindex="0">
-                                <input type="radio" id="STANDARD" name="HARDWARE_SET" value="A">
+                                <input type="radio" id="STANDARD" name="HARDWARE_SET" value="A" checked>
                                 <label for="STANDARD">Standard</label>
                             </div>
 
@@ -828,8 +805,8 @@ function createForm() {
                                         <div class="combined-button-container-inner">
                                             <div class="rw-sliding-button selected">
                                                 <label for="TORSION">Torsion</label>
-                                                <input type="radio" style="display:none;" id="TORSION"
-                                                    name="SPRING_TYPE" value="TOR">
+                                                <input type="radio" style="display:none;" id="TORSION" name="SPRING_TYPE"
+                                                    value="TOR" checked>
                                             </div>
                                             <div class="rw-sliding-button">
                                                 <label for="EXTENSION">Extension</label>
@@ -860,52 +837,43 @@ function createForm() {
                         </div>
                     </div>
 
-                    <div class="dropdown-item" id="liftTypeSection">
-                        <h3 for="LIFT_TYPE">Lift Type</h3>
+                    <div class="dropdown-item">
+                        <h3 for="LIFT_TYPE" class="">Lift Type</h3>
                         <div class="panel-layout">
                             <div class="rw-button panel-button lift-option" tabindex="0" id="opt-STD12">
-                                <input type="radio" id="STD12" name="LIFT_TYPE" value="STD12" ic_code='' hwdesc=''
-                                    trackCode='' numval='1.0' radius="12">
+                                <input type="radio" id="STD12" name="LIFT_TYPE" value="STD12"  ic_code='' hwdesc=''  trackCode='' checked >
                                 <label for="STD12">Standard 12"R</label>
                             </div>
                             <div class="rw-button panel-button lift-option" tabindex="0" id="opt-STD15">
-                                <input type="radio" id="STD15" name="LIFT_TYPE" value="STD15" ic_code='' hwdesc=''
-                                    trackCode='' numval='1.0' radius="15">
+                                <input type="radio" id="STD15" name="LIFT_TYPE" value="STD15"  ic_code='' hwdesc=''  trackCode=''>
                                 <label for="STD15">Standard 15"R</label>
                             </div>
                             <div class="rw-button panel-button lift-option" tabindex="0" id="opt-32R">
-                                <input type="radio" id="32R" name="LIFT_TYPE" value="32R" ic_code='' hwdesc=''
-                                    trackCode='' numval='1.0' radius="32">
+                                <input type="radio" id="32R" name="LIFT_TYPE" value="32R"  ic_code='' hwdesc=''  trackCode=''>
                                 <label for="32R">Standard 32"R</label>
                             </div>
                             <div class="rw-button panel-button lift-option" tabindex="0" id="opt-LHF">
-                                <input type="radio" id="LHF" name="LIFT_TYPE" value="LHF" ic_code='' hwdesc=''
-                                    trackCode='' numval='1.0' radius="7">
+                                <input type="radio" id="LHF" name="LIFT_TYPE" value="LHF"  ic_code='' hwdesc=''  trackCode=''>
                                 <label for="LHF">Low Headroom Front</label>
                             </div>
                             <div class="rw-button panel-button lift-option" tabindex="0" id="opt-LHROUT">
-                                <input type="radio" id="LHROUT" name="LIFT_TYPE" value="LHROUT" ic_code='' hwdesc=''
-                                    trackCode='' numval='1.0' radius="7">
+                                <input type="radio" id="LHROUT" name="LIFT_TYPE" value="LHROUT"  ic_code='' hwdesc=''  trackCode=''>
                                 <label for="LHROUT">Low Headroom Rear</label>
                             </div>
                             <div class="rw-button panel-button lift-option" tabindex="0" id="opt-LHREXT">
-                                <input type="radio" id="LHREXT" name="LIFT_TYPE" value="LHREXT" ic_code='' hwdesc=''
-                                    trackCode='' numval='1.0' radius="7">
+                                <input type="radio" id="LHREXT" name="LIFT_TYPE" value="LHREXT"  ic_code='' hwdesc=''  trackCode=''>
                                 <label for="LHREXT">Low Headroom Ext.</label>
                             </div>
                             <div class="rw-button panel-button lift-option" tabindex="0" id="opt-HL">
-                                <input type="radio" id="HL" name="LIFT_TYPE" value="HL" ic_code='' hwdesc=''
-                                    trackCode='' numval='2.0' radius="0">
+                                <input type="radio" id="HL" name="LIFT_TYPE" value="HL"  ic_code='' hwdesc=''  trackCode=''>
                                 <label for="HL">High Lift</label>
                             </div>
                             <div class="rw-button panel-button lift-option" tabindex="0" id="opt-VL">
-                                <input type="radio" id="VL" name="LIFT_TYPE" value="VL" ic_code='' hwdesc=''
-                                    trackCode='' numval='2.0' radius="0">
+                                <input type="radio" id="VL" name="LIFT_TYPE" value="VL"  ic_code='' hwdesc=''  trackCode=''>
                                 <label for="VL">Vertical Lift</label>
                             </div>
                             <div class="rw-button panel-button lift-option" tabindex="0" id="opt-VL_HD">
-                                <input type="radio" id="LHR_VL" name="LIFT_TYPE" value="LHR_VL" ic_code='' hwdesc=''
-                                    trackCode='' numval='2.0' radius="0">
+                                <input type="radio" id="LHR_VL" name="LIFT_TYPE" value="LHR_VL"  ic_code='' hwdesc='' trackCode=''>
                                 <label for="LHR_VL">Vertical Lift Low Headroom</label>
                             </div>
                         </div>
@@ -943,8 +911,8 @@ function createForm() {
                                 <div class="dropdown-subitem" style="width:100%">
                                     <h3 for="JAMB_SEAL" class="">Jamb Seal </h3>
                                     <select id="JAMB_SEAL" name="JAMB_SEAL">
-                                        <option value="NONE">None</option>
                                         <option value="DUALA">Aluminium - Dual Fin</option>
+                                        <option value="NONE">None</option>
                                         <option value="SINGLE">PVC - Single Fin</option>
                                         <option value="DUAL">PVC - Dual Fin</option>
                                         <option value="DUALS"> Steel - Dual Fin</option>
@@ -1006,190 +974,127 @@ function createForm() {
 
             <!-- OPERATION SECTION-->
             <section face="false" hardware="true" enabled="true" id="OPERATOR_OPTIONS" data-title="Operator"
-                class="rw-configurator__page" data-icon="fas fa-bolt">
-
-                <div class="operator-card">
-
-                    <div class="operator-header">
-                        <div class="operator-icon">
-                            ⚡
-                        </div>
-
-                        <div>
-                            <h2>Operator</h2>
-                            <p>Select and configure your operator system</p>
-                        </div>
-                    </div>
-
-                    <input type="hidden" name="OPERATOR" id="OPERATOR" value="" data-max-door-height=""
-                        data-is-hi-lift-compatible="" />
-
-                    <div class="operator-carousel-wrapper">
+                class="rw-configurator__page">
 
 
-                        <div id="prevButtonOperator" class="operator-arrow" role="button" tabindex="0">
-
-
-                            <svg viewBox="0 0 640 640">
-                                <path
-                                    d="M406.7 105.3C394.2 92.8 373.9 92.8 361.4 105.3L169.4 297.3C156.9 309.8 156.9 330.1 169.4 342.6L361.4 534.6C373.9 547.1 394.2 547.1 406.7 534.6C419.2 522.1 419.2 501.8 406.7 489.3L237.3 320L406.7 150.7C419.2 138.2 419.2 117.8 406.7 105.3Z" />
-                            </svg>
-
-                        </div>
-
+                <div class="operator-carousel-outer">
+                    <div class="operator-group-container">
+                        <input type="hidden" name="OPERATOR" id="OPERATOR" value="" data-max-door-height=""
+                            data-is-hi-lift-compatible="" />
                         <div class="carousel-container-slide">
                             <div id="operator-carousel-container"></div>
                         </div>
-
-
-                        <div id="nextButtonOperator" class="operator-arrow" role="button" tabindex="0">
-
-
-                            <svg viewBox="0 0 640 640">
+                        <div id="nextButtonOperator" class="next-button-carousel">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="chevron-icon-next">
                                 <path
-                                    d="M233.3 534.6C245.8 547.1 266.1 547.1 278.6 534.6L470.6 342.6C483.1 330.1 483.1 309.8 470.6 297.3L278.6 105.3C266.1 92.8 245.8 92.8 233.3 105.3C220.8 117.8 220.8 138.2 233.3 150.7L402.7 320L233.3 489.3C220.8 501.8 220.8 522.1 233.3 534.6Z" />
+                                    d="M471.1 297.4C483.6 309.9 483.6 330.2 471.1 342.7L279.1 534.7C266.6 547.2 246.3 547.2 233.8 534.7C221.3 522.2 221.3 501.9 233.8 489.4L403.2 320L233.9 150.6C221.4 138.1 221.4 117.8 233.9 105.3C246.4 92.8 266.7 92.8 279.2 105.3L471.2 297.3z" />
                             </svg>
-
                         </div>
-
+                        <div id="prevButtonOperator" class="prev-button-carousel">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" class="chevron-icon-prev">
+                                <path
+                                    d="M169.4 297.4C156.9 309.9 156.9 330.2 169.4 342.7L361.4 534.7C373.9 547.2 394.2 547.2 406.7 534.7C419.2 522.2 419.2 501.9 406.7 489.4L237.3 320L406.6 150.6C419.1 138.1 419.1 117.8 406.6 105.3C394.1 92.8 373.8 92.8 361.3 105.3L169.3 297.3z" />
+                            </svg>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="operator-pagination">
 
+
+                <div class="rw-image-input">
+                    <a href="https://www.rwdoors.com/liftmaster/" target="_blank" rel="noopener noreferrer">
+                        <img id="ADDITIONAL_TRANSMITTER_IMAGE" class="rw-image-input-img"
+                            href="https://www.rwdoors.com/liftmaster/" />
+                        <div class="overlay"></div>
+                    </a>
+                    <div class="horizontal-inputs horizontal-inputs--quantity" style="width:75%;">
+                        <div class="image-input-cell">
+                            <h3 for="ADDITIONAL_TRANSMITTER" class="config-option-label-style">Additional Transmitter
+                            </h3>
+                            <select id="ADDITIONAL_TRANSMITTER" style="width:75%" name="ADDITIONAL_TRANSMITTER"
+                                onchange="operatorImageOnChangeLM(this)">
+                                <option value=NONE selected img="" smartpartnum=>NONE</option>
+			                    <option value=952-232 img="L991S-(952-230)_E-Cat.png" smartpartnum=952-232>L993M</option>
+			                    <option value=952-233 img="L993S-(952-233)_E-Cat.png" smartpartnum=952-233>L993S</option>
+			                    <option value=952-231 img="L992U-(952-231)_E-Cat.png" smartpartnum=952-231>L992U</option>
+			                    <option value=952-229 img="L932M-(952-229)_E-Cat.png" smartpartnum=952-229>L932M</option>
+			                    <option value=952-230 img="L991S-(952-230)_E-Cat.png" smartpartnum=952-230>L991S</option>
+                            </select>
+                        </div>
+                        <div class="image-input-cell">
+                            <h3 for="ADDITIONAL_TRANSMITTER_QTY" class="config-option-label-style">Qty</h3>
+                            <select id="ADDITIONAL_TRANSMITTER_QTY" name="ADDITIONAL_TRANSMITTER_QTY"
+                                style="min-width: 50px;">
+                                <option value="0" selected>0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
                     </div>
 
                 </div>
 
+                <div class="rw-image-input">
+                    <a href="https://www.rwdoors.com/liftmaster/" target="_blank" rel="noopener noreferrer">
 
-                <div class="operator-accessories">
-                    <div class="operator-accessory-card">
-                        <a href="" target="_blank">
-                            <div class="image-placeholder-container">
-                                <img class="rw-image-input-img" id="ADDITIONAL_TRANSMITTER_IMAGE" />
-
-                                <div class="no-image-message">
-                                    <span>No</span>
-                                    <span>Accessory</span>
-                                    <span>Selected</span>
-                                </div>
-                                <div class="overlay"></div>
-                            </div>
-                        </a>
-                        <div class="horizontal-inputs horizontal-inputs--quantity" style="width:75%;">
-                            <div class="image-input-cell">
-                                <h3 for="ADDITIONAL_TRANSMITTER" class="config-option-label-style">Additional
-                                    Transmitter
-                                </h3>
-                                <select id="ADDITIONAL_TRANSMITTER" style="width:75%" name="ADDITIONAL_TRANSMITTER"
-                                    onchange="operatorImageOnChangeLM(this)">
-                                    <option value=NONE selected img="" smartpartnum=>NONE</option>
-                                    <option value=952-232 img="L991S-(952-230)_E-Cat.png" smartpartnum=952-232>L993M
-                                    </option>
-                                    <option value=952-233 img="L993S-(952-233)_E-Cat.png" smartpartnum=952-233>L993S
-                                    </option>
-                                    <option value=952-231 img="L992U-(952-231)_E-Cat.png" smartpartnum=952-231>L992U
-                                    </option>
-                                    <option value=952-229 img="L932M-(952-229)_E-Cat.png" smartpartnum=952-229>L932M
-                                    </option>
-                                    <option value=952-230 img="L991S-(952-230)_E-Cat.png" smartpartnum=952-230>L991S
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="image-input-cell">
-                                <h3 for="ADDITIONAL_TRANSMITTER_QTY" class="config-option-label-style">Qty</h3>
-                                <select id="ADDITIONAL_TRANSMITTER_QTY" name="ADDITIONAL_TRANSMITTER_QTY"
-                                    style="min-width: 50px;" disabled>
-                                    <option value="0" selected>0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                </select>
-                            </div>
+                        <img class="rw-image-input-img" id="ADDITIONAL_CONTROL_PANEL_IMAGE"
+                            href="https://www.rwdoors.com/liftmaster/">
+                        <div class="overlay"></div>
+                    </a>
+                    <div class="horizontal-inputs horizontal-inputs--quantity" style="width:75%;">
+                        <div class="image-input-cell">
+                            <h3 for="ADDITIONAL_CONTROL_PANEL" class="config-option-label-style">Additional Control
+                                Panel</h3>
+                            <select id="ADDITIONAL_CONTROL_PANEL" style="width:75%" name="ADDITIONAL_CONTROL_PANEL"
+                                onchange="operatorImageOnChangeLM(this)">
+                                <option value=NONE img="" selected smartpartnum=>None</option>
+			                    <option value=952-227 img="L957W (952-227)_E-Cat.png" smartpartnum=952-227>L957W</option>
+			                    <option value=952-228 img="L958W-(952-228)_E-Cat.png" smartpartnum=952-228>L958W</option>
+			                    <option value=952-225 img="L955W-(952-225)_E-Cat.png" smartpartnum=952-225>L955W</option>
+			                    <option value=952-226 img="L956W-(952-226)_E-Cat.png" smartpartnum=952-226>L956W</option>
+                            </select>
                         </div>
-
-                    </div>
-
-                    <div class="operator-accessory-card">
-                        <a href="" target="_blank">
-                            <div class="image-placeholder-container">
-                                <img class="rw-image-input-img" id="ADDITIONAL_CONTROL_PANEL_IMAGE" />
-
-                                <div class="no-image-message">
-                                    <span>No</span>
-                                    <span>Accessory</span>
-                                    <span>Selected</span>
-                                </div>
-
-                                <div class="overlay"></div>
-                            </div>
-                        </a>
-                        <div class="horizontal-inputs horizontal-inputs--quantity" style="width:75%;">
-                            <div class="image-input-cell">
-                                <h3 for="ADDITIONAL_CONTROL_PANEL" class="config-option-label-style">Additional Control
-                                    Panel</h3>
-                                <select id="ADDITIONAL_CONTROL_PANEL" style="width:75%" name="ADDITIONAL_CONTROL_PANEL"
-                                    onchange="operatorImageOnChangeLM(this)">
-                                    <option value=NONE img="" selected smartpartnum=>None</option>
-                                    <option value=952-227 img="L957W (952-227)_E-Cat.png" smartpartnum=952-227>L957W
-                                    </option>
-                                    <option value=952-228 img="L958W-(952-228)_E-Cat.png" smartpartnum=952-228>L958W
-                                    </option>
-                                    <option value=952-225 img="L955W-(952-225)_E-Cat.png" smartpartnum=952-225>L955W
-                                    </option>
-                                    <option value=952-226 img="L956W-(952-226)_E-Cat.png" smartpartnum=952-226>L956W
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="image-input-cell">
-                                <h3 for="ADDITIONAL_CONTROL_PANEL_QTY" class="config-option-label-style">Qty</h3>
-                                <select id="ADDITIONAL_CONTROL_PANEL_QTY" name="ADDITIONAL_CONTROL_PANEL_QTY"
-                                    style="min-width: 50px;" disabled>
-                                    <option value="0" selected>0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                </select>
-                            </div>
+                        <div class="image-input-cell">
+                            <h3 for="ADDITIONAL_CONTROL_PANEL_QTY" class="config-option-label-style">Qty</h3>
+                            <select id="ADDITIONAL_CONTROL_PANEL_QTY" name="ADDITIONAL_CONTROL_PANEL_QTY"
+                                style="min-width: 50px;">
+                                <option value="0" selected>0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="operator-accessory-card">
-                        <a href="" target="_blank">
-                            <div class="image-placeholder-container">
-                                <img class="rw-image-input-img" id="ADDITIONAL_KEYLESS_ENTRY_IMAGE" />
-                                <div class="no-image-message">
-                                    <span>No</span>
-                                    <span>Accessory</span>
-                                    <span>Selected</span>
-                                </div>
+                </div>
+                <div class="rw-image-input">
+                    <a href="https://www.rwdoors.com/liftmaster/" target="_blank" rel="noopener noreferrer">
+                        <img class="rw-image-input-img" id="ADDITIONAL_KEYLESS_ENTRY_IMAGE"
+                            href="https://www.rwdoors.com/liftmaster/">
+                        <div class="overlay"></div>
 
-                                <div class="overlay"></div>
-                            </div>
-                        </a>
-                        <div class="horizontal-inputs horizontal-inputs--quantity" style="width:75%;">
-                            <div class="image-input-cell">
-                                <h3 for="ADDITIONAL_KEYLESS_ENTRY" class="config-option-label-style">Additional Keyless
-                                    Entry</h3>
-                                <select id="ADDITIONAL_KEYLESS_ENTRY" style="width:75%" name="ADDITIONAL_KEYLESS_ENTRY"
-                                    onchange="operatorImageOnChangeLM(this)">
-                                    <option value=NONE img="" selected smartpartnum=>None</option>
-                                    <option value=952-234 img="L979M-(952-234)_E-Cat.png" smartpartnum=952-234>L979M
-                                    </option>
-                                    <option value=952-235 img="L979S-(952-235)_E-Cat.png" smartpartnum=952-235>L979S
-                                    </option>
-                                    <option value=952-236 img="L979U-(952-236)_E-Cat.png" smartpartnum=952-236>L979U
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="image-input-cell">
-                                <h3 for="ADDITIONAL_KEYLESS_ENTRY_QTY" class="config-option-label-style">Qty</h3>
-                                <select id="ADDITIONAL_KEYLESS_ENTRY_QTY" name="ADDITIONAL_KEYLESS_ENTRY_QTY"
-                                    style="min-width: 50px;" disabled>
-                                    <option value="0" selected>0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                </select>
-                            </div>
+                    </a>
+                    <div class="horizontal-inputs horizontal-inputs--quantity" style="width:75%;">
+                        <div class="image-input-cell">
+                            <h3 for="ADDITIONAL_KEYLESS_ENTRY" class="config-option-label-style">Additional Keyless
+                                Entry</h3>
+                            <select id="ADDITIONAL_KEYLESS_ENTRY" style="width:75%" name="ADDITIONAL_KEYLESS_ENTRY"
+                                onchange="operatorImageOnChangeLM(this)">
+                                <option value=NONE img="" selected smartpartnum=>None</option>
+			                    <option value=952-234 img="L979M-(952-234)_E-Cat.png" smartpartnum=952-234>L979M</option>
+			                    <option value=952-235 img="L979S-(952-235)_E-Cat.png" smartpartnum=952-235>L979S</option>
+			                    <option value=952-236 img="L979U-(952-236)_E-Cat.png" smartpartnum=952-236>L979U</option>
+                            </select>
+                        </div>
+                        <div class="image-input-cell">
+                            <h3 for="ADDITIONAL_KEYLESS_ENTRY_QTY" class="config-option-label-style">Qty</h3>
+                            <select id="ADDITIONAL_KEYLESS_ENTRY_QTY" name="ADDITIONAL_KEYLESS_ENTRY_QTY"
+                                style="min-width: 50px;">
+                                <option value="0" selected>0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -1197,7 +1102,7 @@ function createForm() {
 
             <!-- Advance SECTION-->
             <section face="false" hardware="true" enabled="true" id="ADVANCED" data-title="Advanced"
-                class="rw-configurator__page" data-icon="fas fa-sliders-v">
+                class="rw-configurator__page">
                 <div class="dropdown-container">
                     <div class="dropdown-item">
                         <h3>Door Options</h3>
@@ -1293,8 +1198,8 @@ function createForm() {
                                         </div>
                                         <div class="rw-sliding-button">
                                             <label for="KEYED_TUBE_SHAFT">Keyed Tube Shaft</label>
-                                            <input type="radio" style="display:none;" id="KEYED_TUBE_SHAFT"
-                                                name="SHAFT_TYPE" value="K">
+                                            <input type="radio" style="display:none;" id="KEYED_TUBE_SHAFT" name="SHAFT_TYPE"
+                                                value="K">
                                         </div>
                                     </div>
                                 </div>
@@ -1307,7 +1212,7 @@ function createForm() {
 
             <!-- aNNOTATION SECTION-->
             <section face="false" hardware="true" enabled="true" id="ANNOTATIONS" data-title="Annotations"
-                class="rw-configurator__page" data-icon="fas fa-info-square">
+                class="rw-configurator__page">
                 <div class="config-title-style">Annotations</div>
                 <h3 for="TAG" class="config-option-label-style">Tag</h3>
                 <input type="text" name="TAG" id="TAG" />
@@ -1348,7 +1253,12 @@ function createForm() {
                         </div>
                     </button>
                 </div>
-                <div id="DEFAULTS_PLUGIN"></div>
+                <div id="DEFAULTS_PLUGIN">
+                    <div style="display:flex;justify-content:space-between;width:100%">
+                        <button onclick="saveDefaults()" class="defaults-button">Save as Default</button>
+                        <button type="CONTAINER" id="LOAD_DEFAULTS" class="defaults-button">Restore Default</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1367,15 +1277,8 @@ function toggleAccordion() {
     $('#accordion1406547076').hide()
     $("#accordion1094153584").hide()//Hides the global data for JDE
     $("#accordion9757245").hide() //section bundle
-   // $("#accordion321627220").hide() //Glazing code
-    $("#accordion1892755284").hide() //Scheduling code
-}
-
-// Update data list selection and update positioning
-function updateSelectedOperator(index) {
-    updateCarouselPosition(index);
-    updateActiveOperator(index);
-    updatePaginationDots();
+    //  $("#accordion321627220").hide() //Glazing code
+    //$("#accordion1892755284").hide() //Scheduling code
 }
 
 function populateCarousel() {
@@ -1449,7 +1352,7 @@ function populateCarousel() {
             id: "operator_none",
             name: "None",
             value: "PS",
-            img: `${src_path}images/Operators_none.png`,
+            img: "",
             maxDoorHeight: 1000,
             isHiLiftCompatible: true,
             style: "",
@@ -1458,7 +1361,7 @@ function populateCarousel() {
             id: "operator_jackshaft",
             name: "98022 - Jackshaft",
             value: "951-185",
-            img: `${src_path}images/EW-LM-8500W.jpg`,
+            img: "/HTML/products/1825206974/images/EW-LM-8500W.jpg",
             maxDoorHeight: 168,
             isHiLiftCompatible: true,
             style: "",
@@ -1467,7 +1370,7 @@ function populateCarousel() {
             id: "6580L_Belt",
             name: "6580L - Belt",
             value: "OP_6580L_VALUE",
-            img: `${src_path}images/6580L-(951-193)_E-Cat.png`,
+            img: "/HTML/products/1008928433/images/6580L-(951-193)_E-Cat.png",
             maxDoorHeight: 120,
             isHiLiftCompatible: false,
             style: "",
@@ -1476,7 +1379,7 @@ function populateCarousel() {
             id: "6590L_Belt",
             name: "6690L - Belt",
             value: "OP_6590L_VALUE",
-            img: `${src_path}images/6690L-(951-194)_E-Cat.png`,
+            img: "/HTML/products/1008928433/images/6690L-(951-194)_E-Cat.png",
             maxDoorHeight: 120,
             isHiLiftCompatible: false,
             style: "",
@@ -1485,7 +1388,7 @@ function populateCarousel() {
             id: "2220L_Chain",
             name: "2220L - Chain",
             value: "OP_2220L_CHAIN_VALUE",
-            img: `${src_path}images/2220L-(951-190)_E-Cat.png`,
+            img: "/HTML/products/1008928433/images/2220L-(951-190)_E-Cat.png",
             maxDoorHeight: 120,
             isHiLiftCompatible: false,
             style: "",
@@ -1494,15 +1397,16 @@ function populateCarousel() {
             id: "2420L_Chain",
             name: "2420L - Chain",
             value: "OP_2420L_CHAIN_VALUE",
-            img: `${src_path}images/2420L-(951-191)_E-Cat.png`,
+            img: "/HTML/products/1008928433/images/2420L-(951-191)_E-Cat.png",
             maxDoorHeight: 120,
             isHiLiftCompatible: false,
             style: "",
         },
     };
     // Data and default start index
-    operatorDataArray = Object.values(operatorData);
-
+    const operatorDataArray = Object.values(operatorData);
+    let currentOperatorIndex = 1;
+    let firstTimeLoading = true;
 
     // Creates the HTML for operator
     function createOperatorDiv(operator, activeStatus = false) {
@@ -1513,6 +1417,8 @@ function populateCarousel() {
             operatorItem.classList.add('active');
         }
 
+        // First make sure images get loaded
+        let retryLoading = false;
         let retryCounter = 0;
 
         const image = document.createElement('img');
@@ -1556,6 +1462,7 @@ function populateCarousel() {
     // Creates the carousel with the data (temporary needs changing for innf scrolling)
     function operatorCarouselLoad(indexCurrent) {
         const content = document.getElementById('operator-carousel-container');
+        const operatorInput = document.getElementById('OPERATOR');
 
         content.innerHTML = '';
 
@@ -1569,6 +1476,110 @@ function populateCarousel() {
     }
 
 
+    function updateActiveOperator(index) {
+        const items = document.querySelectorAll('.carousel-operator-item');
+
+        // First set the active tag
+        items.forEach((item, i) => {
+            item.classList.toggle('active', i === index);
+        });
+
+
+        // Due to clones we need to move the index so it it not out of bounds
+        let dataIndex = index - 1;
+
+
+        if (dataIndex < 0) {
+            dataIndex = operatorDataArray.length - 1;
+        } else if (dataIndex >= operatorDataArray.length) {
+            dataIndex = 0;
+        }
+
+        const currentOperator = operatorDataArray[dataIndex];
+        const operatorInput = document.getElementById('OPERATOR');
+        operatorInput.name = currentOperator.name;
+        operatorInput.value = currentOperator.value;
+        !!nodeset['OPERATOR'] ? nodeset['OPERATOR'].value = currentOperator.value : ""
+        !!rw ? rw(getNode("OPERATOR")) : ""
+        operatorInput.dataset.maxDoorHeight = currentOperator.maxDoorHeight;
+        operatorInput.dataset.isHiLiftCompatible = currentOperator.isHiLiftCompatible;
+    }
+
+    function updateCarouselPosition(index) {
+        const carousel = document.getElementById('operator-carousel-container');
+
+        // Prevents slide affect first load
+        if (firstTimeLoading) {
+            carousel.classList.add('no-transition');
+            carousel.style.transform = `translateX(-${index * 100}%)`;
+            firstTimeLoading = false;
+
+            requestAnimationFrame(() => {
+                carousel.classList.remove('no-transition');
+            });
+        } else {
+            carousel.style.transform = `translateX(-${index * 100}%)`;
+        }
+    }
+
+    // // Check if carousel buttons are added
+    // let buttonsAdded = false;
+
+    // // Setup carousel when tab 2 is clicked
+    // const observerTab2 = new MutationObserver((mutations, obs) => {      
+    //   const $tab3 = $('#tab_3');
+    //   if ($tab3) {
+    //     obs.disconnect();
+
+    //     $('#tab_3').on('click', function () {
+
+    //       const carouselContainer = document.getElementById('operator-carousel-container');
+
+    //       if (carouselContainer) {
+    //         operatorCarouselLoad(currentOperatorIndex);
+    //         updateSelectedOperator(currentOperatorIndex);
+
+    //         if (!buttonsAdded) {
+
+    //           buttonsAdded = true;
+
+    //           $('#nextButtonOperator').on('click', () => {
+    //             if (currentOperatorIndex > operatorDataArray.length) return;
+    //             currentOperatorIndex++;
+    //             updateSelectedOperator(currentOperatorIndex);
+    //           });
+
+    //           $('#prevButtonOperator').on('click', () => {
+    //             if (currentOperatorIndex <= 0) return;
+    //             currentOperatorIndex--;
+    //             updateSelectedOperator(currentOperatorIndex);
+    //           });
+
+
+    //           carouselContainer.addEventListener('transitionend', () => {
+
+    //             if (currentOperatorIndex > operatorDataArray.length) {
+    //               indexCorrectionList(carouselContainer, 1);
+    //             }
+
+    //             if (currentOperatorIndex <= 0) {
+    //               indexCorrectionList(carouselContainer, operatorDataArray.length);
+    //             }
+    //           });
+    //         }
+    //       } else {
+    //         console.log('Observer missing');
+    //       }
+    //     });
+    //   }
+    // });
+
+    // observerTab2.observe(document.body, {
+    //   childList: true,
+    //   subtree: true
+    // });
+
+
     function initOperatorCarousel() {
 
         const container = document.getElementById('operator-carousel-container');
@@ -1579,33 +1590,39 @@ function populateCarousel() {
 
         operatorCarouselLoad(currentOperatorIndex);
         updateSelectedOperator(currentOperatorIndex);
-        createOperatorPagination();
 
         container.dataset.loaded = "true";
 
+        // Buttons (only once)
+        $('#nextButtonOperator').off().on('click', () => {
+            if (currentOperatorIndex > operatorDataArray.length) return;
+            currentOperatorIndex++;
+            updateSelectedOperator(currentOperatorIndex);
+        });
 
-        $('#nextButtonOperator')
-            .off()
-            .on('click', () => navigateOperator(1));
-
-        $('#prevButtonOperator')
-            .off()
-            .on('click', () => navigateOperator(-1));
-
+        $('#prevButtonOperator').off().on('click', () => {
+            if (currentOperatorIndex <= 0) return;
+            currentOperatorIndex--;
+            updateSelectedOperator(currentOperatorIndex);
+        });
 
         // Infinite loop fix
         container.addEventListener('transitionend', () => {
             if (currentOperatorIndex > operatorDataArray.length) {
-                return indexCorrectionList(container, 1);
+                indexCorrectionList(container, 1);
             }
 
             if (currentOperatorIndex <= 0) {
-                return indexCorrectionList(container, operatorDataArray.length);
+                indexCorrectionList(container, operatorDataArray.length);
             }
         });
     }
 
-
+    // Update data list selection and update positioning
+    function updateSelectedOperator(index) {
+        updateCarouselPosition(index);
+        updateActiveOperator(index);
+    }
 
     // Move to the correct index for infinite loop
     function indexCorrectionList(container, index) {
@@ -1617,35 +1634,6 @@ function populateCarousel() {
             container.style.transition = 'transform 0.3s ease';
         });
     }
-
-    function createOperatorPagination() {
-        const pagination = document.querySelector('.operator-pagination');
-
-        if (!pagination) return;
-
-        pagination.innerHTML = '';
-
-        operatorDataArray.forEach((_, index) => {
-            const dot = document.createElement('button');
-
-            dot.classList.add('operator-dot');
-            dot.type = 'button';
-            dot.dataset.index = index + 1; // because of cloned slide
-
-            dot.addEventListener('click', () => {
-                currentOperatorIndex = index + 1;
-
-                updateCarouselPosition(currentOperatorIndex);
-                updateActiveOperator(currentOperatorIndex);
-                updatePaginationDots();
-            });
-
-            pagination.appendChild(dot);
-        });
-
-        updatePaginationDots();
-    }
-
 
 
 
@@ -1684,90 +1672,7 @@ function populateCarousel() {
         }, 100);
     });
 
-}
 
-
-function updatePaginationDots() {
-    const dots = document.querySelectorAll('.operator-dot');
-
-    let activeIndex = currentOperatorIndex - 1;
-
-    if (activeIndex < 0) {
-        activeIndex = operatorDataArray.length - 1;
-    }
-
-    if (activeIndex >= operatorDataArray.length) {
-        activeIndex = 0;
-    }
-
-    dots.forEach((dot, index) => {
-        dot.classList.toggle('operator-dot-active', index === activeIndex);
-    });
-}
-
-
-function navigateOperator(direction) {
-
-    currentOperatorIndex += direction;
-
-    const container = document.getElementById('operator-carousel-container');
-
-    updateCarouselPosition(currentOperatorIndex);
-    updateActiveOperator(currentOperatorIndex);
-    updatePaginationDots();
-
-    if (container) {
-        container.style.transform =
-            `translateX(-${currentOperatorIndex * 100}%)`;
-    }
-}
-
-function syncOperatorState(operator) {
-
-    $("#OPERATOR").val(operator.value);
-    setState("OPERATOR", operator.value);
-
-
-    if (nodeset["OPERATOR"]) {
-        nodeset["OPERATOR"].value = operator.value;
-    }
-
-    if (typeof rw === "function") {
-        rw(getNode("OPERATOR"));
-    }
-
-    $("#OPERATOR")
-        .attr("data-max-door-height", operator.maxDoorHeight)
-        .attr("data-is-hi-lift-compatible", operator.isHiLiftCompatible);
-}
-
-function updateActiveOperator(index) {
-    console.log("Carousel index:", index);
-    const items = document.querySelectorAll('.carousel-operator-item');
-
-
-    items.forEach((item, i) => {
-        item.classList.toggle('active', i === index);
-    });
-
-    // Due to clones we need to move the index so it it not out of bounds
-    let dataIndex = index - 1;
-
-
-    if (dataIndex < 0) {
-        dataIndex = operatorDataArray.length - 1;
-    } else if (dataIndex >= operatorDataArray.length) {
-        dataIndex = 0;
-    }
-
-    const currentOperator = operatorDataArray[dataIndex];
-    syncOperatorState(currentOperator);
-
-}
-
-function updateCarouselPosition(index) {
-    const carousel = document.getElementById('operator-carousel-container');
-    carousel.style.transform = `translateX(-${index * 100}%)`;
 }
 
 function applyDefaults() {
@@ -1825,7 +1730,7 @@ function clickHandler() {
             });
 
             // Check this radio
-            $(this).prop("checked", true);
+            $(this).prop("checked", true).prop("checked", true);
             // Add class to selected
             $(this).parent().addClass("btn-checked");
         });
@@ -1859,7 +1764,28 @@ function clickHandler() {
             $(this).parent().addClass("btn-checked");
         });
 
+
+    //select and deselect the inputs on glazing tab
+    $('input[name="GLASS_SHAPE"]').on('click', function () {
+
+        if ($(this).data('checked')) {
+            $(this).prop('checked', false);
+            $(this).data('checked', false);
+            $(this).parent().removeClass("btn-checked");
+            setState("GLASS_SHAPE", '');
+        } else {
+            $('input[name="GLASS_SHAPE"]').data('checked', false);
+            $(this).data('checked', true);
+            $(this).prop('checked', true);
+            $(this).parent().addClass("btn-checked");
+            setState("GLASS_SHAPE", $(this).val());
+        }
+
+    });
+
+    // =========================
     // PANEL STYLE CHANGE
+    // =========================
     $(document)
         .off("click.togglePanelStyle")
         .on("click.togglePanelStyle", "input[name='FACE']", function () {
@@ -1939,15 +1865,18 @@ function clickHandler() {
         setState("INSERT_COLOR", color_info);
     });
 
+    // =========================
     // DOOR OPTION
+    // =========================
     $(document)
         .off("click.doorOpt")
         .on("click.doorOpt", ".rw-sliding-button", function () {
             door_option = $(this).find('input[name="DOOROPT"]').val();
         });
 
-
+    // =========================
     // SPRING TYPE
+    // =========================
     $(document)
         .off("click.SPRING_TYPE")
         .on("click.SPRING_TYPE", ".rw-sliding-button", function (e) {
@@ -1961,24 +1890,6 @@ function clickHandler() {
             const $selected = $(`input[name="${name}"]:checked`);
             $selected.closest(".rw-sliding-button").addClass("selected");
         });
-
-
-    //select and deselect the glass inputs on glazing tab
-    $('input[name="GLASS_SHAPE"]').on('click', function () {
-
-        if ($(this).data('checked')) {
-            $(this).prop('checked', false);
-            $(this).data('checked', false);
-            $(this).parent().removeClass("btn-checked");
-            setState("GLASS_SHAPE", '');
-        } else {
-            $('input[name="GLASS_SHAPE"]').data('checked', false);
-            $(this).data('checked', true);
-            $(this).prop('checked', true);
-            $(this).parent().addClass("btn-checked");
-            setState("GLASS_SHAPE", $(this).val());
-        }
-    });
 
     // Glass type
     $(document).on("change", "input[name='GLASS_SHAPE']", function () {
@@ -2004,25 +1915,6 @@ function clickHandler() {
         }
     });
 
-
-    //select and deselect the hardware set inputs on hardware tab
-    $('input[name="HARDWARE_SET"]').on('click', function () {
-
-        if ($(this).data('checked')) {
-            $(this).prop('checked', false);
-            $(this).data('checked', false);
-            $(this).parent().removeClass("btn-checked");
-            setState("HARDWARE_SET", '');
-
-
-        } else {
-            $('input[name="HARDWARE_SET"]').data('checked', false);
-            $(this).data('checked', true);
-            $(this).prop('checked', true);
-            $(this).parent().addClass("btn-checked");
-            setState("HARDWARE_SET", $(this).val());
-        }
-    });
 
 }
 
@@ -2129,7 +2021,7 @@ function appendColorsTo(containerSelector, colorArray, panel_style = null) {
                 // Remove 2 specific colors for F or T
                 if (
                     (panel_style === "F" || panel_style === "T") &&
-                    ["Cocoa Hickory", "Honey Cedar"].includes(item.colorName)
+                    ["Cocoa Hickory", "Honey Cedar"].includes(item.value)
                 ) {
                     return false;
                 }

@@ -93,6 +93,110 @@ function loadGlobalNodes() {
   addLogic("LM_DOOR_MODEL", function () {
     this.value = getNode("DOOR_MODEL").getAttribute("id")
   }, ["DOOR_MODEL"])
+
+  addNode({
+    id: "WEIGHT", logic: function () {
+      this.value = getCurrentDoorWeight()
+    }, value: 500
+  }, ["WIDTH", "HEIGHT", "COLOR", "HANGER_ANGLE", "HANGER_ANGLE_QTY", "END_CAPS",
+    "TRUSS_QTY", "WINDOW_POSITION", "GLASS_SHAPE", "LIFT_TYPE"])
+
+  // addNode({
+  //   id: "WEIGHT", logic: function () {
+  //     this.value = 500;
+  //   }, value: 500
+  // }, ["WIDTH", "HEIGHT", "COLOR", "HANGER_ANGLE", "HANGER_ANGLE_QTY", "END_CAPS_OUTPUT",
+  //   "TRUSS_QTY", "WINDOW_POSITION", "GLASS_SHAPE", "LIFT_TYPE"])
+
+  addNode({
+    id: "HANGER_ANGLE_QTY",
+    logic: function () {
+      this.value = Number($("#HANGER_ANGLE_QTY").text()) || 0;
+    },
+    value: 0
+  }, []);
+
+  addNode({
+    id: "OP_6580L_VALUE",
+    logic: function () {
+      const height = Number(getState("DOOR_HEIGHT_FEET"));
+
+      switch (height) {
+        case 7: this.value = "951-193-07B"; break;
+        case 8: this.value = "951-193-08B"; break;
+        case 10: this.value = "951-193-010B"; break;
+        default: this.value = "";
+      }
+    }
+  }, ["SIZE"]);
+
+  //OPERATOR 6590
+  addNode({
+    id: "OP_6590L_VALUE",
+    logic: function () {
+      const height = Number(getState("DOOR_HEIGHT_FEET"));
+
+      switch (height) {
+        case 7: this.value = "951-194-07B"; break;
+        case 8: this.value = "951-194-08B"; break;
+        case 10: this.value = "951-194-10B"; break;
+        default: this.value = "";
+      }
+    }
+  }, ["SIZE"]);
+
+
+  //OPERATOR 220L CHAIN
+  addNode({
+    id: "OP_2220L_CHAIN_VALUE",
+    logic: function () {
+      const height = Number(getState("DOOR_HEIGHT_FEET"));
+
+      switch (height) {
+        case 7: this.value = "951-190-07C"; break;
+        case 8: this.value = "951-190-08C"; break;
+        case 10: this.value = "951-190-10C"; break;
+        default: this.value = "";
+      }
+    }
+  }, ["SIZE"]);
+
+  //OPERATOR 2420 CHAIN
+  addNode({
+    id: "OP_2420L_CHAIN_VALUE",
+    logic: function () {
+      const height = Number(getState("DOOR_HEIGHT_FEET"));
+
+      switch (height) {
+        case 7: this.value = "951-191-07C"; break;
+        case 8: this.value = "951-191-08C"; break;
+        case 10: this.value = "951-191-10C"; break;
+        default: this.value = "";
+      }
+    }
+  }, ["SIZE"]);
+
+
+
+  addLogic("HARDWARE_YESNO", function () {
+    let hardware = getState("HARDWARE_SET");
+    if (!hardware) {
+      this.value = 0;
+    } else this.value = 1;
+  }, ["HARDWARE_SET"])
+
+   addLogic("OPT_YESNO", function () {
+    let opt = getState("OPERATOR");
+    if (!opt || opt == 'PS') {
+      this.value = 0;
+    } else this.value = 1;
+  }, ["OPERATOR"])
+
+
+  setupQtyLogic("ADDITIONAL_TRANSMITTER", "ADDITIONAL_TRANSMITTER_QTY");
+  setupQtyLogic("ADDITIONAL_CONTROL_PANEL", "ADDITIONAL_CONTROL_PANEL_QTY");
+  setupQtyLogic("ADDITIONAL_KEYLESS_ENTRY", "ADDITIONAL_KEYLESS_ENTRY_QTY");
+
 }
 
 function updatePrice() {
@@ -106,17 +210,12 @@ function getFrameWidth() {
 function getSectionHeight() {
   return 21;
 }
-function getNumberOfPanes() {
-  return getStackChart()[`${getGlobalDoorWidth()}`].num_panes
-}
 
 function getSelectedNumberOfSection() {
   return parseInt(getState("NUM_OF_SEC"))
 }
 
-function getNumberOfSections(height) {
-  //return (Number)(getState("NUM_OF_SEC"))
-  //return getStackChart()[`${getGlobalDoorHeight()}`].num_sections
+function setNumberOfSections(height) {
   const chart = getStackChart();
   const entries = chart[String(height)] || [];
   return entries.map(e => e.num_sections);
@@ -159,15 +258,17 @@ function getNumberOfGlazedSections() {
   return getNumberOfSections()
 
 }
-function getWindowsPerSection() {
-  return getNumberOfPanes()
-}
+
 function getGlobalDoorWidth() {
   return getState("WIDTH")
 }
 
 function getGlobalDoorHeight() {
   return getState("HEIGHT")
+}
+
+function getNumberOfSections(height) {
+  return getState("NUM_OF_SEC");
 }
 
 function getGlobalDoorWidthFromFeetInches() {
@@ -194,9 +295,70 @@ function getGlobalDoorHeightFromSizeRadio() {
   return (parseInt(getNode("SIZE").getAttribute("height")) || 0) * 12; // convert feet to inches
 };
 
-function getEndCapsData() {
+function operatorImageOnChangeLM(select) {
 
+  const option = select.options[select.selectedIndex];
+  const imageName = option.getAttribute("img");
+
+  const img = document.getElementById(select.id + "_IMAGE");
+  const link = img.closest("a");
+
+  const placeholder = img
+    .closest(".image-placeholder-container")
+    .querySelector(".no-image-message");
+
+  const qtySelect = document.getElementById(select.id + "_QTY");
+
+  if (option.value === "NONE") {
+
+    img.style.display = "none";
+    placeholder.style.display = "flex";
+
+    link.removeAttribute("href");
+    link.style.pointerEvents = "none";
+
+    if (qtySelect) {
+      qtySelect.disabled = true;
+    }
+
+  } else {
+
+    img.src = "/HTML/products/210005530/images/" + imageName;
+    img.style.display = "block";
+
+    placeholder.style.display = "none";
+
+    link.href = "https://www.rwdoors.com/liftmaster/";
+    link.style.pointerEvents = "auto";
+
+    if (qtySelect) {
+      qtySelect.disabled = false;
+    }
+  }
 }
+
+function setupQtyLogic(selectFieldId, qtyFieldId) {
+  addLogic(qtyFieldId, function () {
+    const selectedValue = getState(selectFieldId);
+    const qty = document.getElementById(qtyFieldId);
+
+    if (!qty) return;
+
+    if (selectedValue === "NONE") {
+      this.value = "0";
+      qty.disabled = true;
+    } else {
+      qty.disabled = false;
+
+      // only default to 1 when currently empty/0
+      if (this.value === "0" || this.value === "" || this.value == null) {
+        this.value = "1";
+      }
+    }
+  }, [selectFieldId]);
+}
+
+
 
 //EasyWeb uses a fixed table to calculate section heights. This chart is provided here. 
 function getStackChart() {
