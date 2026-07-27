@@ -101,12 +101,6 @@ function loadGlobalNodes() {
   }, ["WIDTH", "HEIGHT", "COLOR", "HANGER_ANGLE", "HANGER_ANGLE_QTY", "END_CAPS",
     "TRUSS_QTY", "WINDOW_POSITION", "GLASS_SHAPE", "LIFT_TYPE"])
 
-  // addNode({
-  //   id: "WEIGHT", logic: function () {
-  //     this.value = 500;
-  //   }, value: 500
-  // }, ["WIDTH", "HEIGHT", "COLOR", "HANGER_ANGLE", "HANGER_ANGLE_QTY", "END_CAPS_OUTPUT",
-  //   "TRUSS_QTY", "WINDOW_POSITION", "GLASS_SHAPE", "LIFT_TYPE"])
 
   addNode({
     id: "HANGER_ANGLE_QTY",

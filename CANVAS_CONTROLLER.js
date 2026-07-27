@@ -30,6 +30,7 @@ function addRenderNode() {
 				'B': 'colonial_grooved',
 				'S': 'ranch_grooved',
 				'T': 'smooth_ranch',
+			  	'M': 'mixed'
 			};
 
 			const face = face_map[getState('FACE')];
@@ -38,60 +39,10 @@ function addRenderNode() {
 		value: "",
 	}, ["FACE"]);
 
-	// addLogic("GLASS_SHAPE", function () {
-
-	// 	const glass_shape = $("input[name='GLASS_SHAPE']:checked").val();
-	// 	const prevGlassShape = this._prevGlassShape;
-
-	// 	this.value = glass_shape;
-
-	// 	const $all = $("input[name='WINDOW_POSITION']");
-	// 	const $top = $("input[name='WINDOW_POSITION'][value='top']");
-
-	// 	// ✅ TRUE global glass shape change
-	// 	if (glass_shape && glass_shape !== prevGlassShape) {
-
-	// 		// ✅ IMPORTANT FIX:
-	// 		// Reset all section shapes to new global glass_shape.
-	// 		// Otherwise old section.shape = slim_single keeps overriding slim_double.
-	// 		const state = getState("WINDOW_STATE");
-
-	// 		if (state && state.sections) {
-	// 			state.sections.forEach(section => {
-	// 				section.shape = glass_shape;
-	// 				section.enabled = [];
-	// 				section.selected = false;
-	// 			});
-	// 		}
-
-	// 		$all.prop("checked", false)
-	// 			.closest(".rw-button")
-	// 			.removeClass("selected btn-checked");
-
-	// 		$top.prop("checked", true)
-	// 			.closest(".rw-button")
-	// 			.addClass("selected btn-checked");
-
-	// 		// ✅ let WINDOW_STATE recalculate first, then set top + redraw
-	// 		setTimeout(() => {
-	// 			setState("WINDOW_POSITION", "top");
-	// 			forceRedraw();
-	// 		}, 0);
-	// 	}
-
-	// 	if (!glass_shape) {
-	// 		$all.prop("checked", false)
-	// 			.closest(".rw-button")
-	// 			.removeClass("selected btn-checked");
-
-	// 		setState("WINDOW_POSITION", "");
-	// 	}
-
-	// 	addSlimUi();
-
-	// 	this._prevGlassShape = glass_shape;
-
-	// }, []);
+	addNode({
+		id: "CUSTOM_WINDOWS",
+		value: false
+	}, []);
 
 
 	addLogic("GLASS_SHAPE", function () {
@@ -103,8 +54,10 @@ function addRenderNode() {
 
 		const $all = $("input[name='WINDOW_POSITION']");
 		const $top = $("input[name='WINDOW_POSITION'][value='top']");
+		const $left = $("input[name='WINDOW_POSITION'][value='left']");
 
 		if (glass_shape && glass_shape !== prevGlassShape) {
+
 			const state = getState("WINDOW_STATE");
 
 			if (state && Array.isArray(state.sections)) {
@@ -122,6 +75,22 @@ function addRenderNode() {
 				.removeClass("selected btn-checked");
 
 			if (glass_shape.includes("slim")) {
+
+				$("#POSITION_TOP").hide();
+
+				$left.prop("checked", true)
+					.closest(".rw-button")
+					.addClass("selected btn-checked");
+
+				setTimeout(() => {
+					setState("WINDOW_POSITION", "left");
+					forceRedraw();
+				}, 0);
+
+			} else {
+
+				$("#POSITION_TOP").show();
+
 				$top.prop("checked", true)
 					.closest(".rw-button")
 					.addClass("selected btn-checked");
@@ -134,9 +103,12 @@ function addRenderNode() {
 		}
 
 		if (!glass_shape) {
+
 			$all.prop("checked", false)
 				.closest(".rw-button")
 				.removeClass("selected btn-checked");
+
+			$("#POSITION_TOP").show();
 
 			setState("WINDOW_POSITION", "");
 		}
@@ -201,7 +173,6 @@ function addRenderNode() {
 			// console.log("state value", this.value);
 
 			const sections = state.sections;
-			const num_add = Math.abs(sections.length)
 
 			while (sections.length != num_sections) {
 				if (sections.length > num_sections) {
@@ -210,6 +181,7 @@ function addRenderNode() {
 					sections.push({
 						selected: false,
 						slim_one: false,
+						slim_position_mode: false,
 						slim_spacing: 'even',
 						shape: glass_shape,
 						positions: [],
@@ -260,18 +232,20 @@ function addRenderNode() {
 				}
 
 				const slim_one = section.slim_one;
+				const slim_position_mode = section.slim_position_mode;
 				const slim_spacing = section.slim_spacing;
-				if (["slim_single", "slim_double"].includes(glass_shape)) {
+
+				if (glass_shape.includes("slim")) {
 					// if (section.shape.includes("slim")) {
 					// 	shape = section.shape;						
 					// }
 
-					// ✅ ALWAYS trust section shape first
-					if (section.shape && section.shape.includes("slim")) {
-						shape = section.shape;
-					}
+					shape = section.shape?.includes("slim")
+						? section.shape
+						: glass_shape;
 
-					if (slim_one) {
+
+					if (slim_one || slim_position_mode) {
 						const slim_s = 34.344;
 						const slim_l = 68.344;
 						const endcap_single = 4.8125;
@@ -295,10 +269,6 @@ function addRenderNode() {
 				} else {
 					enabled = Array(positions.length).fill(false);
 				}
-
-
-
-
 
 				if (special && section_glass) {
 					enabled.fill(true);
@@ -324,90 +294,72 @@ function addRenderNode() {
 			"SLIM_WINDOW_SPACING", "SLIM_WINDOW_LITES"]);
 
 	addLogic("WINDOW_POSITION", function () {
+
 		const glass_shape = getState("GLASS_SHAPE");
 		const special = getState("SPECIAL_FACE");
 
-
 		const $all = $("input[name='WINDOW_POSITION']");
 		const $top = $("input[name='WINDOW_POSITION'][value='top']");
+		const $left = $("input[name='WINDOW_POSITION'][value='left']");
 		const $nonTop = $("input[name='WINDOW_POSITION']:not([value='top'])");
-
-
 
 		// reset when glass shape is empty
 		if (!glass_shape) {
-			// $("input[name='WINDOW_POSITION']")
-			// 	.prop("checked", false)
-			// 	.closest(".rw-button")
-			// 	.removeClass("selected btn-checked");
-
-			// this.value = "";
-			// return;
-
 
 			$all.prop("checked", false)
 				.closest(".rw-button")
 				.removeClass("selected btn-checked disabled")
 				.css("cursor", "pointer");
 
+			$("#POSITION_TOP").show();
+
 			this.value = "";
 			return;
 		}
 
+		// Slim windows: hide TOP
+		if (glass_shape.includes("slim")) {
+
+			$("#POSITION_TOP").hide();
+			$("#POSITION_CUSTOM").show();
+
+			const wasTopSelected = $top.is(":checked");
+
+			$top.prop("checked", false)
+				.closest(".rw-button")
+				.removeClass("selected btn-checked");
+
+			if (wasTopSelected) {
+				$left.prop("checked", true)
+					.closest(".rw-button")
+					.addClass("selected btn-checked");
+			}
+
+		} else {
+
+			$("#POSITION_TOP").show();
+			$("#POSITION_CUSTOM").hide();
+		}
 
 		let position = $("input[name='WINDOW_POSITION']:checked").val() ?? "";
 
+		const customSelected =
+			$("input[name='WINDOW_POSITION'][value='custom']").is(":checked");
 
 		const isSpecial = special || glass_shape.includes("grand");
 
-		// ✅ RESET UI first
+		// reset UI
 		$all.prop("disabled", false)
 			.closest(".rw-button")
 			.removeClass("disabled")
 			.css("cursor", "pointer");
 
-		// ✅ SPECIAL CASE BEHAVIOR
-		if (isSpecial) {
+		// special/grand force TOP
+		if (isSpecial && !glass_shape.includes("slim")) {
 
-			// 🚫 disable everything except TOP
 			$nonTop.prop("disabled", true)
 				.closest(".rw-button")
-				.addClass("disabled")
-			//	.css("cursor", "not-allowed");
-
-			// ✅ force TOP selection
-			$all.prop("checked", false)
-				.closest(".rw-button")
-				.removeClass("selected btn-checked");
-
-			$top.prop("checked", true)
-				.closest(".rw-button")
-				.addClass("selected btn-checked")
-			//.css("cursor", "pointer");
-
-			position = "top";
-		}
-
-
-		// ✅ ✅ ✅ CRITICAL FIX (manual detection)
-		const state = getState("WINDOW_STATE");
-
-		const has_glass = state.sections.some(section =>
-			section.enabled.some(v => v === true)
-		);
-
-
-		// ✅ fallback if nothing selected
-
-		if (!position && has_glass && !special) {
-			this.value = "";
-			return;
-		}
-
-
-		if (!position) {
-
-			position = "top";
+				.addClass("disabled");
 
 			$all.prop("checked", false)
 				.closest(".rw-button")
@@ -416,33 +368,70 @@ function addRenderNode() {
 			$top.prop("checked", true)
 				.closest(".rw-button")
 				.addClass("selected btn-checked");
+
+			position = "top";
 		}
 
+		const state = getState("WINDOW_STATE");
 
+		const has_glass = state.sections.some(section =>
+			section.enabled.some(v => v === true)
+		);
 
-		// const should_disable = special || glass_shape.includes("grand");
-		// $(`input[name='WINDOW_POSITION']:not([value="top"])`).prop('disabled', special);
-		// if (glass_shape.includes("grand")) {
-		// 	position = "top";
-		// }
+		// IMPORTANT:
+		// If user manually clicked glass on canvas,
+		// don't re-apply default left/top positions.
+		// IMPORTANT:
+		// If user manually clicked glass on canvas,
+		// don't re-apply default left/top positions.	
+		if (!position && has_glass && !special) {
+			if (customSelected) {
+				position = "custom";
+			} else {
+				this.value = "";
+				return;
+			}
+		}
 
-		// const sections = getState("WINDOW_STATE").sections;
-		// const has_glass = sections.some(section => {
-		// 	return section.enabled.some(x => x == true);
-		// });
-		// if (special && has_glass) {
-		// 	position = "top";
-		// }
+		// Apply defaults ONLY when no glass exists yet
+		if (!position && !has_glass) {
 
-		// this.value = position;
-		// //if (glass_shape.includes("slim") || position == "") {
-		// if (position == "") {
-		// 	return;
-		// }
+			position = glass_shape.includes("slim")
+				? "left"
+				: "top";
+
+			$all.prop("checked", false)
+				.closest(".rw-button")
+				.removeClass("selected btn-checked");
+
+			$(`input[name='WINDOW_POSITION'][value='${position}']`)
+				.prop("checked", true)
+				.closest(".rw-button")
+				.addClass("selected btn-checked");
+		}
+
+		if (position === "custom") {
+
+			this.value = "custom";
+
+			addSlimUi();
+
+			forceRedraw();
+
+			return;
+		}
+
 		this.value = position;
-		setWindowPositions(position);
+
+		if (position && position !== "custom") {
+			this._lastPosition = position;
+			setWindowPositions(position);
+		}
+
 		forceRedraw();
+
 	}, ["GLASS_SHAPE", "SPECIAL_FACE", "WINDOW_STATE"]);
+
 
 	addNode({
 		id: "RENDER",
@@ -477,14 +466,19 @@ function addRenderNode() {
 	$(document).off('click.canvasFix');
 
 	$(document).on('click.canvasFix', '#CONFIG_CANVAS', function (event) {
-
 		const isSpecial = getState("SPECIAL_FACE");
 		const glass_shape = getState("GLASS_SHAPE") || "";
+		const node = getNode("WINDOW_POSITION");
+
+		if (glass_shape.includes("slim") && node?.value !== "custom") {
+			return;
+		}
 
 
 		if (isSpecial || glass_shape.includes("grand")) {
 			return;
 		}
+
 
 		const door_width = getState("WIDTH");
 		const door_height = getState("HEIGHT");
@@ -492,12 +486,11 @@ function addRenderNode() {
 
 		const scale = getScale(door_width, door_height);
 		const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
-
 		const windows = getState("WINDOW_STATE");
+
 		const section_heights = getSectionHeights(door_height, num_sections);
 
 		let changed = false;
-
 		const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
 
 		for (const [sIndex, section] of windows.sections.entries()) {
@@ -523,7 +516,6 @@ function addRenderNode() {
 				// 	break;
 				// }
 				if (hit) {
-
 					if (section.slim_one) {
 						// ✅ ONLY ONE window allowed
 						section.enabled.fill(false);   // clear all
@@ -532,8 +524,8 @@ function addRenderNode() {
 						// ✅ normal behavior
 						section.enabled[i] = !section.enabled[i];
 					}
-
 					changed = true;
+					setState("CUSTOM_WINDOWS", changed);
 					break;
 				}
 
@@ -545,15 +537,40 @@ function addRenderNode() {
 		if (changed) {
 			CANVAS_PLUGIN.draw(getDoorInfo());
 
-			$(`input[name='WINDOW_POSITION']`).prop("checked", false).removeAttr("checked")
-				.closest(".rw-button")
-				.removeClass("selected btn-checked");
-			setState("WINDOW_POSITION", "");
+			if (!glass_shape.includes("slim") && node.value !== "custom") {
+
+				$(`input[name='WINDOW_POSITION']`)
+					.prop("checked", false)
+					.removeAttr("checked")
+					.closest(".rw-button")
+					.removeClass("selected btn-checked");
+
+				$("input[name='WINDOW_POSITION'][value='custom']")
+					.prop("checked", true)
+					.closest(".rw-button")
+					.addClass("selected btn-checked");
+
+				node.value = "custom";
+			}
+
+			forceRedraw();
+			// setState("WINDOW_POSITION", "");
 		} else {
 			// console.log("❌ NO PANEL HIT");
 		}
 	});
 
+	$(document).on("click", "input[name='WINDOW_POSITION']", function () {
+		setState("CUSTOM_WINDOWS", false);
+
+		const position = $(this).val();
+
+		if (position === "custom") {
+			resetSlimCustomState();
+		}
+
+
+	});
 
 	$(document).off('mousemove.canvasFix');
 
@@ -584,381 +601,8 @@ function addRenderNode() {
 
 }
 
-// function addSlimUi() {
-// 	$(`[data-id="section_slim_temp"]`).remove();
-// 	const glass_shape = getState("GLASS_SHAPE") ?? "";
-
-// 	const windows = getState("WINDOW_STATE");
-// 	if (!glass_shape.includes("slim")) {
-// 		$(`#slim_spacing_container`).remove();
-// 		windows.sections.forEach(section => {
-// 			section.selected = false;
-// 			section.slim_one = false;
-// 		});
-// 		return;
-// 	}
-
-// 	const door_width = getState("WIDTH");
-// 	const door_height = getState("HEIGHT");
-// 	const scale = getScale(door_width, door_height);
-// 	const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
-// 	const canvas = $("#CONFIG_CANVAS")[0];
-// 	const canvas_pos = $("#CONFIG_CANVAS").offset();
-// 	const rect = canvas.getBoundingClientRect();
-// 	const cx = door_width * scale + canvas_x;
-// 	const menu_y = canvas_pos.top + (canvas_y + door_height * scale / 2) * (rect.height / canvas.height);
-
-// 	const num_sections = getState("NUM_OF_SEC");
-// 	const section_heights = getSectionHeights(door_height, num_sections);
-// 	for (const [i, section] of windows.sections.entries()) {
-// 		const ypos = section_heights.slice(0, i).reduce((acc, val) => acc + val, 0);
-// 		const cy = (ypos + section_heights[i] / 2) * scale + canvas_y;
-// 		const x = cx * rect.width / canvas.width + canvas_pos.left;
-// 		const y = cy * rect.height / canvas.height + canvas_pos.top;
-
-// 		$(`
-// 			<div class="rw-button-container-inner" data-id="section_slim_temp">
-// 				<div class="rw-sliding-button">
-// 					<i class="fas fa-pencil"></i>
-// 					<input type="radio" style="display:none;" id="section_slim_single_${i}" name="section_slim_${i}"
-// 						value="slim_single" />
-// 				</div>
-// 			</div>`)
-// 			.css({
-// 				'position': 'absolute',
-// 				'left': `${x}px`,
-// 				'top': `${y}px`,
-// 				'transform': 'translate(0%, -50%)',
-// 				'min-width': '0',
-// 				'width': '40px',
-// 			}).appendTo('body')
-// 			.on('click', function (event) {
-// 				event.stopPropagation();
-// 				$(`[data-id="section_slim_temp"]`).removeClass('selected');
-// 				$(this).addClass('selected');
-// 				$("#slim_spacing_container").remove();
-// 				$(`
-// 			   <div class="slim-options-container" id="slim_spacing_container">
-// 					 <div class="rw-button" id="SLIM_WINDOW_LITES_ONE" >
-// 					   <label for="SLIM_WINDOW_LITES_ONE">One Lite</label>
-// 					   <input type="radio" style="display:none;" name="SLIM_WINDOW_LITES" id="SLIM_WINDOW_LITES_ONE_INPUT" desc="One Lite" value="one" code="one" checked >
-// 					 </div>
-// 					 <div class="rw-button" id="SLIM_WINDOW_LITES_MORE" >
-// 					   <label for="SLIM_WINDOW_LITES_MORE">More than One</label>
-// 					   <input type="radio" style="display:none;"  name="SLIM_WINDOW_LITES" id="SLIM_WINDOW_LITES_MORE_INPUT" desc="More than One" value="more" code="more" >
-// 					 </div>
-// 					 <div class="rw-button" id="SLIM_WINDOW_SPACING_EVEN" >
-// 					   <label for="SLIM_WINDOW_SPACING_EVEN">Evenly Spaced</label>
-// 					   <input type="radio" style="display:none;" name="SLIM_WINDOW_SPACING" desc="Evenly Spaced" value="even" code="even" checked >
-// 					 </div>
-// 					 <div class="rw-button" id="SLIM_WINDOW_SPACING_FIXED" >
-// 					   <label for="SLIM_WINDOW_SPACING_FIXED">Fixed End</label>
-// 					   <input type="radio" style="display:none;" name="SLIM_WINDOW_SPACING" desc="Evenly Spaced Fixed End" value="fixed" code="fixed" >
-// 					 </div>
-
-// 					<div class="rw-button panel-button" id="SLIM_WINDOW_SINGLE">
-// 						<label for="GLASS_SHAPE_SLIM_SGL">Slim Single</label>
-// 						<input type="radio" id="GLASS_SHAPE_SLIM_SGL" name="GLASS_SHAPE" value="slim_single" >
-// 					</div>
-
-// 					<div class="panel-layout" id="SLIM_WINDOW_DOUBLE">
-// 						<div class="rw-button panel-button">
-// 							<label for="GLASS_SHAPE_MORE_0">Slim Double</label>
-// 							<input type="radio" id="GLASS_SHAPE_MORE_0" name="GLASS_SHAPE" value="slim_double" >
-// 						</div>
-// 					</div>
-// 			   </div>`)
-// 					.css({
-// 						'position': 'absolute',
-// 						'left': `${x + 60}px`,
-// 						'top': `${menu_y}px`,
-// 						'transform': 'translate(0%, -50%)',
-// 					})
-// 					.appendTo('body');
-
-// 				// $(document).on('click.slim_menu', function (event) {
-// 				// 	const $menu = $('#slim_spacing_container');
-// 				// 	// If the click was NOT on the menu AND not on a child of the menu
-// 				// 	if (!$menu.is(event.target) && $menu.has(event.target).length === 0) {
-// 				// 		$menu.remove();						
-// 				// 		$(document).off('click.slim_menu');
-// 				// 	}
-// 				// });
-
-// 				$(document).on('click.slim_menu', function (event) {
-// 					const $menu = $('#slim_spacing_container');
-
-// 					if (!$menu.is(event.target) && $menu.has(event.target).length === 0) {
-// 						$menu.remove();
-// 						$(document).off('click.slim_menu');
-
-// 						// ✅ ONLY REMOVE SELECTION (DO NOT TOUCH hints)
-// 						const state = getState("WINDOW_STATE");
-// 						state.sections.forEach(section => {
-// 							section.selected = false;
-// 						});
-
-// 						forceRedraw();
-// 					}
-// 				});
-
-
-// 				$("#SLIM_WINDOW_LITES_ONE").on('click', function () {
-// 					const state = getState("WINDOW_STATE");
-// 					state.sections[i].slim_one = true;
-// 					setState("SLIM_WINDOW_LITES", "one");
-// 				});
-
-// 				$("#SLIM_WINDOW_LITES_MORE").on('click', function () {
-// 					const state = getState("WINDOW_STATE");
-// 					state.sections[i].slim_one = false;
-// 					setState("SLIM_WINDOW_LITES", "more");
-// 				});
-
-// 				$("#SLIM_WINDOW_SPACING_EVEN").on('click', function () {
-// 					const state = getState("WINDOW_STATE");
-// 					state.sections[i].slim_spacing = 'even';
-// 					setState("SLIM_WINDOW_SPACING", "even");
-// 				});
-
-// 				$("#SLIM_WINDOW_SPACING_FIXED").on('click', function () {
-// 					const state = getState("WINDOW_STATE");
-// 					state.sections[i].slim_spacing = 'fixed';
-// 					setState("SLIM_WINDOW_SPACING", "fixed");
-// 				});
-
-// 				// $("#SLIM_WINDOW_SINGLE").on('click', function () {
-// 				// 	const state = getState("WINDOW_STATE");
-// 				// 	state.sections[i].shape = "slim_single";
-// 				// 	console.log("state.sections[i].shape", state.sections[i].shape)
-// 				// 	setState("GLASS_SHAPE", "slim_single");
-// 				// });
-
-// 				$(document).off('click.slim_single').on('click.slim_single', '#SLIM_WINDOW_SINGLE', function () {
-// 					const state = getState("WINDOW_STATE");
-// 					state.sections[i].shape = "slim_single";
-// 					setState("GLASS_SHAPE", "slim_single");
-// 				});
-
-
-// 				$("#SLIM_WINDOW_DOUBLE").on('click', function () {
-// 					const state = getState("WINDOW_STATE");
-// 					state.sections[i].shape = "slim_double";
-// 					setState("GLASS_SHAPE", "slim_double");
-// 				});
-
-// 				const state = getState("WINDOW_STATE");
-// 				state.sections.forEach(section => {
-// 					section.selected = false;
-// 				});
-// 				state.sections[i].selected = true;
-// 				forceRedraw();
-// 			});
-// 	}
-// }
-
-// function getCanvasMousePos() {
-// 	const canvas = $("#CONFIG_CANVAS")[0];
-// 	const rect = canvas.getBoundingClientRect();
-
-// 	const mouse_x = canvas_mouse.x * (canvas.width / rect.width);
-// 	const mouse_y = canvas_mouse.y * (canvas.height / rect.height);
-// 	return [mouse_x, mouse_y];
-// }
-
-// function addSlimUi() {
-// 	$(`[data-id="section_slim_temp"]`).remove();
-// 	const glass_shape = getState("GLASS_SHAPE") ?? "";
-
-// 	const windows = getState("WINDOW_STATE");
-
-// 	if (!glass_shape.includes("slim")) {
-// 		$("#slim_spacing_container").remove();
-// 		windows.sections.forEach(section => {
-// 			section.selected = false;
-// 			section.slim_one = false;
-// 		});
-// 		forceRedraw();
-// 		return;
-// 	}
-
-// 	const door_width = getState("WIDTH");
-// 	const door_height = getState("HEIGHT");
-// 	const scale = getScale(door_width, door_height);
-
-// 	const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
-// 	const canvas = $("#CONFIG_CANVAS")[0];
-// 	const canvas_pos = $("#CONFIG_CANVAS").offset();
-// 	const rect = canvas.getBoundingClientRect();
-
-// 	const cx = door_width * scale + canvas_x;
-// 	const menu_y = canvas_pos.top + (canvas_y + door_height * scale / 2) * (rect.height / canvas.height);
-
-// 	const num_sections = getState("NUM_OF_SEC");
-// 	const section_heights = getSectionHeights(door_height, num_sections);
-
-// 	for (const [i, section] of windows.sections.entries()) {
-
-// 		const ypos = section_heights.slice(0, i).reduce((a, b) => a + b, 0);
-// 		const cy = (ypos + section_heights[i] / 2) * scale + canvas_y;
-
-// 		const x = cx * rect.width / canvas.width + canvas_pos.left;
-// 		const y = cy * rect.height / canvas.height + canvas_pos.top;
-
-// 		$(`
-//         <div class="rw-button-container-inner" data-id="section_slim_temp">
-//             <div class="rw-sliding-button">
-//                 <i class="fas fa-pencil"></i>
-//             </div>
-//         </div>
-//         `)
-// 			.css({
-// 				position: 'absolute',
-// 				left: `${x}px`,
-// 				top: `${y}px`,
-// 				transform: 'translate(0%, -50%)',
-// 				width: '40px'
-// 			})
-// 			.appendTo('body')
-// 			.on('click', function (event) {
-
-// 				event.stopPropagation();
-
-// 				$(`[data-id="section_slim_temp"]`).removeClass('selected');
-// 				$(this).addClass('selected');
-
-// 				$("#slim_spacing_container").remove();
-
-// 				// ✅ Popup with all steps already inside
-// 				const $menu = $(`
-//                 <div class="slim-options-container show" id="slim_spacing_container">
-
-//                     <div class="slim-header">
-//                         <span>Configure</span>
-//                         <span class="slim-close">&times;</span>
-//                     </div>
-
-//                     <!-- ✅ STEP 1: SHAPE -->
-//                     <div id="STEP_SHAPE">
-//                         <div class="slim-step-title">Select Shape</div>
-//                         <div class="slim-option" data-step="shape" data-value="slim_single">Slim Single</div>
-//                         <div class="slim-option" data-step="shape" data-value="slim_double">Slim Double</div>
-//                     </div>
-
-//                     <!-- ✅ STEP 2: LITES -->
-//                     <div id="STEP_LITES" style="display:none;">
-//                         <div class="slim-step-title">Select Lites</div>
-//                         <div class="slim-option" data-step="lites" data-value="one">One Lite</div>
-//                         <div class="slim-option" data-step="lites" data-value="more">More than One</div>
-//                     </div>
-
-//                     <!-- ✅ STEP 3: SPACING -->
-//                     <div id="STEP_SPACING" style="display:none;">
-//                         <div class="slim-step-title">Select Spacing</div>
-//                         <div class="slim-option" data-step="spacing" data-value="even">Evenly Spaced</div>
-//                         <div class="slim-option" data-step="spacing" data-value="fixed">Fixed End</div>
-//                     </div>
-
-//                 </div>
-//             `)
-// 					.css({
-// 						left: `${x + 60}px`,
-// 						top: `${menu_y}px`,
-// 						transform: 'translate(0%, -50%)'
-// 					})
-// 					.appendTo('body');
-
-// 				// ✅ highlight
-// 				const state = getState("WINDOW_STATE");
-// 				// state.sections.forEach(sec => sec.selected = false);
-
-// 				// ✅ only update current selection
-// 				state.sections.forEach((sec, idx) => {
-// 					sec.selected = (idx === i);
-// 				});
-// 				// state.sections[i].selected = true;
-
-// 				forceRedraw();
-
-// 				$(document)
-// 					.off('click.keepPencil')
-// 					.on('click.keepPencil', '#slim_spacing_container', function (e) {
-// 						e.stopPropagation(); // ✅ prevents losing selection
-// 					});
-
-// 				// ✅ SINGLE HANDLER (no bugs)
-// 				$(document).off('click.slim').on('click.slim', '#slim_spacing_container .slim-option', function () {
-
-// 					const $el = $(this);
-// 					const step = $el.data("step");
-// 					const value = $el.data("value");
-
-// 					// highlight active
-// 					$el.siblings().removeClass('active');
-// 					$el.addClass('active');
-
-// 					const state = getState("WINDOW_STATE");
-
-// 					if (step === "shape") {
-// 						state.sections[i].shape = value;
-// 						setState("GLASS_SHAPE", value);
-
-// 						$("#STEP_LITES").fadeIn();
-// 					}
-
-// 					if (step === "lites") {
-// 						state.sections[i].slim_one = (value === "one");
-// 						setState("SLIM_WINDOW_LITES", value);
-
-
-// 						if (value === "one") {
-// 							// ✅ reset all previous enabled windows
-// 							state.sections[i].enabled.fill(false);
-// 						}
-
-
-
-// 						if (value === "more") {
-// 							$("#STEP_SPACING").fadeIn();
-// 						} else {
-// 							$("#STEP_SPACING").hide();
-// 						}
-// 					}
-
-// 					if (step === "spacing") {
-// 						state.sections[i].slim_spacing = value;
-// 						setState("SLIM_WINDOW_SPACING", value);
-// 					}
-// 				});
-
-// 				// ✅ CLOSE
-// 				$(document).off('click.slimClose').on('click.slimClose', '.slim-close', function () {
-// 					$('#slim_spacing_container').remove();
-
-// 					const state = getState("WINDOW_STATE");
-// 					state.sections.forEach(sec => sec.selected = false);
-// 					forceRedraw();
-
-// 					$(document).off('click.slim');
-// 				});
-// 			});
-// 	}
-// }
-
-function resetWindowPositionForPencil() {
-	$("input[name='WINDOW_POSITION']")
-		.prop("checked", false)
-		.removeAttr("checked")
-		.closest(".rw-button")
-		.removeClass("selected btn-checked");
-
-	const node = getNode("WINDOW_POSITION");
-	if (node) {
-		node.value = "";
-	}
-}
-
 function selectCenterOneLite(section) {
+
 	if (!section || !section.enabled || section.enabled.length === 0) {
 		return;
 	}
@@ -966,6 +610,9 @@ function selectCenterOneLite(section) {
 	section.enabled.fill(false);
 
 	const centerIndex = Math.floor(section.enabled.length / 2);
+
+	console.log("centerIndex", centerIndex);
+
 	section.enabled[centerIndex] = true;
 }
 
@@ -977,29 +624,7 @@ function recalcWindowState() {
 	}
 }
 
-function resetWindowPositionForPencil() {
-	$("input[name='WINDOW_POSITION']")
-		.prop("checked", false)
-		.removeAttr("checked")
-		.closest(".rw-button")
-		.removeClass("selected btn-checked");
 
-	const node = getNode("WINDOW_POSITION");
-	if (node) {
-		node.value = "";
-	}
-}
-
-function selectCenterOneLite(section) {
-	if (!section || !section.enabled || section.enabled.length === 0) {
-		return;
-	}
-
-	section.enabled.fill(false);
-
-	const centerIndex = Math.floor(section.enabled.length / 2);
-	section.enabled[centerIndex] = true;
-}
 
 function addSlimUi() {
 	$(`[data-id="section_slim_temp"]`).remove();
@@ -1021,6 +646,22 @@ function addSlimUi() {
 
 		return;
 	}
+
+
+	const windowPosition = getNode("WINDOW_POSITION")?.value;
+
+	// ✅ Pencil only visible in CUSTOM mode
+	if (windowPosition !== "custom") {
+
+		$("#slim_spacing_container").remove();
+
+		windows.sections.forEach(section => {
+			section.selected = false;
+		});
+
+		return;
+	}
+
 
 	const door_width = getState("WIDTH");
 	const door_height = getState("HEIGHT");
@@ -1082,7 +723,6 @@ function addSlimUi() {
 
 				event.stopPropagation();
 
-				resetWindowPositionForPencil();
 
 				const freshState = getState("WINDOW_STATE");
 
@@ -1129,6 +769,28 @@ function addSlimUi() {
 						transform: 'translate(0%, -50%)'
 					})
 					.appendTo('body');
+
+				const currentShape = section.shape || getState("GLASS_SHAPE");
+				const currentLite = section.slim_one ? "one" : "more";
+				const currentSpacing = section.slim_spacing || "even";
+
+				$menu
+					.find(`[data-step="shape"][data-value="${currentShape}"]`)
+					.addClass("active");
+
+				$menu.find("#STEP_LITES").show();
+
+				$menu
+					.find(`[data-step="lites"][data-value="${currentLite}"]`)
+					.addClass("active");
+
+				if (currentLite === "one") {
+					$menu.find("#STEP_SPACING").hide();
+				} else {
+					// More Than One selected					
+					$menu.find("#STEP_SPACING").show();
+					$menu.find(`[data-step="spacing"][data-value="${currentSpacing}"]`).addClass("active");
+				}
 
 				forceRedraw();
 
@@ -1219,6 +881,10 @@ function addSlimUi() {
 							});
 						}
 
+						// ✅ remove active red pencil state
+						$('[data-id="section_slim_temp"]')
+							.removeClass('selected');
+
 						forceRedraw();
 
 						$(document).off('click.slim');
@@ -1295,107 +961,250 @@ async function renderDoor() {
 }
 
 
+// function setWindowPositions(position) {
+// 	const state = getState("WINDOW_STATE");
+
+// 	state.sections.forEach(section => {
+// 		section.enabled.fill(false);
+// 	});
+
+// 	const enableOneLitePosition = (section, position) => {
+// 		const enabled = section.enabled;
+
+// 		if (!enabled || enabled.length === 0) return;
+
+// 		if (position === "left") {
+// 			enabled[0] = true;
+// 			return;
+// 		}
+
+
+// 		if (position === "center" || position === "top") {
+// 			const centerIndex = Math.floor(enabled.length / 2);
+// 			enabled[centerIndex] = true;
+// 			return;
+// 		}
+
+// 		if (position === "right") {
+// 			enabled[enabled.length - 1] = true;
+// 			return;
+// 		}
+
+// 		// For "both", one-lite cannot show both.
+// 		// Pick center by default, or change to left if business wants.
+// 		if (position === "both") {
+// 			const centerIndex = Math.floor(enabled.length / 2);
+// 			enabled[centerIndex] = true;
+// 		}
+// 	};
+
+// 	if (position == "top") {
+// 		const section = state.sections[0];
+
+// 		if (!section) return;
+
+// 		if (section.slim_one) {
+// 			enableOneLitePosition(section, "top");
+// 		} else {
+// 			section.enabled.fill(true);
+// 		}
+
+// 		if (getState("SPECIAL_FACE")) {
+// 			// getNode("WINDOW_STATE").logic();
+// 			recalcWindowState();
+// 		}
+// 	}
+
+// 	if (position == "left") {
+// 		state.sections.forEach(section => {
+// 			if (section.slim_one) {
+// 				enableOneLitePosition(section, "left");
+// 			} else {
+// 				section.enabled[0] = true;
+// 			}
+// 		});
+// 	}
+
+// 	if (position == "center") {
+// 		state.sections.forEach(section => {
+// 			if (section.slim_one) {
+// 				enableOneLitePosition(section, "center");
+// 			} else {
+// 				const enabled = section.enabled;
+// 				const offset = Math.floor(enabled.length / 2);
+
+// 				enabled[offset] = true;
+
+// 				if (enabled.length % 2 == 0) {
+// 					enabled[offset - 1] = true;
+// 				}
+// 			}
+// 		});
+// 	}
+
+// 	if (position == "right") {
+// 		state.sections.forEach(section => {
+// 			if (section.slim_one) {
+// 				enableOneLitePosition(section, "right");
+// 			} else {
+// 				const enabled = section.enabled;
+// 				enabled[enabled.length - 1] = true;
+// 			}
+// 		});
+// 	}
+
+// 	if (position == "both") {
+// 		state.sections.forEach(section => {
+// 			if (section.slim_one) {
+// 				enableOneLitePosition(section, "both");
+// 			} else {
+// 				const enabled = section.enabled;
+// 				enabled[0] = true;
+// 				enabled[enabled.length - 1] = true;
+// 			}
+// 		});
+// 	}
+// }
+
+
 function setWindowPositions(position) {
+
 	const state = getState("WINDOW_STATE");
 
+	// clear existing selections
 	state.sections.forEach(section => {
 		section.enabled.fill(false);
 	});
 
-	const enableOneLitePosition = (section, position) => {
-		const enabled = section.enabled;
+	if (position === "top") {
 
-		if (!enabled || enabled.length === 0) return;
-
-		if (position === "left") {
-			enabled[0] = true;
-			return;
-		}
-
-		if (position === "center" || position === "top") {
-			const centerIndex = Math.floor(enabled.length / 2);
-			enabled[centerIndex] = true;
-			return;
-		}
-
-		if (position === "right") {
-			enabled[enabled.length - 1] = true;
-			return;
-		}
-
-		// For "both", one-lite cannot show both.
-		// Pick center by default, or change to left if business wants.
-		if (position === "both") {
-			const centerIndex = Math.floor(enabled.length / 2);
-			enabled[centerIndex] = true;
-		}
-	};
-
-	if (position == "top") {
 		const section = state.sections[0];
 
-		if (!section) return;
+		if (!section) {
+			return;
+		}
 
-		if (section.slim_one) {
-			enableOneLitePosition(section, "top");
+		if (section.shape?.includes("slim")) {
+
+			section.slim_one = true;
+			section.enabled = [];
+
+			recalcWindowState();
+
+			selectCenterOneLite(section);
+
 		} else {
+
 			section.enabled.fill(true);
+
 		}
 
 		if (getState("SPECIAL_FACE")) {
-			// getNode("WINDOW_STATE").logic();
 			recalcWindowState();
 		}
+
+		return;
 	}
 
-	if (position == "left") {
+	if (position === "left") {
+
+		state.sections.forEach(prepareSlimPositionMode);
+
+		recalcWindowState();
+
 		state.sections.forEach(section => {
-			if (section.slim_one) {
-				enableOneLitePosition(section, "left");
+
+			section.enabled.fill(false);
+			section.enabled[0] = true;
+
+		});
+
+		return;
+	}
+
+	if (position === "center") {
+		state.sections.forEach(prepareSlimPositionMode);
+
+		recalcWindowState();
+
+		state.sections.forEach(section => {
+
+			if (section.shape?.includes("slim")) {
+
+				section.enabled.fill(false);
+
+				const centerIndex =
+					Math.floor(section.enabled.length / 2);
+
+				section.enabled[centerIndex] = true;
+
+				return;
+			}
+
+			const enabled = section.enabled;
+			const offset = Math.floor(enabled.length / 2);
+
+			enabled[offset] = true;
+
+			if (enabled.length % 2 === 0) {
+				enabled[offset - 1] = true;
+			}
+
+		});
+
+		return;
+	}
+
+	if (position === "right") {
+
+		state.sections.forEach(prepareSlimPositionMode);
+
+		recalcWindowState();
+
+		state.sections.forEach(section => {
+
+			if (section.shape?.includes("slim")) {
+
+				section.enabled.fill(false);
+
+				section.enabled[
+					section.enabled.length - 1
+				] = true;
+
 			} else {
+
+				section.enabled[
+					section.enabled.length - 1
+				] = true;
+			}
+
+		});
+
+		return;
+	}
+	if (position === "both") {
+
+
+		state.sections.forEach(prepareSlimPositionMode);
+
+
+		recalcWindowState();
+
+		state.sections.forEach(section => {
+
+			if (section.shape?.includes("slim")) {
+
+				selectCenterOneLite(section);
+
+			} else {
+
 				section.enabled[0] = true;
+				section.enabled[section.enabled.length - 1] = true;
+
 			}
 		});
-	}
 
-	if (position == "center") {
-		state.sections.forEach(section => {
-			if (section.slim_one) {
-				enableOneLitePosition(section, "center");
-			} else {
-				const enabled = section.enabled;
-				const offset = Math.floor(enabled.length / 2);
-
-				enabled[offset] = true;
-
-				if (enabled.length % 2 == 0) {
-					enabled[offset - 1] = true;
-				}
-			}
-		});
-	}
-
-	if (position == "right") {
-		state.sections.forEach(section => {
-			if (section.slim_one) {
-				enableOneLitePosition(section, "right");
-			} else {
-				const enabled = section.enabled;
-				enabled[enabled.length - 1] = true;
-			}
-		});
-	}
-
-	if (position == "both") {
-		state.sections.forEach(section => {
-			if (section.slim_one) {
-				enableOneLitePosition(section, "both");
-			} else {
-				const enabled = section.enabled;
-				enabled[0] = true;
-				enabled[enabled.length - 1] = true;
-			}
-		});
+		return;
 	}
 }
 
@@ -1405,6 +1214,7 @@ function getPanelConfigurationKey(panel_type) {
 		return 'windemere';
 	}
 
+	console.log("panel_type", panel_type);
 	return panel_type;
 }
 
@@ -1627,7 +1437,8 @@ function getCanvasDoorPosition(door_width, door_height) {
 	const canvas = $("#CONFIG_CANVAS")[0];
 	const w = door_width * scale, h = door_height * scale;
 	const x = (canvas.width - w) / 2;
-	const y = ((canvas.height - h) / 2) - 60;
+	// const y = ((canvas.height - h) / 2) - 60;
+	const y = ((canvas.height - h) / 2);
 
 	return [x, y];
 }
@@ -1745,7 +1556,6 @@ function getDoorInfo() {
 		},
 
 		insert: insert,
-
 		sections: sections,
 		scale: getScale(width, height),
 
@@ -1753,8 +1563,8 @@ function getDoorInfo() {
 		misc: {
 			labels: true,
 		},
-
 		draw_hints: hints,
+		custom_windows: getState("CUSTOM_WINDOWS")
 	}
 }
 
@@ -1782,4 +1592,103 @@ function hideConfigureLoader() {
 	if ($loader.length) {
 		$loader.hide();
 	}
+}
+
+function prepareSlimPositionMode(section) {
+	if (!section.shape?.includes("slim")) return;
+
+	section.slim_position_mode = true;
+	section.enabled = [];
+}
+
+function enableSlimCustomMode(section) {
+
+	if (!section.shape?.includes("slim")) {
+		return;
+	}
+
+	section.slim_position_mode = false;
+
+	section.positions = slim_getWindowPositions(
+		section.shape,
+		getState("WIDTH"),
+		section.slim_spacing === "fixed",
+		getState("END_CAPS") == "N"
+	);
+
+	if (section.enabled.length !== section.positions.length) {
+
+		section.enabled =
+			Array(section.positions.length).fill(false);
+
+		if (section.enabled.length) {
+			//section.enabled[0] = true;
+		}
+	}
+}
+
+function resetSlimCustomState() {
+
+	const state = getState("WINDOW_STATE");
+	const glass_shape = getState("GLASS_SHAPE");
+
+	const lastPosition =
+		getNode("WINDOW_POSITION")?._lastPosition || "left";
+
+	state.sections.forEach(section => {
+
+		section.selected = false;
+		section.slim_one = false;
+		section.slim_position_mode = false;
+		section.slim_spacing = "even";
+		section.shape = glass_shape;
+		section.enabled = [];
+
+	});
+
+	recalcWindowState();
+
+	// IMPORTANT:
+	// recalcWindowState() creates positions but selects nothing.
+	state.sections.forEach(section => {
+
+		if (!section.enabled?.length) {
+			return;
+		}
+
+		section.enabled.fill(false);
+
+		switch (lastPosition) {
+
+			case "left":
+				section.enabled[0] = true;
+				break;
+
+			case "right":
+				section.enabled[
+					section.enabled.length - 1
+				] = true;
+				break;
+
+			case "center": {
+				const center =
+					Math.floor(section.enabled.length / 2);
+
+				section.enabled[center] = true;
+				break;
+			}
+
+			case "both":
+				section.enabled[0] = true;
+				section.enabled[
+					section.enabled.length - 1
+				] = true;
+				break;
+
+			default:
+				section.enabled[0] = true;
+		}
+	});
+
+	forceRedraw();
 }

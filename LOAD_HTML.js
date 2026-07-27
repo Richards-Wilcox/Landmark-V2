@@ -29,7 +29,11 @@ let currentOperatorIndex = 1;
 let operatorDataArray = [];
 
 
+
 function loadForm() {
+
+    calculatePrice();
+
 
     toggleAccordion();
     const form = createForm();
@@ -88,6 +92,9 @@ function loadForm() {
 }
 
 function createForm() {
+
+    const totalPrice = $("#TOTAL_PRICE").val();
+
     const form = `
 	<script src="/HTML/products/162059085/jscripts/panelConfigurations.js"></script>
 
@@ -103,7 +110,7 @@ function createForm() {
                 </div>
 
                 <div class="window-position-container">
-                    <div class="rw-button" tabindex="0">
+                    <div class="rw-button" tabindex="0" id="POSITION_TOP">
                         <label for="WINDOW_POSITION_TOP">Top</label>
                         <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_TOP"
                             name="WINDOW_POSITION" desc="Top" value="top" code="top">
@@ -128,6 +135,11 @@ function createForm() {
                         <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_BOTH"
                             name="WINDOW_POSITION" desc="Both" code="both" value="both">
                     </div>
+                    <div class="rw-button" tabindex="0"  id="POSITION_CUSTOM" style="display:none;" >
+                        <label for="WINDOW_POSITION_CUSTOM">Custom</label>
+                        <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_CUSTOM"
+                            name="WINDOW_POSITION" desc="Custom" code="custom" value="custom">
+                    </div>
                 </div>
             </div>
 
@@ -150,7 +162,7 @@ function createForm() {
 		  font-size: 24px;
 		  font-weight: 700;
 		  font-style: italic;
-	   ">00.00
+	   ">${totalPrice}
                     </span>
                 </div>
             </div>
@@ -324,7 +336,7 @@ function createForm() {
                     </div>
 
                     <!-- Mix Panel Design code-->
-                    <div class="dropdown-item" class="mix-panel-layout" style="width:50%">
+                    <div class="dropdown-item" class="mix-panel-layout" style="width:50%" id="MixPanelLayout" style="display:none">
                         <h3>Design Code</h3>
                         <div>
                             <select id="DESIGN_CODE" name="DESIGN_CODE">
@@ -394,7 +406,7 @@ function createForm() {
 
                 <!-- glass shapes -->
 
-                <div class="dropdown-item">
+                <div class="dropdown-item" id="GLASS_SHAPE_LAYOUT">
                     <h3>Glass Shape</h3>
                     <div class="panel-layout">
                         <div class="rw-button panel-button" tabindex="0">
@@ -1367,8 +1379,8 @@ function toggleAccordion() {
     $('#accordion1406547076').hide()
     $("#accordion1094153584").hide()//Hides the global data for JDE
     $("#accordion9757245").hide() //section bundle
-   // $("#accordion321627220").hide() //Glazing code
-    $("#accordion1892755284").hide() //Scheduling code
+    //$("#accordion321627220").hide() //Glazing code
+    //$("#accordion1892755284").hide() //Scheduling code
 }
 
 // Update data list selection and update positioning
@@ -2767,6 +2779,7 @@ function loadGlazingUI() {
     $('input[name="GLASS_TYPE"]').prop('checked', false).data('checked', false);
 
     $('#more_glass_types').change(function () {
+        console.log("more_glass_types_container", $(this).is(':checked'));
         if ($(this).is(':checked')) {
             $("#more_glass_types_container").slideDown();
         } else {
@@ -2886,4 +2899,21 @@ function loadGlazingUI() {
             setState("WINDOW_STATE", state);
         }
     });
+}
+
+
+function calculatePrice() {
+    let DOOR_FACE_PRICE = $("#DOOR_FACE_PRICE").val();
+    let GLAZING_PRICE = $("#GLAZING_PRICE").val();
+    let OPERATORS_PRICE = $("#OPERATORS_PRICE").val();
+    let HARDWARE_PRICE = $("#HARDWARE_PRICE").val();
+
+
+    let totalPrice = DOOR_FACE_PRICE + GLAZING_PRICE + OPERATORS_PRICE + HARDWARE_PRICE;
+
+    $("#TOTAL_PRICE").val(totalPrice)
+    //setState("TOTAL_PRICE", totalPrice);
+
+
+
 }

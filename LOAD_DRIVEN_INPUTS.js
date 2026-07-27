@@ -140,75 +140,51 @@ function loadDrivenInputEvents() {
 
   }, ["FACE", "COLOR"])
 
-  addLogic("SPRING_TYPE", function () {
+  // addLogic("SPRING_TYPE", function () {
 
-    let hardware = getState("HARDWARE_SET");
-    const torsionBtn = $("#TORSION").closest(".rw-sliding-button");
-    const extensionBtn = $("#EXTENSION").closest(".rw-sliding-button");
-    var labelText = $('input[name="HARDWARE_SET"]:checked').next('label').text();
-
-    // If hardware = A → disable Extension
-    if (hardware === "A" || hardware === "C") {
-
-      // Disable click
-      $("#EXTENSION").prop("disabled", true);
-      extensionBtn.addClass("disabled");
-
-      extensionBtn.addClass("color-tooltip");
-      extensionBtn.attr("data-tooltip", `Extension not available for ${labelText} Hardware`);
-
-
-      // If Extension was selected, switch to Torsion
-      if (getState("SPRING_TYPE") === "EXT") {
-        $("#TORSION").prop("checked", true).trigger("change");
-      }
-
-    } else {
-      // Re-enable Extension for other hardware types
-      $("#EXTENSION").prop("disabled", false);
-      extensionBtn.removeClass("disabled");
-      extensionBtn.removeClass("color-tooltip");
-      extensionBtn.removeAttr("data-tooltip");
-    }
-
-    this.value = $(`input[type="radio"][name="SPRING_TYPE"][checked]`).val();
-
-  }, ["HARDWARE_SET"]);
-
-  // addLogic("SPRING_CYCLE", function () {
   //   let hardware = getState("HARDWARE_SET");
-  //   const springCycle10k = $("#10K").closest(".rw-sliding-button");
-  //   const springCycle20k = $("#20K").closest(".rw-sliding-button");
+  //   const torsionBtn = $("#TORSION").closest(".rw-sliding-button");
+  //   const extensionBtn = $("#EXTENSION").closest(".rw-sliding-button");
   //   var labelText = $('input[name="HARDWARE_SET"]:checked').next('label').text();
 
-  //   console.log("hardware", hardware);
-  //   if (hardware === "Y") {
-  //     //disable 10k
-  //     $("#10K").prop("disabled", true).removeAttr("checked");
-  //     springCycle10k.addClass("disabled").removeClass("btn-checked selected");
-  //     springCycle10k.addClass("color-tooltip");
-  //     springCycle10k.attr("data-tooltip", `Spring Cycle 10K not available for ${labelText} Hardware`);
+  //   // If hardware = A → disable Extension
+  //   if (hardware === "A" || hardware === "C") {
 
-  //     //select 20k
-  //     $("#20K").prop("checked", true).attr("checked", "checked");
-  //     springCycle20k.addClass("btn-checked selected");
+  //     // Disable click
+  //     $("#EXTENSION").prop("disabled", true);
+  //     extensionBtn.addClass("disabled");
+
+  //     extensionBtn.addClass("color-tooltip");
+  //     extensionBtn.attr("data-tooltip", `Extension not available for ${labelText} Hardware`);
+
+
+  //     // If Extension was selected, switch to Torsion
+  //     if (getState("SPRING_TYPE") === "EXT") {
+  //       $("#TORSION").prop("checked", true).trigger("change");
+  //     }
+
   //   } else {
-  //     // Enable both
-  //     springCycle10k.prop('disabled', false);
-  //     springCycle20k.prop('disabled', false);
-
-  //     // Default back to 10K
-  //     $("#10K").prop('checked', true).attr("checked", "checked");
-  //     $("#20K").prop('checked', false).removeAttr("checked");
-
-  //     springCycle10k.addClass('selected btn-checked');
-  //     springCycle20k.removeClass('selected btn-checked');
+  //     // Re-enable Extension for other hardware types
+  //     $("#EXTENSION").prop("disabled", false);
+  //     extensionBtn.removeClass("disabled");
+  //     extensionBtn.removeClass("color-tooltip");
+  //     extensionBtn.removeAttr("data-tooltip");
   //   }
 
-  //   this.value = $(`input[type="radio"][name="SPRING_CYCLE"][checked]`).val()
+  //   this.value = $(`input[type="radio"][name="SPRING_TYPE"][checked]`).val();
 
-  // }, ["HARDWARE_SET"])
+  // }, ["HARDWARE_SET"]);
 
+  addLogic("SPRING_CYCLE", function () {
+    const value = $('input[name="SPRING_CYCLE"]:checked').val();
+    this.value = value;
+  }, ["HARDWARE_SET"])
+
+
+  addLogic("SPRING_TYPE", function () {
+    const value = $('input[name="SPRING_TYPE"]:checked').val();
+    this.value = value;
+  }, ["HARDWARE_SET"])
 
   addLogic("LIFT_TYPE", function () {
     let selectedHardware = getState("HARDWARE_SET");
@@ -301,7 +277,6 @@ function loadDrivenInputEvents() {
   }, ["HARDWARE_SET", "SPRING_TYPE", "INCLINEDTRACK"])
 
   addLogic("PANEL_SPACING", function () {
-
     const panel_style = getState("FACE") || "";
     const glass_shape = getState("GLASS_SHAPE") || "";
 
@@ -379,6 +354,20 @@ function loadDrivenInputEvents() {
       const allowedFacesRanch = ["R", "C", "B", "S", "T", "F", "V"];
       const allowedFacesSlim = ["F", "V"];
 
+      //Hide the glass shape when mix panel is selected
+      if (face === 'M') {
+        $("#GLASS_SHAPE_LAYOUT").hide();
+
+
+        $("#more_glass_types")
+          .prop("checked", false)
+          .trigger("change");
+
+        $("#more_glass_types_container").hide();
+
+        return;
+      } else $("#GLASS_SHAPE_LAYOUT").show();
+
       $("input[name='GLASS_SHAPE']").each(function () {
 
         const value = $(this).val();
@@ -447,6 +436,7 @@ function loadDrivenInputEvents() {
       const door_model = getState("DOOR_MODEL");
       const glass_shape = getState("GLASS_SHAPE");
       const currentGlassType = getState("GLASS_TYPE");
+      let face = getState("FACE");
 
       const allowedAllGlass = [
         "CLEAR", "CLEAR_SINGLE", "SATIN",
@@ -454,6 +444,7 @@ function loadDrivenInputEvents() {
         "DARK_TINT_SEALED", "DARK_TINT_SINGLE",
         "BLACK_SATIN_SEALED"
       ];
+
       const allowedSlimGlassL138 = ["CLEAR", "SATIN"];
       const allowedSlimGlassL200 = ["CLEAR", "SATIN", "BLACK_SATIN_SEALED"];
       const slimShapes = ["slim_single", "slim_double"];
@@ -463,6 +454,19 @@ function loadDrivenInputEvents() {
         clearRadio("GLASS_TYPE");
         return;
       }
+
+
+      if (face === "M") {
+
+        $("#more_glass_types")
+          .prop("checked", false)
+          .trigger("change");
+
+        $("#more_glass_types_container").hide();
+
+        return;
+      }
+
 
       // STEP 2: Determine which glass types are allowed
       let allowedList = allowedAllGlass;
@@ -486,7 +490,6 @@ function loadDrivenInputEvents() {
         setState("GLASS_TYPE", defaultValue);
         syncRadioUI("GLASS_TYPE", defaultValue);
       }
-
     },
     "",
     $("#GLASS_TYPE_VISIBILITY")[0],
@@ -609,6 +612,7 @@ function loadDrivenInputEvents() {
     ["GLASS_SHAPE", "WIDTH", "PANEL_SPACING", "FACE"]
   );
 
+  //LIFT TYPE VISIBILITY
   createNode(
     "LIFT_TYPE_VISIBILITY",
     function () {
@@ -617,22 +621,11 @@ function loadDrivenInputEvents() {
       if (!hardware) {
         $("#liftTypeSection").hide();
         setState("LIFT_TYPE", "");
-        clearSwitch("SPRING_TYPE");
-        clearSwitch("SPRING_CYCLE");
+        // clearSwitch("SPRING_TYPE");
+        // clearSwitch("SPRING_CYCLE");
 
       } else {
         $("#liftTypeSection").show();
-        // $("#TORSION").prop("checked", true)
-        //   .closest(".rw-sliding-button")
-        //   .addClass("selected btn-checked");
-
-        // $("#10K").prop("checked", true)
-        //   .closest(".rw-sliding-button")
-        //   .addClass("selected btn-checked");
-
-        // setState("SPRING_TYPE", $(`input[name='SPRING_TYPE']`).val());
-        // setState("SPRING_CYCLE", $(`input[name='SPRING_CYCLE']`).val());
-
       }
 
     }, "",
@@ -640,13 +633,32 @@ function loadDrivenInputEvents() {
     ["HARDWARE_SET"]
   );
 
-  // -- Design Code
+  // Design Code visibility
+  createNode(
+    "DESIGN_CODE_VISIBILITY",
+    function () {
+
+      const panel_style = getState("FACE");
+      if (panel_style === 'M') {
+        $("#MixPanelLayout").show();
+      } else {
+        $("#MixPanelLayout").hide();
+      }
+
+    },
+    "",
+    $("#DESIGN_CODE_VISIBILITY")[0],
+    ["FACE"]
+  );
+
   createNode(
     "DESIGN_CODE",
     function () {
 
       const panel_style = getState("FACE");
       const width = parseFloat(getState("WIDTH")) || 0;
+      const currentValue = getState("DESIGN_CODE");
+
       const $designCode = $("#DESIGN_CODE");
 
       const designOptionsMap = [
@@ -732,6 +744,7 @@ function loadDrivenInputEvents() {
 
       // Only populate for FACE = M
       if (panel_style !== "M") {
+        this.value = "";
         return "";
       }
 
@@ -741,37 +754,213 @@ function loadDrivenInputEvents() {
       );
 
       if (!match) {
+        this.value = "";
         return "";
       }
 
-      // Add options
-      match.options.forEach(function (item, index) {
-
+      // Populate options
+      match.options.forEach(function (item) {
         $designCode.append(
           $("<option>", {
             value: item.value,
-            text: item.text,
-            selected: index === 0
+            text: item.text
           })
         );
-
       });
 
-      // Default selection = first option in range
-      const defaultValue = match.options[0].value;
-      console.log("default value", defaultValue);
+      // Keep current selection if still valid
+      const isCurrentValueValid = match.options.some(
+        option => option.value === currentValue
+      );
 
-      $designCode.val(defaultValue);
+      const selectedValue = isCurrentValueValid
+        ? currentValue
+        : match.options[0].value;
 
-      // Trigger downstream logic/BOM updates
-     // $designCode.trigger("change");
+      $designCode.val(selectedValue);
 
-      return defaultValue;
+      this.value = selectedValue;
+
+      // Handle user change
+      $designCode
+        .off("change.designCode")
+        .on("change.designCode", function () {
+
+          const selected = $(this).val();
+
+          // Update dropdown value
+          $(this).val(selected);
+
+          // Update state if supported
+          if (typeof setState === "function") {
+            setState("DESIGN_CODE", selected);
+          }
+        });
+
+      return selectedValue;
     },
     "",
     $("#DESIGN_CODE")[0],
     ["FACE", "WIDTH"]
   );
+
+  //Spring cycle visibility
+  createNode(
+    "SPRING_CYCLE_VISIBILITY",
+    function () {
+
+      let hardware = getState("HARDWARE_SET");
+
+      const springCycle10k = $("#10K").closest(".rw-sliding-button");
+      const springCycle20k = $("#20K").closest(".rw-sliding-button");
+
+      const labelText =
+        $('input[name="HARDWARE_SET"]:checked')
+          .next("label")
+          .text();
+
+      if (!hardware) {
+        this.value = "";
+        clearSwitch("SPRING_CYCLE");
+        return;
+      }
+
+      if (hardware === "Y") {
+
+        // Disable 10K
+        $("#10K")
+          .prop("disabled", true)
+          .prop("checked", false)
+          .removeAttr("checked");
+
+        springCycle10k
+          .addClass("disabled color-tooltip")
+          .removeClass("btn-checked selected");
+
+        springCycle10k.attr(
+          "data-tooltip",
+          `Spring Cycle 10K not available for ${labelText} Hardware`
+        );
+
+        // Select 20K
+        $("#20K")
+          .prop("checked", true)
+          .attr("checked", "checked");
+
+        springCycle20k.addClass("btn-checked selected");
+
+        this.value = "20K";
+        setState("SPRING_CYCLE", "20K")
+
+      } else {
+
+        // Enable 10K
+        $("#10K")
+          .prop("disabled", false);
+
+        springCycle10k
+          .removeClass("disabled color-tooltip")
+          .removeAttr("data-tooltip");
+
+        // Enable 20K
+        $("#20K")
+          .prop("disabled", false);
+
+        // Default back to 10K
+        $("#10K")
+          .prop("checked", true)
+          .attr("checked", "checked");
+
+        $("#20K")
+          .prop("checked", false)
+          .removeAttr("checked");
+
+        springCycle10k.addClass("selected btn-checked");
+        springCycle20k.removeClass("selected btn-checked");
+
+        this.value = "10K";
+        setState("SPRING_CYCLE", "10K")
+      }
+
+      return this.value;
+
+    },
+    "",
+    $("#SPRING_CYCLE_VISIBILITY")[0],
+    ["HARDWARE_SET"]
+  );
+
+  //SPRING TYPE VISIBILITY
+  createNode(
+    "SPRING_TYPE_VISIBILITY",
+    function () {
+
+      const hardware = getState("HARDWARE_SET");
+
+      const torsionBtn = $("#TORSION").closest(".rw-sliding-button");
+      const extensionBtn = $("#EXTENSION").closest(".rw-sliding-button");
+
+      const labelText = $('input[name="HARDWARE_SET"]:checked')
+        .next("label")
+        .text();
+
+      if (!hardware) {
+        this.value = "";
+        clearSwitch("SPRING_TYPE");
+        return;
+      }
+
+      if (hardware === "A" || hardware === "C") {
+
+        // Disable Extension
+        $("#EXTENSION")
+          .prop("disabled", true)
+          .prop("checked", false)
+          .removeAttr("checked");
+
+        extensionBtn
+          .removeClass("btn-checked selected")
+          .addClass("disabled color-tooltip")
+          .attr(
+            "data-tooltip",
+            `Extension not available for ${labelText} Hardware`
+          );
+
+        // Default to Torsion
+
+        $("#TORSION")
+          .prop("checked", true)
+          .attr("checked", "checked");
+
+        setState("SPRING_TYPE", "TOR");
+
+        torsionBtn
+          .addClass("btn-checked selected")
+          .removeClass("disabled");
+
+
+
+
+      } else {
+
+        // Re-enable Extension
+        $("#EXTENSION")
+          .prop("disabled", false);
+
+        extensionBtn
+          .removeClass("disabled color-tooltip")
+          .removeAttr("data-tooltip");
+
+      }
+
+      return "";
+
+    },
+    "",
+    $("#SPRING_TYPE_VISIBILITY")[0],
+    ["HARDWARE_SET"]
+  );
+
 
 }
 

@@ -872,14 +872,75 @@ async function drawWindows(ctx, section, info, hints) {
 	const pW = section.panel_width * info.scale;
 	const pH = section.panel_height * info.scale;
 
+	// NEW LOGIC UPDATED FOR SLIM
+	const windowPosition = getState("WINDOW_POSITION");
+	const customMode = windowPosition === "custom";
+	const isSlimGlass = info.glass_shape?.includes("slim");
+
+
+
 	ctx.save();
 
 	const y_offset = (section.height * info.scale - pH) / 2;
 	const py = section.ypos * info.scale + info.ypos + y_offset;
+
+
 	for (const [i, pos] of section.positions.entries()) {
 		const px = pos * info.scale + info.xpos;
 
-		if (section.enabled[i]) {
+		//NEW LOGIC IMPLEMENTED FOR SLIM
+
+		let isWindowVisible = false;
+
+		if (!isSlimGlass) {
+
+			isWindowVisible = section.enabled[i];
+
+		}
+		else if (customMode) {
+
+			isWindowVisible = section.enabled[i];
+
+		}
+		else {
+
+			const count = section.positions.length;
+
+			switch (windowPosition) {
+
+				case "left":
+					isWindowVisible = (i === 0);
+					break;
+
+				case "center":
+					isWindowVisible = (i === Math.floor(count / 2));
+					break;
+
+				case "right":
+					isWindowVisible = (i === count - 1);
+					break;
+
+				case "both":
+					isWindowVisible = (i === 0 || i === count - 1);
+					break;
+
+				default:
+					isWindowVisible = section.enabled[i];
+					break;
+			}
+		}
+
+
+		// console.log({
+		// 	position: windowPosition,
+		// 	customMode,
+		// 	enabled: section.enabled,
+		// 	index: i
+		// });
+
+		//	ENDS HERE
+		// if (section.enabled[i]) {
+		if (isWindowVisible) {
 			const gradx = px + pW / 2 - pH / 2;
 			const grady = py + pH / 2 - pW / 2;
 			const gradient = ctx.createLinearGradient(gradx, grady, gradx + pH, grady + pW);
@@ -904,6 +965,14 @@ async function drawWindows(ctx, section, info, hints) {
 				drawWindowFrame(ctx, px, py, pW, pH, info);
 			}
 		}
+
+		if (isSlimGlass && !customMode && !isWindowVisible) {
+			continue;
+		}
+
+
+
+
 		if (hints) {
 			if (section.slim_one) {
 
@@ -988,7 +1057,8 @@ const CANVAS_PLUGIN = {
 			'flush': function (ctx, positions, info) { },
 			'colonial_grooved': drawColonialGroovedSection,
 			'ranch_grooved': drawRanchGroovedSection,
-			'smooth_ranch': drawSmoothRanchSection
+			'smooth_ranch': drawSmoothRanchSection,
+		  	'mixed': drawSectionPanel
 		};
 
 		const canvas = $("#CONFIG_CANVAS")[0];

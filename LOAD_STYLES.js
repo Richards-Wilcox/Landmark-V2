@@ -307,35 +307,52 @@ function loadStyles() {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: ${COLORS.gray500};
+  // background-color: ${COLORS.gray500};
+  background-color: #fff;
+  border: 1px solid #000;
+  color:#000;
   -webkit-transition: .4s;
   transition: .4s;
 }
 
 .slider:before {
   position: absolute;
-  content: "";
-  height: 22px;
-  width: 22px;
+  content: "X";
+
+  height: 20px;
+  width: 20px;
+
   left: 4px;
   bottom: 4px;
-  background-color: white;
+
+  background-color: #000;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+
   -webkit-transition: .4s;
   transition: .4s;
 }
 
-input:checked + .slider {
-  background-color: #000;
+input:checked + .slider:before {
+  content: "✓";
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);  
+}
+
+input:checked + .slider{
+    background:${COLORS.gray300};
 }
 
 input:focus + .slider {
   box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
 }
 
 /* Rounded sliders */
@@ -668,6 +685,7 @@ input:checked + .slider:before {
 	flex-direction: column;
 	margin-top: auto;
 	padding: 0 0 10px 0;
+  margin-bottom: 10px;
 }
 
 .finish-container, .doorOpt-container, .springType-container{
@@ -907,8 +925,8 @@ div.radio-layout{
 }
 
 .slim-option.active {
-    background: #000;
-    color: white;
+    background: ${COLORS.gray300};
+    color: #000;
     border-color: #000;
 }
 
@@ -1193,8 +1211,11 @@ div.radio-layout{
 }
 
 
-#configurator .dimension-layout .rw-button.btn-checked::after, #configurator .panel-layout .rw-button.btn-checked::after,
-.window-position-container .rw-button.btn-checked::after {
+#configurator .dimension-layout .rw-button.btn-checked::after, 
+#configurator .panel-layout .rw-button.btn-checked::after,
+.window-position-container .rw-button.btn-checked::after,
+.slim-option.active::after
+  {
     content: "✓";
     position: absolute;
     right: 12px;
@@ -1675,7 +1696,7 @@ option--disabled {
     border: none !important;
     border-radius: 50% !important;
 
-    background: #d9d9d9 !important;
+    background:${COLORS.gray300} !important;
 
     cursor: pointer;
     flex: 0 0 10px !important;
@@ -1700,7 +1721,7 @@ option--disabled {
     height: 10px !important;
 
     border-radius: 50% !important;
-    background: #d9d9d9 !important;
+    background: ${COLORS.gray300}  !important;
 
     cursor: pointer;
     display: block;
@@ -1714,7 +1735,7 @@ option--disabled {
     width: 80px;
     height: 80px;
     position: relative;
-    border: 1px solid #d9d9d9;
+    border: 1px solid ${COLORS.gray300} ;
     background: ${COLORS.gray100};
     overflow: hidden;
     border-radius: 8px;

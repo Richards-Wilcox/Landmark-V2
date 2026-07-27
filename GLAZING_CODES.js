@@ -711,23 +711,23 @@ function addGlazingCodeLogic() {
         setPunchCode.call(this, 3);
     }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
 
-     addLogic("PUNCH_CODE_SECTION_04", function () {
+    addLogic("PUNCH_CODE_SECTION_04", function () {
         setPunchCode.call(this, 4);
     }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
 
-     addLogic("PUNCH_CODE_SECTION_05", function () {
+    addLogic("PUNCH_CODE_SECTION_05", function () {
         setPunchCode.call(this, 5);
     }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
 
-     addLogic("PUNCH_CODE_SECTION_06", function () {
+    addLogic("PUNCH_CODE_SECTION_06", function () {
         setPunchCode.call(this, 6);
     }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
 
-     addLogic("PUNCH_CODE_SECTION_07", function () {
+    addLogic("PUNCH_CODE_SECTION_07", function () {
         setPunchCode.call(this, 7);
     }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
 
-     addLogic("PUNCH_CODE_SECTION_08", function () {
+    addLogic("PUNCH_CODE_SECTION_08", function () {
         setPunchCode.call(this, 8);
     }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
 
@@ -747,7 +747,8 @@ function setPunchCode(sectionNumber) {
         .reverse()
         .map(v => v ? 0 : 1);
 
-    this.value = punchCode.join(",");
+    this.value = punchCode.join("");
+
 }
 
 function setGlassQtyToSCInputs() {
@@ -1146,8 +1147,19 @@ function createSmartcomLogic(sectionField) {
         var drill_code = getState("DRILL");
         var width_ft = getState("DOOR_WIDTH_FEET");
         var width_inch = getState("DOOR_WIDTH_INCHES");
+        let custom_window = getDoorInfo().custom_windows;
+        let prefix = '';
+        let window_position = getState("WINDOW_POSITION");
+        let glass_shape = getState("GLASS_SHAPE");
 
-        var code = panel_style + panel_spacing + hinge_code + "S" + drill_code + "-" + width_ft + width_inch;
+
+        if (panel_style === "F" || panel_style === "V") {
+            if (custom_window === true || window_position === 'top') {
+                prefix = liteCodeMap[glass_shape] ?? "";
+            }
+        } else prefix = panel_style;
+
+        var code = prefix + panel_spacing + hinge_code + "S" + drill_code + "-" + width_ft + width_inch;
 
         // ✅ Apply rule
         if (sectionValue !== "" && sectionValue !== null && sectionValue !== undefined) {
@@ -1169,12 +1181,14 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
         };
 
         const door_thickness = getState("DOOR_THICKNESS");
-        const lite_location = getState("LITE_LOCATION");
+        // const lite_location = getState("LITE_LOCATION");
         const rp_width = getState("WIDTH");
         const glass_shape = getState("GLASS_SHAPE");
+        const window_pos = getState("WINDOW_POSITION");
         const total_punches = Number(getState("WINDOW_1_QTY")) || 0;
-
+        const liteCode = liteCodeMap[glass_shape] || "";
         const sections = getSectionInfo();
+
 
         // ✅ Get enabled array for correct section
         const enabledArr =
@@ -1182,6 +1196,13 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
                 ? sections[sectionIndex - 1].enabled
                 : [];
 
+        console.log("enabledArr", enabledArr);
+
+        // 1 => R/C, 0 => 0
+        const punchCode = enabledArr
+            .slice()
+            .map(v => v ? liteCode : "0")
+            .join("");
 
         // ✅ Get RLL values (1X → nX)
         const sectionRLL =
@@ -1195,8 +1216,6 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
         });
 
         const num_of_windows = enabledArr.filter(v => v === true).length;
-
-
 
         const location_y = LOC_Y_MAP[section_height] ?? 0;
 
@@ -1233,7 +1252,7 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
             }
         );
 
-        let cnc = `${sc_part_no},${door_thickness},${lite_location},${rp_width},${section_height},LR`;
+        let cnc = `${sc_part_no},${door_thickness},${punchCode},${rp_width},${section_height},LR`;
 
         cnc += "," + Array(14).fill(0).join(",");
         cnc += `,${num_of_windows}`;
@@ -1245,7 +1264,6 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
             } else {
                 cnc += `,0,0,0,0,0`;
             }
-
         }
 
         return cnc;
