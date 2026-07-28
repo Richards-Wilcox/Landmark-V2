@@ -1897,7 +1897,7 @@ function clickHandler() {
             $(this).find("input[name='COLOR']").prop("checked", true).trigger("change");
 
             const color = $(this).find("input[name='COLOR']").val();
-            setState && setState("COLOR", color);
+            //setState && setState("COLOR", color);
 
             frameColorUserOverride = false;
             insertColorUserOverride = false;
@@ -2181,28 +2181,56 @@ function appendColorsTo(containerSelector, colorArray, panel_style = null) {
 
     registerColorEvents();
     // 🔥 IMPORTANT FIX: re-select AFTER filtering
-    requestAnimationFrame(() => {
-        selectFirstColor($container);
-    });
+    // requestAnimationFrame(() => {
+    //     selectFirstColor($container);
+    // });
 }
 
 function appendOptionalColors(panel_style) {
     appendColorsTo("#OptionalColorsSection", OptionalColorImages, panel_style);
 }
 
+// function registerColorEvents() {
+//     $(document).on("click", ".color-button-container", function () {
+//         const $container = $(this).closest(".colorContainer");
+
+//         // ── Scope to THIS container only, not all color buttons globally ──
+//         $container.find(".color-button-container").removeClass("selected");
+//         $(this).addClass("selected");
+
+//         const inputName = $(this).find("input[type='radio']").attr("name");
+
+//         $container.find(`input[type='radio'][name='${inputName}']`).prop("checked", false);
+//         $(this).find(`input[type='radio']`).prop("checked", true).trigger("change");
+//     });
+// }
+
 function registerColorEvents() {
-    $(document).on("click", ".color-button-container", function () {
-        const $container = $(this).closest(".colorContainer");
+    $(document)
+        .off("click.genericColorButtons")
+        .on("click.genericColorButtons", ".color-button-container", function () {
 
-        // ── Scope to THIS container only, not all color buttons globally ──
-        $container.find(".color-button-container").removeClass("selected");
-        $(this).addClass("selected");
+            // Door color is handled by click.colorSelect only.
+            if ($(this).closest("div[data-id='COLOR']").length) {
+                return;
+            }
 
-        const inputName = $(this).find("input[type='radio']").attr("name");
+            const $container = $(this).closest(".colorContainer");
 
-        $container.find(`input[type='radio'][name='${inputName}']`).prop("checked", false);
-        $(this).find(`input[type='radio']`).prop("checked", true).trigger("change");
-    });
+            $container.find(".color-button-container").removeClass("selected");
+            $(this).addClass("selected");
+
+            const inputName = $(this).find("input[type='radio']").attr("name");
+
+            $container
+                .find(`input[type='radio'][name='${inputName}']`)
+                .prop("checked", false);
+
+            $(this)
+                .find("input[type='radio']")
+                .prop("checked", true)
+                .trigger("change");
+        });
 }
 
 
@@ -2254,10 +2282,10 @@ function toggleStackColors() {
         hideContainer($("#AvaialbleColorsSection .colorContainer"));
 
 
-        const $optional = $("#OptionalColorsSection .colorContainer");
-        selectFirstColor($optional);
+        // const $optional = $("#OptionalColorsSection .colorContainer");
+        // selectFirstColor($optional);
 
-        rw(getNode("COLOR"))
+        // rw(getNode("COLOR"))
     });
 
     $("#optionalStackFrameColors").on("click", function () {
@@ -2295,11 +2323,11 @@ function toggleStackColors() {
         //selectFirstColor($("#AvaialbleColorsSection .colorContainer"));
         //unselectFirstColor($("#OptionalColorsSection .colorContainer"));
 
-        const $available = $("#AvaialbleColorsSection .colorContainer");
-        selectFirstColor($available);
+        // const $available = $("#AvaialbleColorsSection .colorContainer");
+        // selectFirstColor($available);
 
-        // registerColorEvents();
-        rw(getNode("COLOR"))
+        // // registerColorEvents();
+        // rw(getNode("COLOR"))
 
     });
 

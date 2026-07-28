@@ -568,10 +568,13 @@ function addGlazingCodeLogic() {
         const bundle = getBundles()[0];
         const sections = getDoorInfo().sections.slice().reverse();
 
+        console.log("sections", sections);
+
         this.value =
             bundle?.indexes?.[0]
                 ? Number(sections[bundle.indexes[0] - 1]?.glass_qty) || 0
                 : 0;
+       
     }, GLASS_QTY_DEPS);
 
     addLogic("GLASS_QTY_B1_SC2", function () {
@@ -1195,9 +1198,7 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
             Array.isArray(sections[sectionIndex - 1]?.enabled)
                 ? sections[sectionIndex - 1].enabled
                 : [];
-
-        console.log("enabledArr", enabledArr);
-
+        
         // 1 => R/C, 0 => 0
         const punchCode = enabledArr
             .slice()

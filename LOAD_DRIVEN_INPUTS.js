@@ -416,11 +416,11 @@ function loadDrivenInputEvents() {
       });
 
       // If the currently-selected shape is now hidden, deselect it and clear glass type too
-      const $checked = $("input[name='GLASS_SHAPE']:checked");
-      if ($checked.length && !$checked.closest(".rw-button").is(":visible")) {
-        clearRadio("GLASS_SHAPE");
-        clearRadio("GLASS_TYPE");
-      }
+      // const $checked = $("input[name='GLASS_SHAPE']:checked");
+      // if ($checked.length && !$checked.closest(".rw-button").is(":visible")) {
+      //   clearRadio("GLASS_SHAPE");
+      //   clearRadio("GLASS_TYPE");
+      // }
 
     },
     "",
@@ -1087,6 +1087,7 @@ function resolveLiteResult(options) {
     } else if (glass_shape === "ranch") {
       window_type = "ranch_std";
     }
+    
   }
 
   if (!window_type) return null;
@@ -1099,7 +1100,8 @@ function resolveLiteResult(options) {
 
   const result = getLites(width, window_type) || null;
   LITE_RESULT_CACHE[cacheKey] = result;
-
+  
+  console.log("result", result);
   return result;
 }
 

@@ -610,9 +610,7 @@ function selectCenterOneLite(section) {
 	section.enabled.fill(false);
 
 	const centerIndex = Math.floor(section.enabled.length / 2);
-
-	console.log("centerIndex", centerIndex);
-
+	
 	section.enabled[centerIndex] = true;
 }
 
@@ -1213,8 +1211,7 @@ function getPanelConfigurationKey(panel_type) {
 	if (windemere.includes(panel_type)) {
 		return 'windemere';
 	}
-
-	console.log("panel_type", panel_type);
+	
 	return panel_type;
 }
 
@@ -1471,6 +1468,74 @@ function getPanelPositions(panel_type, door_width, special = false) {
 	return positions_x;
 }
 
+// The legacy configurator stores mixed designs as a C/R pattern.  Read that
+// pattern from the option text (for example, "CRRCRC (MP-7)") so the display
+// works even when the option value itself is only "MP-7".
+function getMixedPanelPattern() {
+	const select = document.getElementById("DESIGN_CODE");
+	if (!select || !select.selectedOptions.length) return [];
+
+	const option = select.selectedOptions[0];
+	const source = option.dataset.pattern || option.text || option.value || "";
+	const pattern = source.match(/[CR]+/i)?.[0]?.toUpperCase();
+	if (pattern) return pattern.split("");
+
+	// Keep the code value usable if its label does not contain the pattern.
+	const codePatterns = { "MP-7": "CRRCRC" };
+	return (codePatterns[option.value] || "").split("");
+}
+
+function getMixedPanelLayout(door_width) {
+	const pattern = getMixedPanelPattern();
+	if (!pattern.length) return [];
+
+	// Mixed doors do not use the normal Colonial/Ranch panel widths.  The
+	// mixed configuration contains the narrower C/R dimensions that make the
+	// complete code fit within each door-width rule.
+	const mixed = panelConfigurations.mixed;
+	const rule = getRule("mixed", door_width);
+	if (!mixed || !rule) return [];
+
+	const spacing = rule.muttSpacing ?? 0;
+	const panels = pattern.map(style => {
+		const colonial = style === "C";
+		return {
+			style: style,
+			width: colonial ? mixed.panelWidthCol : mixed.panelWidthRnc,
+			height: colonial ? mixed.panelHeightCol : mixed.panelHeightRnc,
+		};
+	});
+	if (panels.some(panel => !Number.isFinite(panel.width) || !Number.isFinite(panel.height))) {
+		return [];
+	}
+
+	// Match the end-stile margin used by a normal Colonial section, then fit
+	// the entire mixed sequence into the remaining door width.  The source
+	// mixed dimensions establish the C:R ratio; this step makes that ratio work
+	// for every configured door width instead of allowing it to overrun a 16'.
+	const colonialPositions = getPanelPositions("colonial", door_width);
+	const endStile = Math.max(0, colonialPositions[0] ?? 0);
+	const usableWidth = Math.max(0, door_width - 2 * endStile);
+	const rawWidth = panels.reduce((sum, panel) => sum + panel.width, 0)
+		+ spacing * (panels.length - 1);
+	const fitScale = rawWidth > 0 ? usableWidth / rawWidth : 1;
+	const fittedSpacing = spacing * fitScale;
+
+	panels.forEach(panel => {
+		panel.width *= fitScale;
+	});
+
+	const totalWidth = panels.reduce((sum, panel) => sum + panel.width, 0)
+		+ fittedSpacing * (panels.length - 1);
+	let x = endStile + (usableWidth - totalWidth) / 2;
+
+	return panels.map(panel => {
+		const positionedPanel = { ...panel, x: x };
+		x += panel.width + fittedSpacing;
+		return positionedPanel;
+	});
+}
+
 function getDoorInfo() {
 	const url_woodtexture = `/HTML/products/162059085/images/woodtexture_dark.png`;
 	const url_woodgrain = `/HTML/products/162059085/images/woodgrain_dark.png`;
@@ -1506,6 +1571,7 @@ function getDoorInfo() {
 	const [mouse_x, mouse_y] = getCanvasMousePosFromEvent();
 	const window_info = getState("WINDOW_STATE");
 	const section_heights = getSectionHeights(height, num_sections);
+	const mixed_panels = face === "mixed" ? getMixedPanelLayout(width) : [];
 
 	let sum = 0;
 	const sections = [];
@@ -1513,10 +1579,10 @@ function getDoorInfo() {
 		const info = { ...section_info };
 		info.height = section_heights[i];
 		info.ypos = sum;
+		info.mixed_panels = mixed_panels;
 
 		//calculation to count the glass qty for each section 
-		const glassQty = section_info.enabled.filter(v => v === true).length;
-		info[`glass_${i + 1}_qty`] = glassQty;
+		info.glass_qty = section_info.enabled.filter(v => v === true).length;
 
 		sections.push(info);
 		sum += section_heights[i];

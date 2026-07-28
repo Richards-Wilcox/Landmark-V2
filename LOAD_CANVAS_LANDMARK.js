@@ -140,6 +140,20 @@ function drawSectionPanel(ctx, section, info) {
 	}
 }
 
+function drawMixedSection(ctx, section, info) {
+	const scale = info.scale;
+	let colors = info.colors;
+
+	for (const panel of section.mixed_panels || []) {
+		const panel_width = panel.width * scale;
+		const panel_height = panel.height * scale;
+		const x = panel.x * scale + info.xpos;
+		const y_offset = (section.height * scale - panel_height) / 2;
+		const y = section.ypos * scale + info.ypos + y_offset;
+		DoorUtils.drawBeveledPanel(ctx, x, y, panel_width, panel_height, 2 * scale, colors);
+	}
+}
+
 function drawPlankSection(ctx, section, info) {
 	const line_map = {
 		'24': 5,
@@ -1058,7 +1072,7 @@ const CANVAS_PLUGIN = {
 			'colonial_grooved': drawColonialGroovedSection,
 			'ranch_grooved': drawRanchGroovedSection,
 			'smooth_ranch': drawSmoothRanchSection,
-		  	'mixed': drawSectionPanel
+		  	'mixed': drawMixedSection
 		};
 
 		const canvas = $("#CONFIG_CANVAS")[0];
