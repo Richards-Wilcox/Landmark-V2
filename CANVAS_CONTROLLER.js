@@ -30,7 +30,7 @@ function addRenderNode() {
 				'B': 'colonial_grooved',
 				'S': 'ranch_grooved',
 				'T': 'smooth_ranch',
-			  	'M': 'mixed'
+				'M': 'mixed'
 			};
 
 			const face = face_map[getState('FACE')];
@@ -43,7 +43,6 @@ function addRenderNode() {
 		id: "CUSTOM_WINDOWS",
 		value: false
 	}, []);
-
 
 	addLogic("GLASS_SHAPE", function () {
 
@@ -314,6 +313,7 @@ function addRenderNode() {
 			$("#POSITION_TOP").show();
 
 			this.value = "";
+			addSlimUi();
 			return;
 		}
 
@@ -321,7 +321,7 @@ function addRenderNode() {
 		if (glass_shape.includes("slim")) {
 
 			$("#POSITION_TOP").hide();
-			$("#POSITION_CUSTOM").show();
+			// $("#POSITION_CUSTOM").show();
 
 			const wasTopSelected = $top.is(":checked");
 
@@ -338,7 +338,7 @@ function addRenderNode() {
 		} else {
 
 			$("#POSITION_TOP").show();
-			$("#POSITION_CUSTOM").hide();
+			// $("#POSITION_CUSTOM").hide();
 		}
 
 		let position = $("input[name='WINDOW_POSITION']:checked").val() ?? "";
@@ -389,6 +389,7 @@ function addRenderNode() {
 				position = "custom";
 			} else {
 				this.value = "";
+				addSlimUi();
 				return;
 			}
 		}
@@ -422,6 +423,7 @@ function addRenderNode() {
 		}
 
 		this.value = position;
+		addSlimUi();
 
 		if (position && position !== "custom") {
 			this._lastPosition = position;
@@ -469,6 +471,22 @@ function addRenderNode() {
 		const isSpecial = getState("SPECIAL_FACE");
 		const glass_shape = getState("GLASS_SHAPE") || "";
 		const node = getNode("WINDOW_POSITION");
+		const windows = getState("WINDOW_STATE");
+		const door_width = getState("WIDTH");
+		const door_height = getState("HEIGHT");
+		const num_sections = getState("NUM_OF_SEC");
+
+		const scale = getScale(door_width, door_height);
+		const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
+
+		const section_heights = getSectionHeights(door_height, num_sections);
+
+		let changed = false;
+		const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
+
+		if (!windows?.hints) {
+			return;
+		}
 
 		if (glass_shape.includes("slim") && node?.value !== "custom") {
 			return;
@@ -479,19 +497,6 @@ function addRenderNode() {
 			return;
 		}
 
-
-		const door_width = getState("WIDTH");
-		const door_height = getState("HEIGHT");
-		const num_sections = getState("NUM_OF_SEC");
-
-		const scale = getScale(door_width, door_height);
-		const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
-		const windows = getState("WINDOW_STATE");
-
-		const section_heights = getSectionHeights(door_height, num_sections);
-
-		let changed = false;
-		const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
 
 		for (const [sIndex, section] of windows.sections.entries()) {
 			const panel_width = section.panel_width * scale;
@@ -567,6 +572,7 @@ function addRenderNode() {
 
 		if (position === "custom") {
 			resetSlimCustomState();
+			setState("CUSTOM_WINDOWS", true);
 		}
 
 
@@ -610,7 +616,7 @@ function selectCenterOneLite(section) {
 	section.enabled.fill(false);
 
 	const centerIndex = Math.floor(section.enabled.length / 2);
-	
+
 	section.enabled[centerIndex] = true;
 }
 
@@ -651,7 +657,8 @@ function addSlimUi() {
 	// ✅ Pencil only visible in CUSTOM mode
 	if (windowPosition !== "custom") {
 
-		$("#slim_spacing_container").remove();
+		$('[data-id="section_slim_temp"]').remove();
+		$('#slim_spacing_container').remove();
 
 		windows.sections.forEach(section => {
 			section.selected = false;
@@ -659,7 +666,6 @@ function addSlimUi() {
 
 		return;
 	}
-
 
 	const door_width = getState("WIDTH");
 	const door_height = getState("HEIGHT");
@@ -720,7 +726,6 @@ function addSlimUi() {
 			.on('click', function (event) {
 
 				event.stopPropagation();
-
 
 				const freshState = getState("WINDOW_STATE");
 
@@ -1180,26 +1185,46 @@ function setWindowPositions(position) {
 
 		return;
 	}
+	// if (position === "both") {
+
+
+	// 	state.sections.forEach(prepareSlimPositionMode);
+
+
+	// 	recalcWindowState();
+
+	// 	state.sections.forEach(section => {
+
+	// 		if (section.shape?.includes("slim")) {
+
+	// 			selectCenterOneLite(section);
+
+	// 		} else {
+
+	// 			section.enabled[0] = true;
+	// 			section.enabled[section.enabled.length - 1] = true;
+
+	// 		}
+	// 	});
+
+	// 	return;
+	// }
 	if (position === "both") {
 
-
 		state.sections.forEach(prepareSlimPositionMode);
-
 
 		recalcWindowState();
 
 		state.sections.forEach(section => {
 
-			if (section.shape?.includes("slim")) {
-
-				selectCenterOneLite(section);
-
-			} else {
-
-				section.enabled[0] = true;
-				section.enabled[section.enabled.length - 1] = true;
-
+			if (!section.enabled?.length) {
+				return;
 			}
+
+			section.enabled.fill(false);
+
+			section.enabled[0] = true;
+			section.enabled[section.enabled.length - 1] = true;
 		});
 
 		return;
@@ -1211,7 +1236,7 @@ function getPanelConfigurationKey(panel_type) {
 	if (windemere.includes(panel_type)) {
 		return 'windemere';
 	}
-	
+
 	return panel_type;
 }
 
@@ -1583,6 +1608,7 @@ function getDoorInfo() {
 
 		//calculation to count the glass qty for each section 
 		info.glass_qty = section_info.enabled.filter(v => v === true).length;
+		info.max_window_qty = getMaxSlimWindowQty(info.shape, width, info.slim_spacing, getState("END_CAPS") === "N");
 
 		sections.push(info);
 		sum += section_heights[i];
@@ -1630,13 +1656,118 @@ function getDoorInfo() {
 			labels: true,
 		},
 		draw_hints: hints,
-		custom_windows: getState("CUSTOM_WINDOWS")
+		custom_windows: getState("CUSTOM_WINDOWS"),
+
 	}
 }
 
 function addChangeEvents() {
 	addRenderNode()
 }
+
+
+function getMaxSlimWindowQty(shape, doorWidth, spacing, singleEndcap) {
+
+	let rules = [];
+
+	if (shape === "slim_single") {
+
+		// Even Spaced + Single Endcap
+		if (spacing === "even" && singleEndcap) {
+
+			rules = [
+				{ min: 96, max: 132, qty: 2 },
+				{ min: 133, max: 175, qty: 3 },
+				{ min: 176, max: 217, qty: 4 },
+				{ min: 218, max: 242, qty: 5 }
+			];
+		}
+
+		// Fixed End + Single Endcap
+		else if (spacing === "fixed" && singleEndcap) {
+
+			rules = [
+				{ min: 96, max: 128, qty: 2 },
+				{ min: 129, max: 170, qty: 3 },
+				{ min: 171, max: 213, qty: 4 },
+				{ min: 214, max: 242, qty: 5 }
+			];
+		}
+
+		// Even Spaced + Double Endcap
+		else if (spacing === "even" && !singleEndcap) {
+
+			rules = [
+				{ min: 96, max: 136, qty: 2 },
+				{ min: 137, max: 179, qty: 3 },
+				{ min: 180, max: 222, qty: 4 },
+				{ min: 223, max: 242, qty: 5 }
+			];
+		}
+
+		// Fixed End + Double Endcap
+		else {
+
+			rules = [
+				{ min: 96, max: 134, qty: 2 },
+				{ min: 135, max: 177, qty: 3 },
+				{ min: 178, max: 219, qty: 4 },
+				{ min: 220, max: 242, qty: 5 }
+			];
+		}
+	}
+
+	else if (shape === "slim_double") {
+
+		// Even Spaced + Single Endcap
+		if (spacing === "even" && singleEndcap) {
+
+			rules = [
+				{ min: 96, max: 158, qty: 1 },
+				{ min: 159, max: 234, qty: 2 },
+				{ min: 235, max: 242, qty: 3 }
+			];
+		}
+
+		// Fixed End + Single Endcap
+		else if (spacing === "fixed" && singleEndcap) {
+
+			rules = [
+				{ min: 96, max: 154, qty: 1 },
+				{ min: 155, max: 230, qty: 2 },
+				{ min: 231, max: 242, qty: 3 }
+			];
+		}
+
+		// Even Spaced + Double Endcap
+		else if (spacing === "even" && !singleEndcap) {
+
+			rules = [
+				{ min: 96, max: 161, qty: 1 },
+				{ min: 162, max: 238, qty: 2 },
+				{ min: 239, max: 242, qty: 3 }
+			];
+		}
+
+		// Fixed End + Double Endcap
+		else {
+
+			rules = [
+				{ min: 96, max: 160, qty: 1 },
+				{ min: 161, max: 236, qty: 2 },
+				{ min: 237, max: 242, qty: 3 }
+			];
+		}
+	}
+
+	const rule = rules.find(r =>
+		doorWidth >= r.min &&
+		doorWidth <= r.max
+	);
+
+	return rule ? rule.qty : 0;
+}
+
 
 function showConfigureLoader() {
 	var $loader = $("#canvas-loader");

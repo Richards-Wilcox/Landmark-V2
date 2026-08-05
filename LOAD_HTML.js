@@ -5,7 +5,7 @@ const AvailableColorImages = [
     { url: "images/White_2.jpg", value: "W", colorName: "White", hex: "#fdf6ee", desc: "Wht" },
     { url: "images/Black_2.jpg", value: "K", colorName: "Black", hex: "#211f1e", desc: "Blk" },
     { url: "images/Iron Ore_2.jpg", value: "V", colorName: "Iron Ore", hex: "#313532", desc: "Ore" },
-    { url: "images/Cafe_2.jpg", value: "F", colorName: "Cafe", hex: "#3b3831", desc: "Cafe" },
+    { url: "images/Cafe_2.jpg", value: "F", colorName: "Cafe", hex: "#3b3831", desc: "Cafe" }
 ];
 
 const OptionalColorImages = [
@@ -18,6 +18,14 @@ const OptionalColorImages = [
     { url: "images/Honey Cedar.png", value: "X", colorName: "Honey Cedar", restricted: true, hex: "#914e27" },
     { url: "images/Cocoa Hickory.png", value: "Y", colorName: "Cocoa Hickory", restricted: true, hex: "#45261c" }
 ];
+
+const SilverColor = {
+    url: "images/support_silver.jpg",
+    value: "S",
+    colorName: "Silver",
+    hex: "#d2d2d2",
+    desc: "Silver"
+};
 
 const woodTones = ["X", "Y"];
 
@@ -135,7 +143,7 @@ function createForm() {
                         <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_BOTH"
                             name="WINDOW_POSITION" desc="Both" code="both" value="both">
                     </div>
-                    <div class="rw-button" tabindex="0"  id="POSITION_CUSTOM" style="display:none;" >
+                    <div class="rw-button" tabindex="0"  id="POSITION_CUSTOM" >
                         <label for="WINDOW_POSITION_CUSTOM">Custom</label>
                         <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_CUSTOM"
                             name="WINDOW_POSITION" desc="Custom" code="custom" value="custom">
@@ -505,7 +513,7 @@ function createForm() {
                     </div>
                 </div>
 
-                <div class="dropdown-item custom-dimension-item">
+                <div class="dropdown-item custom-dimension-item" id="more_glass_type_switch">
                     <h3>More Glass Types</h3>
                     <label class="switch">
                         <input type="checkbox" id="more_glass_types" value="off">
@@ -814,8 +822,8 @@ function createForm() {
                     <div class="dropdown-item">
                         <h3>Hardware Set</h3>
                         <div class="dimension-layout">
-                            <div class="rw-button" tabindex="0">
-                                <input type="radio" id="STANDARD" name="HARDWARE_SET" value="A">
+                            <div class="rw-button btn-checked" tabindex="0">
+                                <input type="radio" id="STANDARD" name="HARDWARE_SET" value="A" checked>
                                 <label for="STANDARD">Standard</label>
                             </div>
 
@@ -880,9 +888,9 @@ function createForm() {
                                     trackCode='' numval='1.0' radius="12">
                                 <label for="STD12">Standard 12"R</label>
                             </div>
-                            <div class="rw-button panel-button lift-option" tabindex="0" id="opt-STD15">
+                            <div class="rw-button panel-button lift-option btn-checked" tabindex="0" id="opt-STD15">
                                 <input type="radio" id="STD15" name="LIFT_TYPE" value="STD15" ic_code='' hwdesc=''
-                                    trackCode='' numval='1.0' radius="15">
+                                    trackCode='' numval='1.0' radius="15" checked>
                                 <label for="STD15">Standard 15"R</label>
                             </div>
                             <div class="rw-button panel-button lift-option" tabindex="0" id="opt-32R">
@@ -1379,8 +1387,8 @@ function toggleAccordion() {
     $('#accordion1406547076').hide()
     $("#accordion1094153584").hide()//Hides the global data for JDE
     $("#accordion9757245").hide() //section bundle
-    //$("#accordion321627220").hide() //Glazing code
-    //$("#accordion1892755284").hide() //Scheduling code
+    $("#accordion321627220").hide() //Glazing code
+    $("#accordion1892755284").hide() //Scheduling code
 }
 
 // Update data list selection and update positioning
@@ -1932,8 +1940,12 @@ function clickHandler() {
     // FRAME color — user explicitly picked, set override
     $('#FRAME_COLOR').on('click', '.color-button-container', function () {
         const color = $(this).find(`input[type='radio']`).val();
-        const color_info = [...AvailableColorImages, ...OptionalColorImages]
-            .find(c => c.value == color);
+
+        const color_info = [
+            ...AvailableColorImages,
+            ...OptionalColorImages,
+            SilverColor
+        ].find(c => c.value == color);
         if (!color_info) return;
 
         frameColorUserOverride = true;
@@ -2018,23 +2030,67 @@ function clickHandler() {
 
 
     //select and deselect the hardware set inputs on hardware tab
-    $('input[name="HARDWARE_SET"]').on('click', function () {
+    // Initialize currently checked item
+    $('input[name="HARDWARE_SET"]:checked')
+        .data('checked', true)
+        .closest('.rw-button')
+        .addClass('btn-checked');
 
-        if ($(this).data('checked')) {
-            $(this).prop('checked', false);
-            $(this).data('checked', false);
-            $(this).parent().removeClass("btn-checked");
-            setState("HARDWARE_SET", '');
+    $('input[name="HARDWARE_SET"]')
+        .off('click.hardwareSet')
+        .on('click.hardwareSet', function (e) {
 
+            const wasChecked = $(this).data('checked') === true;
 
-        } else {
-            $('input[name="HARDWARE_SET"]').data('checked', false);
-            $(this).data('checked', true);
-            $(this).prop('checked', true);
-            $(this).parent().addClass("btn-checked");
-            setState("HARDWARE_SET", $(this).val());
-        }
-    });
+            e.preventDefault();
+
+            if (wasChecked) {
+
+                // Deselect current selection
+                $(this)
+                    .prop('checked', false)
+                    .removeAttr('checked')
+                    .data('checked', false);
+
+                $(this)
+                    .closest('.rw-button')
+                    .removeClass('btn-checked');
+
+                setState("HARDWARE_SET", '');
+
+                // hide commercial-only UI if needed
+                $(".inclined-track").hide();
+
+            } else {
+
+                // Clear all others
+                $('input[name="HARDWARE_SET"]')
+                    .prop('checked', false)
+                    .removeAttr('checked')
+                    .data('checked', false)
+                    .closest('.rw-button')
+                    .removeClass('btn-checked');
+
+                // Select clicked one
+                $(this)
+                    .prop('checked', true)
+                    .attr('checked', 'checked')
+                    .data('checked', true);
+
+                $(this)
+                    .closest('.rw-button')
+                    .addClass('btn-checked');
+
+                setState("HARDWARE_SET", $(this).val());
+
+                // Commercial logic
+                if ($(this).val() === "C") {
+                    $(".inclined-track").show();
+                } else {
+                    $(".inclined-track").hide();
+                }
+            }
+        });
 
 }
 
@@ -2574,176 +2630,6 @@ function toggleHandler() {
 
 }
 
-// function toogleSpringCycle() {
-
-//   const springCycle10k = $("#10K");
-//   const springCycle20k = $("#20K");
-
-//   const springCycle10kWrapper = springCycle10k.closest(".rw-sliding-button");
-//   const springCycle20kWrapper = springCycle20k.closest(".rw-sliding-button");
-
-//   function updateSpringCycle() {
-
-//     const selectedHardware = $("input[name='HARDWARE_SET']:checked").val();
-//     const labelText = $("input[name='HARDWARE_SET']:checked")
-//       .next("label")
-//       .text();
-
-//     if (selectedHardware === "Y") {
-
-//       // Disable 10K
-//       springCycle10k.prop("checked", false).prop("disabled", true);
-//       springCycle10kWrapper
-//         .addClass("disabled color-tooltip spring-cycle")
-//         .removeClass("btn-checked selected")
-//         .attr(
-//           "data-tooltip",
-//           `Spring Cycle 10K not available for ${labelText} Hardware`
-//         );
-
-//       // Select 20K
-//       springCycle20k.prop("checked", true).prop("disabled", false);
-//       springCycle20kWrapper.addClass("btn-checked selected");
-
-//     } else {
-
-//       // Enable both
-//       springCycle10k.prop("disabled", false);
-//       springCycle20k.prop("disabled", false);
-
-//       // Default back to 10K
-//       springCycle10k.prop("checked", true);
-//       springCycle20k.prop("checked", false);
-
-//       // Restore classes & tooltip
-//       springCycle10kWrapper
-//         .removeClass("disabled color-tooltip")
-//         .removeAttr("data-tooltip")
-//         .addClass("btn-checked selected");
-
-//       springCycle20kWrapper.removeClass("btn-checked selected");
-//     }
-//   }
-
-//   // Run when hardware changes
-//   $("input[name='HARDWARE_SET']").on("change", updateSpringCycle);
-
-//   // Run once on page load
-//   updateSpringCycle();
-// }
-
-function initAppEvents() {
-
-    // // =========================
-    // // PANEL STYLE CHANGE
-    // // =========================
-    // $(document)
-    //     .off("click.togglePanelStyle")
-    //     .on("click.togglePanelStyle", "input[name='FACE']", function () {
-
-    //         const panel_style = this.value;
-
-    //         appendOptionalColors(panel_style);
-
-    //         // re-select first color after render
-    //         requestAnimationFrame(() => {
-    //             selectFirstColor($("#OptionalColorsSection .colorContainer"));
-    //             rw(getNode("COLOR"))
-    //         });
-    //     });
-
-    // $(document)
-    //     .off("click.colorSelect")
-    //     .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
-    //         const $container = $(this).closest(".colorContainer");
-    //         $container.find(".color-button-container").removeClass("selected");
-    //         $(this).addClass("selected");
-    //         $container.find("input[name='COLOR']").prop("checked", false);
-    //         $(this).find("input[name='COLOR']").prop("checked", true).trigger("change");
-
-    //         const color = $(this).find("input[name='COLOR']").val();
-    //         setState && setState("COLOR", color);
-
-    //         frameColorUserOverride = false;
-    //         insertColorUserOverride = false;
-
-    //         rw(getNode("COLOR"));
-    //         rw(getNode("FRAME_COLOR"));
-    //         rw(getNode("INSERT_COLOR"));
-
-    //         // ── Sync selected class to new door color ──
-    //         requestAnimationFrame(() => {
-    //             [
-    //                 $("#AvailableFrameColorsSection .colorContainer"),
-    //                 $("#OptionalFrameColorsSection .colorContainer"),
-    //                 $("#AvailableInsertColorsSection .colorContainer"),
-    //                 $("#OptionalInsertColorsSection .colorContainer")
-    //             ].forEach($c => {
-    //                 $c.find(".color-button-container").removeClass("selected");
-    //                 $c.find("input[type='radio']").prop("checked", false);
-
-    //                 const $match = $c.find(`input[type='radio'][value="${color}"]`)
-    //                     .closest(".color-button-container");
-
-    //                 if ($match.length) {
-    //                     $match.addClass("selected");
-    //                     $match.find("input[type='radio']").prop("checked", true);
-    //                 }
-    //             });
-    //         });
-    //     });
-
-
-    // // FRAME color — user explicitly picked, set override
-    // $('#FRAME_COLOR').on('click', '.color-button-container', function () {
-    //     const color = $(this).find(`input[type='radio']`).val();
-    //     const color_info = [...AvailableColorImages, ...OptionalColorImages]
-    //         .find(c => c.value == color);
-    //     if (!color_info) return;
-
-    //     frameColorUserOverride = true;
-    //     setState("FRAME_COLOR", color_info);
-    // });
-
-    // // INSERT color — user explicitly picked, set override
-    // $('#INSERT_COLOR').on('click', '.color-button-container', function () {
-    //     const color = $(this).find(`input[type='radio']`).val();
-    //     const color_info = [...AvailableColorImages, ...OptionalColorImages]
-    //         .find(c => c.value == color);
-    //     if (!color_info) return;
-
-    //     insertColorUserOverride = true;
-    //     setState("INSERT_COLOR", color_info);
-    // });
-
-
-
-    // // =========================
-    // // DOOR OPTION
-    // // =========================
-    // $(document)
-    //     .off("click.doorOpt")
-    //     .on("click.doorOpt", ".rw-sliding-button", function () {
-    //         door_option = $(this).find('input[name="DOOROPT"]').val();
-    //     });
-
-    // // =========================
-    // // SPRING TYPE
-    // // =========================
-    // $(document)
-    //     .off("click.SPRINGTYPE")
-    //     .on("click.SPRINGTYPE", ".rw-sliding-button", function (e) {
-
-    //         const name = e.target.name;
-
-    //         $(`input[name="${name}"]`).each(function () {
-    //             $(this).closest(".rw-sliding-button").removeClass("selected");
-    //         });
-
-    //         const $selected = $(`input[name="${name}"]:checked`);
-    //         $selected.closest(".rw-sliding-button").addClass("selected");
-    //     });
-}
 
 function getCounterVal(toggle_Switch) {
     return toggle_Switch;
@@ -2851,8 +2737,17 @@ function loadGlazingUI() {
     `;
     }
 
-    AvailableColorImages.forEach((imgSrc, index) => {
+    const frameColorsList = [
+        ...AvailableColorImages,
+        SilverColor
+    ];
+
+    frameColorsList.forEach((imgSrc, index) => {
         $frameColors.append(generateColorHTML(imgSrc, index, "FRAME_COLOR"));
+    });
+
+    AvailableColorImages.forEach((imgSrc, index) => {
+        // $frameColors.append(generateColorHTML(imgSrc, index, "FRAME_COLOR"));
         $insertColors.append(generateColorHTML(imgSrc, index, "INSERT_COLOR"));
     });
 

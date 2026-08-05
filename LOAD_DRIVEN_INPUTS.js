@@ -37,21 +37,111 @@ function loadDrivenInputEvents() {
     }
   }, [""])
 
+  // addNode({
+  //   id: "FRAME_COLOR",
+  //   value: null,
+  //   logic: function () {
+  //     // Only fall back to door color if user hasn't made an explicit pick
+  //     if (!frameColorUserOverride) {
+  //       const doorColor = getNode("COLOR")?.value;
+  //       if (doorColor?.value) {
+  //         const match = [...AvailableColorImages, ...OptionalColorImages]
+  //           .find(c => c.value === doorColor.value);
+  //         this.value = match ?? null;
+  //       }
+  //     }
+  //   }
+  // }, ["COLOR"]);
+
   addNode({
     id: "FRAME_COLOR",
     value: null,
     logic: function () {
-      // Only fall back to door color if user hasn't made an explicit pick
-      if (!frameColorUserOverride) {
-        const doorColor = getNode("COLOR")?.value;
-        if (doorColor?.value) {
-          const match = [...AvailableColorImages, ...OptionalColorImages]
-            .find(c => c.value === doorColor.value);
-          this.value = match ?? null;
+
+      const isSlimA =
+        getState("DOOR_MODEL") === "A" &&
+        (getState("GLASS_SHAPE") || "")
+          .toLowerCase()
+          .includes("slim");
+
+      const doorColor = getNode("COLOR")?.value;
+
+      // Silver becomes invalid outside Slim
+      if (
+        this.value?.value === "S" &&
+        !isSlimA
+      ) {
+
+        frameColorUserOverride = false;
+
+        const blackColor = [
+          ...AvailableColorImages,
+          SilverColor
+        ].find(c => c.value === "K");
+
+        if (blackColor) {
+          this.value = blackColor;
+          syncFrameColorUI("K");
+        }
+
+        return;
+      }
+
+      // User manually selected a color
+      if (frameColorUserOverride) {
+        syncFrameColorUI(this.value?.value);
+        return;
+      }
+
+      // -----------------------
+      // SLIM A
+      // -----------------------
+      if (isSlimA) {
+
+        // Keep existing Black/Silver selection
+        if (
+          this.value?.value === "K" ||
+          this.value?.value === "S"
+        ) {
+          syncFrameColorUI(this.value.value);
+          return;
+        }
+
+        // Default to Black
+        const blackColor = [
+          ...AvailableColorImages,
+          SilverColor
+        ].find(c => c.value === "K");
+
+        if (blackColor) {
+          this.value = blackColor;
+          syncFrameColorUI("K");
+        }
+
+        return;
+      }
+
+      // -----------------------
+      // NON-SLIM
+      // -----------------------
+      if (doorColor?.value) {
+
+        const match = [
+          ...AvailableColorImages,
+          ...OptionalColorImages
+        ].find(
+          c => c.value === doorColor.value
+        );
+
+        if (match) {
+          this.value = match;
+          syncFrameColorUI(match.value);
         }
       }
     }
-  }, ["COLOR"]);
+  }, ["COLOR", "DOOR_MODEL", "GLASS_SHAPE"]);
+
+
 
   addNode({
     id: "INSERT_COLOR",
@@ -139,41 +229,6 @@ function loadDrivenInputEvents() {
 
 
   }, ["FACE", "COLOR"])
-
-  // addLogic("SPRING_TYPE", function () {
-
-  //   let hardware = getState("HARDWARE_SET");
-  //   const torsionBtn = $("#TORSION").closest(".rw-sliding-button");
-  //   const extensionBtn = $("#EXTENSION").closest(".rw-sliding-button");
-  //   var labelText = $('input[name="HARDWARE_SET"]:checked').next('label').text();
-
-  //   // If hardware = A → disable Extension
-  //   if (hardware === "A" || hardware === "C") {
-
-  //     // Disable click
-  //     $("#EXTENSION").prop("disabled", true);
-  //     extensionBtn.addClass("disabled");
-
-  //     extensionBtn.addClass("color-tooltip");
-  //     extensionBtn.attr("data-tooltip", `Extension not available for ${labelText} Hardware`);
-
-
-  //     // If Extension was selected, switch to Torsion
-  //     if (getState("SPRING_TYPE") === "EXT") {
-  //       $("#TORSION").prop("checked", true).trigger("change");
-  //     }
-
-  //   } else {
-  //     // Re-enable Extension for other hardware types
-  //     $("#EXTENSION").prop("disabled", false);
-  //     extensionBtn.removeClass("disabled");
-  //     extensionBtn.removeClass("color-tooltip");
-  //     extensionBtn.removeAttr("data-tooltip");
-  //   }
-
-  //   this.value = $(`input[type="radio"][name="SPRING_TYPE"][checked]`).val();
-
-  // }, ["HARDWARE_SET"]);
 
   addLogic("SPRING_CYCLE", function () {
     const value = $('input[name="SPRING_CYCLE"]:checked').val();
@@ -455,7 +510,6 @@ function loadDrivenInputEvents() {
         return;
       }
 
-
       if (face === "M") {
 
         $("#more_glass_types")
@@ -475,6 +529,15 @@ function loadDrivenInputEvents() {
       } else if (door_model === "D" && slimShapes.includes(glass_shape)) {
         allowedList = allowedSlimGlassL200;
       }
+
+      // Show or hide the MoreGlass switch based on whether this is the narrow slim glass set.
+      const $moreGlassToggleSwitch = $("#more_glass_type_switch");
+      const showMoreGlassToggle = allowedList !== allowedSlimGlassL138;
+      if (!showMoreGlassToggle) {
+        $moreGlassToggleSwitch.prop("checked", false).trigger("change");
+      }
+      $moreGlassToggleSwitch.toggle(showMoreGlassToggle);
+
 
       // STEP 3: Toggle button visibility
       $("input[name='GLASS_TYPE']").each(function () {
@@ -961,6 +1024,16 @@ function loadDrivenInputEvents() {
     ["HARDWARE_SET"]
   );
 
+  createNode(
+    "FRAME_COLOR_VISIBILITY",
+    function () {
+      updateFrameColorRestriction();
+    },
+    "",
+    $("#FRAME_COLOR_VISIBILITY")[0],
+    ["DOOR_MODEL", "GLASS_SHAPE"]
+  );
+
 
 }
 
@@ -1087,7 +1160,7 @@ function resolveLiteResult(options) {
     } else if (glass_shape === "ranch") {
       window_type = "ranch_std";
     }
-    
+
   }
 
   if (!window_type) return null;
@@ -1100,8 +1173,7 @@ function resolveLiteResult(options) {
 
   const result = getLites(width, window_type) || null;
   LITE_RESULT_CACHE[cacheKey] = result;
-  
-  console.log("result", result);
+
   return result;
 }
 
@@ -1156,4 +1228,132 @@ function getLites(width, type) {
   return table.find(function (r) {
     return width >= r.min && width <= r.max;
   }) || null;
+}
+
+function updateFrameColorRestriction() {
+
+  const doorModel = getState("DOOR_MODEL");
+  const glassShape = (getState("GLASS_SHAPE") || "").toLowerCase();
+
+  const isSlimA =
+    doorModel === "A" &&
+    glassShape.includes("slim");
+
+  // Show / hide available frame colors
+  $("#AvailableFrameColorsSection .color-button-container").each(function () {
+
+    const value = $(this).find("input").val();
+
+    if (isSlimA) {
+
+      // Only Black + Silver
+      $(this).toggle(
+        value === "K" ||
+        value === "S"
+      );
+
+    } else {
+
+      // Hide Silver
+      $(this).toggle(value !== "S");
+    }
+  });
+
+  // Hide optional colors during slim
+  if (isSlimA) {
+    $("#OptionalFrameColorsSection .color-button-container").hide();
+  } else {
+    $("#OptionalFrameColorsSection .color-button-container").show();
+  }
+
+  $("#optionalStackFrameColors")
+    .closest(".stack-wrapper")
+    .toggle(!isSlimA);
+
+  $("#OptionalFrameColorsSection .divider")
+    .toggle(!isSlimA);
+
+  const frameColor = getState("FRAME_COLOR");
+
+  // Slim mode default = Black
+  if (
+    isSlimA &&
+    !frameColorUserOverride &&
+    frameColor?.value !== "K"
+  ) {
+
+    const blackColor =
+      [...AvailableColorImages, SilverColor]
+        .find(c => c.value === "K");
+
+    if (blackColor) {
+
+      if (frameColor?.value !== "K") {
+        setState("FRAME_COLOR", blackColor);
+      }
+
+      $("input[name='FRAME_COLOR']")
+        .prop("checked", false)
+        .closest(".color-button-container")
+        .removeClass("selected");
+
+      $("input[name='FRAME_COLOR'][value='K']")
+        .prop("checked", true)
+        .closest(".color-button-container")
+        .addClass("selected");
+    }
+  }
+
+  // Leaving slim with Silver selected
+  if (
+    !isSlimA &&
+    frameColor?.value === "S"
+  ) {
+
+    frameColorUserOverride = false;
+
+    const blackColor =
+      [...AvailableColorImages, SilverColor]
+        .find(c => c.value === "K");
+
+    if (blackColor) {
+
+      setState("FRAME_COLOR", blackColor);
+
+      $("input[name='FRAME_COLOR']")
+        .prop("checked", false)
+        .closest(".color-button-container")
+        .removeClass("selected");
+
+      $("input[name='FRAME_COLOR'][value='K']")
+        .prop("checked", true)
+        .closest(".color-button-container")
+        .addClass("selected");
+    }
+  }
+}
+
+function syncFrameColorUI(value) {
+
+  if (!value) {
+    return;
+  }
+
+  $("input[name='FRAME_COLOR']")
+    .prop("checked", false)
+    .closest(".color-button-container")
+    .removeClass("selected");
+
+  const $match = $(
+    `input[name='FRAME_COLOR'][value='${value}']`
+  );
+
+  if ($match.length) {
+
+    $match.prop("checked", true);
+
+    $match
+      .closest(".color-button-container")
+      .addClass("selected");
+  }
 }

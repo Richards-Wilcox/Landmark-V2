@@ -14,6 +14,8 @@ const BUNDLES = [
 const liteCodeMap = {
     "colonial": "C",
     "ranch": "R",
+    "slim_single": "S",
+    "slim_double": "L"
 };
 
 
@@ -211,14 +213,39 @@ function addGlazingCodeLogic() {
     addLogic("WINDOW_1_QTY", function () {
         const glass_shape = getState("GLASS_SHAPE") || "";
         const glass_type = getState("GLASS_TYPE") || "";
+        const window_pos = getState("WINDOW_POSITION");
+        const sections = getSectionInfo();
+        const temp_glass = getState("GLASS_TEMPERED");
 
         if (!glass_shape || !glass_type) {
             this.value = 0;
             return;
         }
 
-        this.value = computeValue("lites");
-    }, ["WIDTH", "FACE", "GLASS_SHAPE", "GLASS_TYPE", "PANEL_SPACING"]);
+        if (getDoorInfo().custom_windows === false && !glass_shape.includes("slim")) {
+            if (window_pos === 'top') {
+                this.value = computeValue("lites");
+            }
+        }
+
+        if (getDoorInfo().custom_windows === true && !glass_shape.includes("slim")) {
+            const onlyLastHasGlass =
+                sections[sections.length - 1].glass_qty > 0 &&
+                sections.slice(0, -1).every(s => s.glass_qty === 0);
+            if (onlyLastHasGlass) {
+                this.value = sections[sections.length - 1].glass_qty;
+            }
+            else {
+                this.value = "";
+            }
+        }
+
+
+        //slim window calculation
+
+
+
+    }, ["WIDTH", "FACE", "GLASS_SHAPE", "GLASS_TYPE", "PANEL_SPACING", "GLASS_TEMPERED"]);
 
     addLogic("CENTER_HINGE_QTY", function () {
         this.value = getState("CENTER_HINGE_CODE");
@@ -228,8 +255,33 @@ function addGlazingCodeLogic() {
         const glass_shape = getState("GLASS_SHAPE") || "";
         const window_1_qty = getState("WINDOW_1_QTY") || 0;
         const liteCode = liteCodeMap[glass_shape] ?? "";
+        const sections = getSectionInfo();
+        const window_pos = getState("WINDOW_POSITION");
 
-        this.value = liteCode.repeat(window_1_qty);
+        // Standard logic
+        if (getDoorInfo().custom_windows === false && !glass_shape.includes("slim")) {
+            if (window_pos === 'top') {
+                const window_1_qty = getState("WINDOW_1_QTY") || 0;
+                this.value = liteCode.repeat(window_1_qty);
+                return;
+            }
+        }
+
+        // Custom windows logic      
+        if (getDoorInfo().custom_windows === true && !glass_shape.includes("slim")) {
+            const onlyLastHasGlass =
+                sections[sections.length - 1].glass_qty > 0 &&
+                sections.slice(0, -1).every(s => s.glass_qty === 0); // check if top section is selected only in custom window
+            if (onlyLastHasGlass) {
+                const enabled = sections[sections.length - 1].enabled || [];
+                this.value = enabled
+                    .map(v => v ? liteCode : "0")
+                    .join("");
+            } else {
+                this.value = "";
+            }
+        }
+
 
 
     }, ["WINDOW_1_QTY", "GLASS_SHAPE"])
@@ -344,6 +396,8 @@ function addGlazingCodeLogic() {
     addLogic("EXTERIOR_FRAME_1", function () {
         const glass_shape = getState("GLASS_SHAPE") || "";
         const color = getState("FRAME_COLOR").value;
+        let door_model = getState("DOOR_MODEL");
+
 
         if (!glass_shape) {
             this.value = "None";
@@ -351,7 +405,12 @@ function addGlazingCodeLogic() {
         }
         if (glass_shape === 'colonial') this.value = `550-601${color}`;
         if (glass_shape === 'ranch') this.value = `550-651${color}`;
-    }, ["GLASS_SHAPE", "FRAME_COLOR"])
+
+        if (door_model === 'D') {
+            if (glass_shape === 'slim_single') this.value = `550-620${color}`;
+            if (glass_shape === 'slim_double') this.value = `550-670${color}`;
+        }
+    }, ["GLASS_SHAPE", "FRAME_COLOR", "DOOR_MODEL"])
 
     addLogic("INTERIOR_FRAME_1", function () {
         const door_model = getState("DOOR_MODEL");
@@ -364,22 +423,55 @@ function addGlazingCodeLogic() {
         }
         //colonial window
         if (door_model === 'A' && glass_shape === 'colonial') {
-            this.value = glazingtype === 'double' ? `550-606W` : `550-612W`;
+            this.value = glazingtype === 'double' ? `550-606X` : `550-612X`;
         }
         else if (door_model === 'D' && glass_shape === 'colonial') {
-            this.value = glazingtype === 'double' ? `550-612W` : `550-613W`;
+            this.value = glazingtype === 'double' ? `550-612X` : `550-613X`;
         }
 
         //ranch window 
         if (door_model === 'A' && glass_shape === 'ranch') {
-            this.value = glazingtype === 'double' ? `550-656W` : `550-662W`;
+            this.value = glazingtype === 'double' ? `550-656X` : `550-662X`;
         }
         else if (door_model === 'D' && glass_shape === 'ranch') {
-            this.value = glazingtype === 'double' ? `550-662W` : `550-663W`;
+            this.value = glazingtype === 'double' ? `550-662X` : `550-663X`;
         }
 
+        if (door_model === 'D') {
+            if (glass_shape === 'slim_single') this.value = `550-622`;
+            if (glass_shape === 'slim_double') this.value = `550-672`;
+        }
 
     }, ["GLASS_TYPE", "DOOR_MODEL", "GLASS_SHAPE"])
+
+    addLogic("FRAME_KIT", function () {
+
+        const doorModel = getState("DOOR_MODEL");
+        const glassShape = getState("GLASS_SHAPE");
+        const frameColor = getState("FRAME_COLOR").value;
+
+        const frameKitMap = {
+            slim_single: {
+                S: "54S-6214",
+                K: "54S-621K",
+                W: "54S-621W"
+            },
+            slim_double: {
+                S: "54L-6214",
+                K: "54L-621K",
+                W: "54L-621W"
+            }
+        };
+
+        if (doorModel !== "A") {
+            this.value = "None";
+            return;
+        }
+
+        this.value =
+            frameKitMap[glassShape]?.[frameColor] || "None";
+    }, ["DOOR_MODEL", "GLASS_SHAPE", "FRAME_COLOR"]);
+
 
     addLogic("SCREWS", function () {
         const door_model = getState("DOOR_MODEL");
@@ -393,10 +485,18 @@ function addGlazingCodeLogic() {
         if (door_model === 'A') this.value = `215-321`;
         if (door_model === 'D') this.value = `215-328`;
 
+        if (door_model === 'D') {
+            if (glass_shape.includes("slim")) this.value = `215-333`;
+        }
+        if (door_model === 'A') {
+            if (glass_shape.includes("slim")) this.value = `215-334`;
+        }
+
     }, ["DOOR_MODEL", "GLASS_SHAPE"])
 
     addLogic("SCREWS_QTY", function () {
         const glass_shape = getState("GLASS_SHAPE") || "";
+        const door_model = getState("DOOR_MODEL");
 
         if (!glass_shape) {
             this.value = "";
@@ -406,8 +506,17 @@ function addGlazingCodeLogic() {
         if (glass_shape === 'colonial') this.value = 10;
         if (glass_shape === 'ranch') this.value = 18;
 
+        if (door_model === 'D') {
+            if (glass_shape === 'slim_single') this.value = 12;
+            if (glass_shape === 'slim_double') this.value = 20;
+        }
 
-    }, ["GLASS_SHAPE"])
+        if (door_model === 'A') {
+            if (glass_shape === 'slim_single') this.value = 14;
+            if (glass_shape === 'slim_double') this.value = 22;
+        }
+
+    }, ["GLASS_SHAPE", "DOOR_MODEL"])
 
     addLogic("GLAZING_CODE", function () {
 
@@ -420,24 +529,6 @@ function addGlazingCodeLogic() {
         }
 
         this.value = generateGlazingCodeString("WINDOW_1");
-
-        // const ext_frame_1 = getState("EXTERIOR_FRAME_1");
-        // const int_frame_1 = getState("INTERIOR_FRAME_1");
-        // const screw = getState("SCREWS");
-        // const glass = getState("WINDOW_1");
-        // const insert_1 = getState("INSERT_1");
-        // const insert_1_qty = getState("INSERT_1_QTY");
-        // const lite_location = getState("LITE_LOCATION");
-        // const glass_shape = getState("GLASS_SHAPE");
-
-        // // const insert_2 = getState("INSERT_2");
-        // // const insert_2_qty = getState("INSERT_2_QTY");
-
-        // if (!glass_shape) {
-        //     this.value = "";
-        //     return;
-        // }
-        // else this.value = `${ext_frame_1},${glass},${int_frame_1},${screw},${insert_1},${insert_1_qty},${lite_location}`;
 
     }, ["EXTERIOR_FRAME_1", "WINDOW_1", "INTERIOR_FRAME_1", "INSERT_1", "INSERT_1_QTY", "SCREWS", "PANEL_SPACING", "LITE_LOCATION", "GLASS_SHAPE", "WINDOW_POSITION"]);
 
@@ -568,13 +659,11 @@ function addGlazingCodeLogic() {
         const bundle = getBundles()[0];
         const sections = getDoorInfo().sections.slice().reverse();
 
-        console.log("sections", sections);
-
         this.value =
             bundle?.indexes?.[0]
                 ? Number(sections[bundle.indexes[0] - 1]?.glass_qty) || 0
                 : 0;
-       
+
     }, GLASS_QTY_DEPS);
 
     addLogic("GLASS_QTY_B1_SC2", function () {
@@ -737,7 +826,6 @@ function addGlazingCodeLogic() {
     addLogic("PUNCH_CODE_SECTION_09", function () {
         setPunchCode.call(this, 9);
     }, ["HEIGHT", "WIDTH", "NUM_OF_SEC", "WINDOW_POSITION", "GLASS_SHAPE"]);
-
 }
 
 function setPunchCode(sectionNumber) {
@@ -1155,6 +1243,10 @@ function createSmartcomLogic(sectionField) {
         let window_position = getState("WINDOW_POSITION");
         let glass_shape = getState("GLASS_SHAPE");
 
+        if (glass_shape.includes("slim")) {
+            this.value = "";
+            return;
+        }
 
         if (panel_style === "F" || panel_style === "V") {
             if (custom_window === true || window_position === 'top') {
@@ -1173,6 +1265,343 @@ function createSmartcomLogic(sectionField) {
     };
 }
 
+// function getCNCString(section_height, sc_part_no, sectionIndex) {
+//     try {
+//         const MAX_WINDOWS = 10;
+
+//         const LOC_Y_MAP = {
+//             24: 12.0,
+//             21: 10.5,
+//             18: 9.0
+//         };
+
+//         const widthMap = {
+//             colonial: 18.8125,
+//             ranch: 41.6875,
+//             slim_single: 34.469,
+//             slim_double: 68.469,
+//         };
+
+//         const heightMap = {
+//             colonial: 13.625,
+//             ranch: 13.625,
+//             slim_single: 6.594,
+//             slim_double: 6.594,
+//         };
+
+
+//         const door_thickness = getState("DOOR_THICKNESS");
+//         // const lite_location = getState("LITE_LOCATION");
+//         const rp_width = Number(getState("WIDTH")) || 0;
+//         const glass_shape = getState("GLASS_SHAPE");
+//         const window_pos = getState("WINDOW_POSITION");
+//         const total_punches = Number(getState("WINDOW_1_QTY")) || 0;
+//         const liteCode = liteCodeMap[glass_shape] || "";
+//         const sections = getSectionInfo();
+//         const double_end_cap = getState("END_CAPS");
+
+
+//         // ✅ Get enabled array for correct section
+//         const enabledArr =
+//             Array.isArray(sections[sectionIndex - 1]?.enabled)
+//                 ? sections[sectionIndex - 1].enabled
+//                 : [];
+
+//         // 1 => R/C, 0 => 0
+//         const punchCode = enabledArr
+//             .slice()
+//             .map(v => v ? liteCode : "0")
+//             .join("");
+
+//         // ✅ Get RLL values (1X → nX)
+//         const sectionRLL =
+//             SECTION_RLL_VALUES[sectionIndex - 1] || Array(15).fill(0);
+
+//         // ✅ Apply enabled mask
+//         const RLL = Array.from({ length: MAX_WINDOWS }, (_, i) => {
+//             return enabledArr[i]
+//                 ? Number(sectionRLL[i]) || 0
+//                 : 0;
+//         });
+
+//         const num_of_windows = enabledArr.filter(v => v === true).length;
+
+//         const location_y = LOC_Y_MAP[section_height] ?? 0;
+
+//         const buildArray = (count, value) =>
+//             Array.from({ length: MAX_WINDOWS }, (_, i) => (i < count ? value : 0));
+
+//         const buildCharArray = (count, char) =>
+//             Array.from({ length: MAX_WINDOWS }, (_, i) => (i < count ? char : 0));
+
+
+
+//         const windowWidth = widthMap[glass_shape] || 0;
+//         const windowheight = heightMap[glass_shape] || 0;
+
+//         const WIDTHS = Array.from(
+//             { length: MAX_WINDOWS },
+//             (_, i) => (enabledArr[i] ? windowWidth : 0)
+//         );
+
+
+//         const HEIGHTS = Array.from(
+//             { length: MAX_WINDOWS },
+//             (_, i) => enabledArr[i] ? windowheight : 0
+//         );
+
+//         const LOC_Y = Array.from(
+//             { length: MAX_WINDOWS },
+//             (_, i) => enabledArr[i] ? location_y : 0
+//         );
+
+//         const WC = Array.from(
+//             { length: MAX_WINDOWS },
+//             (_, i) => {
+//                 if (!enabledArr[i]) return 0;
+
+//                 if (glass_shape === "ranch") return "R";
+//                 if (glass_shape === "colonial") return "C";
+//                 if (glass_shape === "slim_single") return "S";
+//                 if (glass_shape === "slim_double") return "L";
+
+//                 return 0;
+//             }
+//         );
+
+//         let cnc = `${sc_part_no},${door_thickness},${punchCode},${rp_width},${section_height},LR`;
+
+//         cnc += "," + Array(14).fill(0).join(",");
+//         cnc += `,${num_of_windows}`;
+
+//         let slim_loc_x = ''
+//         if (glass_shape.includes("slim")) { // slim logic
+//             const custom_windows = getState("CUSTOM_WINDOWS");
+//             const section = sections[sectionIndex - 1] || {};
+//             const windowQty = section.max_window_qty;
+
+//             if (custom_windows) {
+
+//                 const windowQty = section.max_window_qty;
+
+//                 // =====================================================
+//                 // ONE LITE
+//                 // =====================================================
+//                 if (section.slim_one === true) {
+
+//                     const offset =
+//                         section.shape === "slim_single"
+//                             ? (double_end_cap === "Y" ? 25 : 22)
+//                             : (double_end_cap === "Y" ? 42 : 39);
+
+//                     const windowIndex =
+//                         enabledArr.findIndex(v => v);
+
+//                     let slim_loc_x;
+
+//                     // CENTER
+//                     if (windowIndex === 1) {
+
+//                         slim_loc_x = rp_width / 2;
+
+//                     }
+//                     // LEFT
+//                     else if (windowIndex === 0) {
+
+//                         slim_loc_x = rp_width - offset;
+
+//                     }
+//                     // RIGHT
+//                     else {
+
+//                         slim_loc_x = offset;
+//                     }
+
+//                     for (let i = 0; i < MAX_WINDOWS; i++) {
+
+//                         if (enabledArr[i]) {
+
+//                             cnc += `,${WC[i]},${windowWidth},${windowheight},${slim_loc_x},${location_y}`;
+
+//                         } else {
+
+//                             cnc += ",0,0,0,0,0";
+//                         }
+//                     }
+//                 }
+//                 // =====================================================
+//                 // MULTI LITE - EVEN SPACED
+//                 // =====================================================
+//                 else if (section.slim_spacing === "even") {
+
+//                     const offset =
+//                         (rp_width - (windowQty * windowWidth))
+//                         / (windowQty + 1);
+
+//                     const firstCenterLine =
+//                         offset + (windowWidth / 2);
+
+//                     const locXValues = [];
+
+//                     let centerLine = firstCenterLine;
+
+//                     for (let i = 0; i < windowQty; i++) {
+
+//                         locXValues.push(
+//                             Number(centerLine.toFixed(2))
+//                         );
+
+//                         centerLine += offset + windowWidth;
+//                     }
+
+//                     // CNC = right → left
+//                     locXValues.reverse();
+
+//                     let liteIndex = 0;
+
+//                     for (let i = 0; i < MAX_WINDOWS; i++) {
+
+//                         if (enabledArr[i]) {
+
+//                             const loc_x = locXValues[liteIndex];
+
+//                             cnc += `,${WC[i]},${windowWidth},${windowheight},${loc_x.toFixed(2)},${location_y}`;
+
+//                             liteIndex++;
+
+//                         } else {
+
+//                             cnc += ",0,0,0,0,0";
+//                         }
+//                     }
+//                 }
+
+//                 // =====================================================
+//                 // MULTI LITE - FIXED END
+//                 // =====================================================
+//                 else if (section.slim_spacing === "fixed") {
+
+//                     const F =
+//                         getState("END_CAPS") === "N"
+//                             ? 4.8125
+//                             : 7.8125;
+
+//                     const firstCenterLine =
+//                         F + (windowWidth / 2);
+
+//                     const spacing =
+//                         (rp_width - (2 * firstCenterLine))
+//                         / (windowQty - 1);
+
+//                     const locXValues = [];
+
+//                     let centerLine = firstCenterLine;
+
+//                     for (let i = 0; i < windowQty; i++) {
+
+//                         locXValues.push(
+//                             Number(centerLine.toFixed(2))
+//                         );
+
+//                         centerLine += spacing;
+//                     }
+
+//                     // CNC = right → left
+//                     locXValues.reverse();
+
+//                     let liteIndex = 0;
+
+//                     for (let i = 0; i < MAX_WINDOWS; i++) {
+
+//                         if (enabledArr[i]) {
+
+//                             const loc_x = locXValues[liteIndex];
+
+//                             cnc += `,${WC[i]},${windowWidth},${windowheight},${loc_x.toFixed(2)},${location_y}`;
+
+//                             liteIndex++;
+
+//                         } else {
+
+//                             cnc += ",0,0,0,0,0";
+//                         }
+//                     }
+//                 }
+//             }
+
+//             else { // slim default selected option
+
+//                 const offset =
+//                     glass_shape === "slim_single"
+//                         ? (double_end_cap === "Y" ? 25 : 22)
+//                         : (double_end_cap === "Y" ? 42 : 39);
+
+//                 if (window_pos === "both") {
+
+//                     const firstIndex = enabledArr.indexOf(true);
+//                     const lastIndex = enabledArr.lastIndexOf(true);
+
+//                     for (let i = 0; i < MAX_WINDOWS; i++) {
+
+//                         if (i === firstIndex) {
+
+//                             cnc += `,${WC[i]},${windowWidth},${windowheight},${rp_width - offset},${location_y}`;
+
+//                         } else if (i === lastIndex && firstIndex !== lastIndex) {
+
+//                             cnc += `,${WC[i]},${windowWidth},${windowheight},${offset},${location_y}`;
+
+//                         } else {
+
+//                             cnc += ",0,0,0,0,0";
+//                         }
+//                     }
+
+//                 } else {
+
+//                     let slim_loc_x;
+
+//                     if (window_pos === "center") {
+
+//                         slim_loc_x = rp_width / 2;
+
+//                     } else {
+
+//                         slim_loc_x =
+//                             window_pos === "left"
+//                                 ? rp_width - offset
+//                                 : offset;
+//                     }
+
+//                     const windowIndex = enabledArr.findIndex(v => v);
+
+//                     cnc += `,${WC[windowIndex]},${windowWidth},${windowheight},${slim_loc_x},${location_y}`;
+
+//                     for (let i = 1; i < MAX_WINDOWS; i++) {
+//                         cnc += ",0,0,0,0,0";
+//                     }
+//                 }
+//             }
+//         }
+//         else { // non-slim logic
+//             for (let i = 0; i < MAX_WINDOWS; i++) {
+
+//                 if (enabledArr[i]) {
+//                     cnc += `,${WC[i]},${WIDTHS[i]},${HEIGHTS[i]},${RLL[i]},${LOC_Y[i]}`;
+//                 } else {
+//                     cnc += `,0,0,0,0,0`;
+//                 }
+//             }
+//         }
+
+//         return cnc;
+
+//     } catch (err) {
+//         console.error("ERROR in getCNCString:", err);
+//         return "";
+//     }
+// }
+
 function getCNCString(section_height, sc_part_no, sectionIndex) {
     try {
         const MAX_WINDOWS = 10;
@@ -1183,14 +1612,37 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
             18: 9.0
         };
 
+        const widthMap = {
+            colonial: 18.8125,
+            ranch: 41.6875,
+            slim_single: 34.469,
+            slim_double: 68.469,
+        };
+
+        const heightMap = {
+            colonial: 13.625,
+            ranch: 13.625,
+            slim_single: 6.594,
+            slim_double: 6.594,
+        };
+
+        const shapeCodeMap = {
+            ranch: "R",
+            colonial: "C",
+            slim_single: "S",
+            slim_double: "L"
+        };
+
+
         const door_thickness = getState("DOOR_THICKNESS");
         // const lite_location = getState("LITE_LOCATION");
-        const rp_width = getState("WIDTH");
+        const rp_width = Number(getState("WIDTH")) || 0;
         const glass_shape = getState("GLASS_SHAPE");
         const window_pos = getState("WINDOW_POSITION");
-        const total_punches = Number(getState("WINDOW_1_QTY")) || 0;
+
         const liteCode = liteCodeMap[glass_shape] || "";
         const sections = getSectionInfo();
+        const double_end_cap = getState("END_CAPS");
 
 
         // ✅ Get enabled array for correct section
@@ -1198,7 +1650,7 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
             Array.isArray(sections[sectionIndex - 1]?.enabled)
                 ? sections[sectionIndex - 1].enabled
                 : [];
-        
+
         // 1 => R/C, 0 => 0
         const punchCode = enabledArr
             .slice()
@@ -1220,37 +1672,19 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
 
         const location_y = LOC_Y_MAP[section_height] ?? 0;
 
-        const buildArray = (count, value) =>
-            Array.from({ length: MAX_WINDOWS }, (_, i) => (i < count ? value : 0));
+        const windowWidth = widthMap[glass_shape] || 0;
+        const windowheight = heightMap[glass_shape] || 0;
+        const slimOffset = shape =>
+            shape === "slim_single"
+                ? (double_end_cap === "Y" ? 25 : 22)
+                : (double_end_cap === "Y" ? 42 : 39);
 
-        const buildCharArray = (count, char) =>
-            Array.from({ length: MAX_WINDOWS }, (_, i) => (i < count ? char : 0));
+        const WIDTHS = enabledArr.map(v => v ? windowWidth : 0);
+        const HEIGHTS = enabledArr.map(v => v ? windowheight : 0);
+        const LOC_Y = enabledArr.map(v => v ? location_y : 0);
 
-        const WIDTHS = Array.from(
-            { length: MAX_WINDOWS },
-            (_, i) => enabledArr[i] ? 18.8125 : 0
-        );
-
-        const HEIGHTS = Array.from(
-            { length: MAX_WINDOWS },
-            (_, i) => enabledArr[i] ? 13.625 : 0
-        );
-
-        const LOC_Y = Array.from(
-            { length: MAX_WINDOWS },
-            (_, i) => enabledArr[i] ? location_y : 0
-        );
-
-        const WC = Array.from(
-            { length: MAX_WINDOWS },
-            (_, i) => {
-                if (!enabledArr[i]) return 0;
-
-                if (glass_shape === "ranch") return "R";
-                if (glass_shape === "colonial") return "C";
-
-                return 0;
-            }
+        const WC = enabledArr.map(enabled =>
+            enabled ? shapeCodeMap[glass_shape] : 0
         );
 
         let cnc = `${sc_part_no},${door_thickness},${punchCode},${rp_width},${section_height},LR`;
@@ -1258,12 +1692,183 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
         cnc += "," + Array(14).fill(0).join(",");
         cnc += `,${num_of_windows}`;
 
-        for (let i = 0; i < MAX_WINDOWS; i++) {
+        const appendSlimWindows = (locXValues, useDecimals = true) => {
 
-            if (enabledArr[i]) {
-                cnc += `,${WC[i]},${WIDTHS[i]},${HEIGHTS[i]},${RLL[i]},${LOC_Y[i]}`;
-            } else {
-                cnc += `,0,0,0,0,0`;
+            let liteIndex = 0;
+
+            for (let i = 0; i < MAX_WINDOWS; i++) {
+
+                if (!enabledArr[i]) {
+                    cnc += ",0,0,0,0,0";
+                    continue;
+                }
+
+                const locX = locXValues[liteIndex++];
+
+                cnc += `,${WC[i]},${windowWidth},${windowheight},${useDecimals
+                    ? Number(locX).toFixed(2)
+                    : locX
+                    },${location_y}`;
+            }
+        };
+
+        const buildLocXValues = (firstCenterLine, spacing, qty) => {
+
+            const values = [];
+
+            let centerLine = firstCenterLine;
+
+            for (let i = 0; i < qty; i++) {
+
+                values.push(
+                    Number(centerLine.toFixed(2))
+                );
+
+                centerLine += spacing;
+            }
+
+            return values.reverse();
+        };
+
+        if (glass_shape.includes("slim")) { // slim logic
+            const custom_windows = getState("CUSTOM_WINDOWS");
+            const section = sections[sectionIndex - 1] || {};
+            const windowQty = section.max_window_qty;
+
+            if (custom_windows) {
+
+                if (section.slim_one) {
+
+                    const offset = slimOffset(section.shape);
+
+                    const windowIndex =
+                        enabledArr.findIndex(v => v);
+
+                    let slim_loc_x;
+
+                    if (windowIndex === 1) {
+
+                        slim_loc_x = rp_width / 2;
+
+                    } else if (windowIndex === 0) {
+
+                        slim_loc_x = rp_width - offset;
+
+                    } else {
+
+                        slim_loc_x = offset;
+                    }
+
+                    appendSlimWindows(
+                        [slim_loc_x],
+                        false
+                    );
+                }
+
+                else if (section.slim_spacing === "even") {
+
+                    const offset =
+                        (rp_width - (windowQty * windowWidth))
+                        / (windowQty + 1);
+
+                    const firstCenterLine =
+                        offset + (windowWidth / 2);
+
+                    const spacing =
+                        offset + windowWidth;
+
+                    appendSlimWindows(
+                        buildLocXValues(
+                            firstCenterLine,
+                            spacing,
+                            windowQty
+                        )
+                    );
+                }
+
+                else if (section.slim_spacing === "fixed") {
+
+                    const F =
+                        getState("END_CAPS") === "N"
+                            ? 4.8125
+                            : 7.8125;
+
+                    const firstCenterLine =
+                        F + (windowWidth / 2);
+
+                    const spacing =
+                        (rp_width - (2 * firstCenterLine))
+                        / (windowQty - 1);
+
+                    appendSlimWindows(
+                        buildLocXValues(
+                            firstCenterLine,
+                            spacing,
+                            windowQty
+                        )
+                    );
+                }
+            }
+
+            else { // slim default selected option
+
+                const offset = slimOffset(glass_shape);
+
+                if (window_pos === "both") {
+
+                    const firstIndex = enabledArr.indexOf(true);
+                    const lastIndex = enabledArr.lastIndexOf(true);
+
+                    for (let i = 0; i < MAX_WINDOWS; i++) {
+
+                        if (i === firstIndex) {
+
+                            cnc += `,${WC[i]},${windowWidth},${windowheight},${rp_width - offset},${location_y}`;
+
+                        } else if (i === lastIndex && firstIndex !== lastIndex) {
+
+                            cnc += `,${WC[i]},${windowWidth},${windowheight},${offset},${location_y}`;
+
+                        } else {
+
+                            cnc += ",0,0,0,0,0";
+                        }
+                    }
+
+                } else {
+
+                    let slim_loc_x;
+
+                    if (window_pos === "center") {
+
+                        slim_loc_x = rp_width / 2;
+
+                    } else {
+
+                        slim_loc_x =
+                            window_pos === "left"
+                                ? rp_width - offset
+                                : offset;
+                    }
+
+                    const windowIndex = enabledArr.findIndex(v => v);
+
+                    cnc += `,${WC[windowIndex]},${windowWidth},${windowheight},${slim_loc_x},${location_y}`;
+
+                    for (let i = 1; i < MAX_WINDOWS; i++) {
+                        cnc += ",0,0,0,0,0";
+                    }
+                }
+            }
+        }
+        else { // non-slim logic
+            for (let i = 0; i < MAX_WINDOWS; i++) {
+
+                if (enabledArr[i]) {
+                    cnc += `,${WC[i]},${WIDTHS[i]},${HEIGHTS[i]},${RLL[i]},${LOC_Y[i]}`;
+                } else {
+                    cnc += `,0,0,0,0,0`;
+                }
             }
         }
 
@@ -1274,6 +1879,7 @@ function getCNCString(section_height, sc_part_no, sectionIndex) {
         return "";
     }
 }
+
 
 function buildCncCode(sectionIndex) {
     const window_position = getState("WINDOW_POSITION");
@@ -1401,19 +2007,28 @@ function generateGlazingCodeString(glassKey) {
     const glass = getState(glassKey);
     const insert_1 = getState("INSERT_1");
     const insert_1_qty = getState("INSERT_1_QTY");
-    const lite_location = getState("LITE_LOCATION");
     const glass_shape = getState("GLASS_SHAPE");
     const liteLocation = getState("LITE_LOCATION");
+    const frameKit = getState("FRAME_KIT");
 
-
-    return [
+    if (glass_shape.includes("slim") && getState("DOOR_MODEL") === 'A') {
+        return [
+            frameKit,
+            glass,
+            screw,
+            insert_1,
+            insert_1_qty
+            // liteLocation
+        ].join(",");
+    }
+    else return [
         ext_frame_1,
         glass,
         int_frame_1,
         screw,
         insert_1,
-        insert_1_qty,
-        liteLocation
+        insert_1_qty
+        // liteLocation
     ].join(",");
 
 

@@ -32,6 +32,10 @@ function loadStyles() {
 //     overflow: hidden !important;
 // }
 
+.translationPopupTrigger.js-messagePopupTrigger{
+  display: none;
+}
+
 #CANVAS_PLUGIN {
     display: flex;
     justify-content: center;
