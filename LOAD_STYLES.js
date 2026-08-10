@@ -36,6 +36,60 @@ function loadStyles() {
   display: none;
 }
 
+#DEFAULTS_PLUGIN {
+    			width: 100%;
+    			display: block;
+		}
+
+            #DEFAULTS_PLUGIN .defaults-plugin-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            #DEFAULTS_PLUGIN .defaults-button {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+
+                cursor: pointer;
+                user-select: none;
+
+                color: #000;
+                text-decoration: none;
+
+                font-size: 12px;
+                font-weight: 600;
+                line-height: 1;
+            }
+
+            #DEFAULTS_PLUGIN .defaults-button i {
+                font-size: 14px;
+                color: #000;
+                line-height: 1;
+                width: 14px;
+                text-align: center;
+            }
+
+		  #DEFAULTS_PLUGIN .defaults-button .fas:before,
+		  #DEFAULTS_PLUGIN .defaults-button .far:before{
+			font-size: 12px;
+		  }
+
+            #DEFAULTS_PLUGIN .defaults-button span {
+                font-size: 14px;
+                font-weight: 600;
+                color: #000;
+                line-height: 1;
+                white-space: nowrap;
+            }
+
+            #DEFAULTS_PLUGIN .defaults-button:hover {
+                opacity: 0.7;
+            }
+                
 #CANVAS_PLUGIN {
     display: flex;
     justify-content: center;
@@ -43,7 +97,20 @@ function loadStyles() {
     height: 60vh;
 }
 
+.canvas-loader-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+
 .canvas-loader {
+  position: relative;
   width: 60px;
   height: 60px;
   border-radius: 50% !important;
@@ -53,6 +120,7 @@ function loadStyles() {
   box-sizing: border-box;
   animation: rotation 1s linear infinite;
 }
+
 .canvas-loader::after {
   content: '';  
   box-sizing: border-box;
@@ -1198,7 +1266,9 @@ div.radio-layout{
   }
 }
 
-
+#configurator .color-button.btn-checked{
+  background: none;
+}
 
 #configurator div.dimension-layout{
     display: flex;

@@ -1,0 +1,197 @@
+<doc>
+<javascript>
+
+var sections = {};
+
+function loadInputJson(inputJson) {
+
+    if (!inputJson || inputJson.trim() === "") {
+        return;
+    }
+
+    inputJson = inputJson.trim().replace(/(\r\n|\n|\r|\t)/gm, "");
+    inputJson = inputJson.replace(/^\[|\]$/g, "");
+    inputJson = inputJson.replace(/&quot;/g, '"');
+
+    var objects = inputJson.split('},{');
+
+    if (objects.length > 0) {
+        objects[0] = objects[0].replace('{', '');
+        objects[objects.length - 1] =
+            objects[objects.length - 1].replace('}', '');
+    }
+
+    for (var i = 0; i < objects.length; i++) {
+
+        var obj = objects[i];
+
+        if (obj.indexOf('glazingobj') !== -1) {
+            continue;
+        }
+
+        var keyValuePairs = obj.split(',');
+
+        var id = '';
+        var value = '';
+        var desc = '';
+        var text = '';
+
+        for (var j = 0; j < keyValuePairs.length; j++) {
+
+            var pair = keyValuePairs[j].split(':');
+
+            var key = pair[0].trim();
+
+            if (key.charAt(0) == '&') {
+                key = key.substring(6, key.length - 6);
+            }
+
+            var val = pair.slice(1).join(':').trim();
+
+            if (val.charAt(0) == '&') {
+                val = val.substring(6, val.length - 6);
+            }
+
+            if (key === 'id') {
+                id = val;
+            }
+
+            if (key === 'value') {
+                value = val;
+
+                if (
+                    value === 'null' ||
+                    value === 'undefined' ||
+                    value === 'NONE'
+                ) {
+                    value = '';
+                }
+            }
+
+            if (key === 'desc') {
+                desc = val;
+            }
+
+            if (key === 'text') {
+                text = val;
+            }
+        }
+
+        sections[id] =
+            text !== ''
+                ? text
+                : (desc !== '' ? desc : value);
+
+        if (sections[id]) {
+            sections[id] = sections[id].replace(/\\/g, '');
+        }
+    }
+}
+
+loadInputJson(processText("<doc>design.value.INPUT_JSON_1</doc>"));
+loadInputJson(processText("<doc>design.value.INPUT_JSON_2</doc>"));
+loadInputJson(processText("<doc>design.value.INPUT_JSON_3</doc>"));
+loadInputJson(processText("<doc>design.value.INPUT_JSON_4</doc>"));
+
+var doorWidth =
+    (sections['DOOR_WIDTH_FEET'] || '')
+    + "' "
+    + (sections['DOOR_WIDTH_INCHES'] || '0')
+    + '"';
+
+var doorHeight =
+    (sections['DOOR_HEIGHT_FEET'] || '')
+    + "' "
+    + (sections['DOOR_HEIGHT_INCHES'] || '0')
+    + '"';
+
+var html = '';
+
+/* DOOR */
+
+html += '<div>';
+html += '<h3>Door Model and Dimensions</h3>';
+html += '<table class="product-details-table">';
+
+html += '<tr><th><b>Input Field</b></th><th><b>Value</b></th></tr>';
+
+html += '<tr><td>Door Model</td><td>' + (sections['DOOR_MODEL'] || '') + '</td></tr>';
+html += '<tr><td>Door Width</td><td>' + doorWidth + '</td></tr>';
+html += '<tr><td>Door Height</td><td>' + doorHeight + '</td></tr>';
+html += '<tr><td>Number of Sections</td><td>' + (sections['NUM_OF_SEC'] || '') + '</td></tr>';
+html += '<tr><td>Panel Style</td><td>' + (sections['FACE'] || '') + '</td></tr>';
+html += '<tr><td>Door Color</td><td>' + (sections['COLOR'] || '') + '</td></tr>';
+
+html += '</table>';
+html += '</div>';
+
+/* GLAZING */
+
+html += '<div>';
+html += '<h3>Glazing</h3>';
+html += '<table class="product-details-table">';
+
+html += '<tr><th><b>Input Field</b></th><th><b>Value</b></th></tr>';
+
+html += '<tr><td>Glass Shape</td><td>' + (sections['GLASS_SHAPE'] || '') + '</td></tr>';
+html += '<tr><td>Glass Type</td><td>' + (sections['GLASS_TYPE'] || '') + '</td></tr>';
+html += '<tr><td>Window Position</td><td>' + (sections['WINDOW_POSITION'] || '') + '</td></tr>';
+html += '<tr><td>Glass Inserts</td><td>' + (sections['GLASS_INSERT'] || '') + '</td></tr>';
+html += '<tr><td>Frame Color</td><td>' + (sections['FRAME_COLOR'] || '') + '</td></tr>';
+html += '<tr><td>Insert Color</td><td>' + (sections['INSERT_COLOR'] || '') + '</td></tr>';
+html += '<tr><td>Tempered Glass</td><td>' + (sections['GLASS_TEMPERED'] || '') + '</td></tr>';
+
+html += '</table>';
+html += '</div>';
+
+/* HARDWARE */
+
+html += '<div>';
+html += '<h3>Hardware</h3>';
+html += '<table class="product-details-table">';
+
+html += '<tr><th><b>Input Field</b></th><th><b>Value</b></th></tr>';
+
+html += '<tr><td>Hardware Set</td><td>' + (sections['HARDWARE_SET'] || '') + '</td></tr>';
+html += '<tr><td>Spring Type</td><td>' + (sections['SPRING_TYPE'] || '') + '</td></tr>';
+html += '<tr><td>Inclined Track</td><td>' + (sections['INCLINEDTRACK'] || '') + '</td></tr>';
+html += '<tr><td>Lift Type</td><td>' + (sections['LIFT_TYPE'] || '') + '</td></tr>';
+
+if (sections['LIFT_TYPE'] == 'HL') {
+    html += '<tr><td>High Lift</td><td>' + (sections['HIGHLIFT'] || '') + '</td></tr>';
+}
+
+html += '<tr><td>Spring Cycle</td><td>' + (sections['SPRING_CYCLE'] || '') + '</td></tr>';
+html += '<tr><td>Jamb Seal</td><td>' + (sections['JAMB_SEAL'] || '') + '</td></tr>';
+html += '<tr><td>Jamb Seal Screws</td><td>' + (sections['JAMB_SEAL_SCREW_PACKAGES'] || '') + '</td></tr>';
+html += '<tr><td>Hanger Angle</td><td>' + (sections['HANGER_ANGLE'] || '') + '</td></tr>';
+html += '<tr><td>Hanger Qty</td><td>' + (sections['HANGER_ANGLE_QTY'] || '') + '</td></tr>';
+html += '<tr><td>Extra Truss</td><td>' + (sections['EXTRA_TRUSS'] || '') + '</td></tr>';
+
+html += '</table>';
+html += '</div>';
+
+
+/* OPERATOR */
+
+html += '<div>';
+html += '<h3>Operators</h3>';
+html += '<table class="product-details-table">';
+
+html += '<tr><th><b>Input Field</b></th><th><b>Value</b></th></tr>';
+
+html += '<tr><td>Operator</td><td>' + (sections['OPERATOR'] || '') + '</td></tr>';
+html += '<tr><td>Additional Transmitter</td><td>' + (sections['ADDITIONAL_TRANSMITTER'] || '') + '</td></tr>';
+html += '<tr><td>Additional Transmitter Qty</td><td>' + (sections['ADDITIONAL_TRANSMITTER_QTY'] || '') + '</td></tr>';
+html += '<tr><td>Additional Control Panel</td><td>' + (sections['ADDITIONAL_CONTROL_PANEL'] || '') + '</td></tr>';
+html += '<tr><td>Additional Control Panel Qty</td><td>' + (sections['ADDITIONAL_CONTROL_PANEL_QTY'] || '') + '</td></tr>';
+html += '<tr><td>Additional Keyless Entry</td><td>' + (sections['ADDITIONAL_KEYLESS_ENTRY'] || '') + '</td></tr>';
+html += '<tr><td>Additional Keyless Entry Qty</td><td>' + (sections['ADDITIONAL_KEYLESS_ENTRY_QTY'] || '') + '</td></tr>';
+
+html += '</table>';
+html += '</div>';
+
+out.println(html);
+
+</javascript>
+</doc>

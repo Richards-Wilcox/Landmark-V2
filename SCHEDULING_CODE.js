@@ -48,8 +48,7 @@ function createSectionScCodeLogic(sectionIndex) {
             let section_height = section?.[sectionIndex].height;
             let sc_code = getState(`SECTION_0${sectionIndex+1}_SMARTCOM_CODE`);
             
-
-            // ✅ FIX HERE
+            
             this.value = generateScCode(glazed, btm_retainer, panel_seq, section_height, sc_code);
         } else {
             this.value = null; // optional safety

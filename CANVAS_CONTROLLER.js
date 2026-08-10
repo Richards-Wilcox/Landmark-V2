@@ -321,7 +321,7 @@ function addRenderNode() {
 		if (glass_shape.includes("slim")) {
 
 			$("#POSITION_TOP").hide();
-			// $("#POSITION_CUSTOM").show();
+			$("#POSITION_CUSTOM").show();
 
 			const wasTopSelected = $top.is(":checked");
 
@@ -338,7 +338,7 @@ function addRenderNode() {
 		} else {
 
 			$("#POSITION_TOP").show();
-			// $("#POSITION_CUSTOM").hide();
+			$("#POSITION_CUSTOM").hide();
 		}
 
 		let position = $("input[name='WINDOW_POSITION']:checked").val() ?? "";
@@ -1769,26 +1769,37 @@ function getMaxSlimWindowQty(shape, doorWidth, spacing, singleEndcap) {
 }
 
 
+// function showConfigureLoader() {
+// 	// var $loader = $("#canvas-loader");
+// 	const $loader = $("#canvas-loader-backdrop");
+
+// 	if (!$loader.length) {
+// 		console.warn("Loader element #canvas-loader not found");
+// 		return;
+// 	}
+
+// 	$loader.show();
+
+// 	// Force reflow so browser applies display change immediately
+// 	$loader[0].offsetHeight;
+// }
+
+// function hideConfigureLoader() {
+// 	var $loader = $("#canvas-loader");
+
+// 	if ($loader.length) {
+// 		$loader.hide();
+// 	}
+// }
+
 function showConfigureLoader() {
-	var $loader = $("#canvas-loader");
-
-	if (!$loader.length) {
-		console.warn("Loader element #canvas-loader not found");
-		return;
-	}
-
-	$loader.show();
-
-	// Force reflow so browser applies display change immediately
-	$loader[0].offsetHeight;
+	$("#canvas-loader-backdrop").css("display", "flex");
+	$("#canvas-loader").show();
 }
 
 function hideConfigureLoader() {
-	var $loader = $("#canvas-loader");
-
-	if ($loader.length) {
-		$loader.hide();
-	}
+	$("#canvas-loader-backdrop").hide();
+	$("#canvas-loader").hide();
 }
 
 function prepareSlimPositionMode(section) {

@@ -179,17 +179,18 @@ function loadGlobalNodes() {
     } else this.value = 1;
   }, ["HARDWARE_SET"])
 
-   addLogic("OPT_YESNO", function () {
+  addLogic("OPT_YESNO", function () {
     let opt = getState("OPERATOR");
     if (!opt || opt == 'PS') {
       this.value = 0;
     } else this.value = 1;
   }, ["OPERATOR"])
 
-
   setupQtyLogic("ADDITIONAL_TRANSMITTER", "ADDITIONAL_TRANSMITTER_QTY");
   setupQtyLogic("ADDITIONAL_CONTROL_PANEL", "ADDITIONAL_CONTROL_PANEL_QTY");
   setupQtyLogic("ADDITIONAL_KEYLESS_ENTRY", "ADDITIONAL_KEYLESS_ENTRY_QTY");
+
+
 
 }
 

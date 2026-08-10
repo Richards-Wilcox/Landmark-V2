@@ -168,48 +168,82 @@ function loadDrivenInputEvents() {
   createNode(
     "NUM_OF_SEC",
     function () {
+
       let toggle_Switch = getState("customSwitch");
+
       if (toggle_Switch === "on") {
+
         let height = getState("HEIGHT");
         const $select = $("#NUM_OF_SEC");
 
-        // Get all num_sections for this height (may contain duplicates)
+        // Get available section counts
         const list = setNumberOfSections(height);
 
-        // Clear and rebuild dropdown
+        // Rebuild dropdown
         $select.empty();
-        list.forEach(n => {
-          $select.append(`<option value="${n}">${n}</option>`);
+
+        list.forEach(function (n) {
+          $select.append(
+            '<option value="' + n + '">' + n + '</option>'
+          );
         });
 
-        // Determine what the selected value should be
-        const previous = this.value;   // what user previously selected
+        // Preserve previous selection if still valid
+        const previous = this.value;
         const hasPrevious = list.includes(Number(previous));
 
-        // Set dropdown selection
-        const selected = hasPrevious ? previous : list[0];
-        $select.val(selected);
+        const selected = hasPrevious
+          ? previous
+          : list[0];
 
-        // Update node value
-        this.value = selected;
+        // Update dropdown UI
+        $select.val(String(selected));
 
-        // add listener ONLY once
+        // Update RW node value
+        this.value = String(selected);
+
+        // Attach listener only once
         if (!this.listenerAdded) {
-          $select.on("change", () => {
-            // this.value = Number($select.val());
-            const val = Number($select.val());
-            setState("NUM_OF_SEC", val);
+
+          $select.on("change", function () {
+
+            const val = String($select.val());
+
+            setState(
+              "NUM_OF_SEC",
+              val
+            );
+
           });
+
           this.listenerAdded = true;
         }
-      } else {
-        this.value = 4;
-      }
 
+      } else {
+
+        this.value = "4";
+
+        const $select = $("#NUM_OF_SEC");
+
+        if ($select.length) {
+
+          if ($select.find('option[value="4"]').length === 0) {
+
+            $select.empty();
+            $select.append(
+              '<option value="4">4</option>'
+            );
+          }
+
+          $select.val("4");
+        }
+      }
     },
     "",
     $("#NUM_OF_SEC")[0],
-    ["HEIGHT", "customSwitch"])
+    ["HEIGHT", "customSwitch"]
+  );
+
 
 
   addLogic("STUCCO", function () {

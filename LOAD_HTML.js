@@ -36,13 +36,52 @@ let insertColorUserOverride = false;
 let currentOperatorIndex = 1;
 let operatorDataArray = [];
 
+function getInputJsonValue() {
 
+    let jsonValue = "";
+
+    for (let i = 1; i <= 4; i++) {
+        const key = `INPUT_JSON_${i}`;
+
+        if (
+            typeof nodeset !== "undefined" &&
+            nodeset &&
+            nodeset[key] &&
+            typeof nodeset[key].value !== "undefined"
+        ) {
+            jsonValue += nodeset[key].value || "";
+        }
+    }
+
+    if (jsonValue) {
+        return jsonValue;
+    }
+
+    for (let i = 1; i <= 4; i++) {
+        const $input = $(`#INPUT_JSON_${i}`);
+
+        if ($input.length) {
+            jsonValue += $input.val() || "";
+        }
+    }
+
+    return jsonValue;
+}
+
+function setInputJsonValue(value) {
+    if (typeof nodeset !== "undefined" && nodeset && nodeset["INPUT_JSON"]) {
+        nodeset["INPUT_JSON"].value = value;
+    }
+
+    const $input = $("#INPUT_JSON");
+    if ($input.length) {
+        $input.val(value);
+    }
+}
 
 function loadForm() {
 
     calculatePrice();
-
-
     toggleAccordion();
     const form = createForm();
     //Here is where we append the HTML
@@ -82,14 +121,17 @@ function loadForm() {
     })
 
     //Load the caching system.
-    rw_init('configurator')
+    rw_init("configurator");
 
     $('.rw-warning').hide()
-    $("#DEFAULTS_PLUGIN").html(DEFAULTS_PLUGIN.load("1825206974"))
+    // $("#DEFAULTS_PLUGIN").html(DEFAULTS_PLUGIN.load("162059085"))
     $('#configurator button').on("click", evt => evt.preventDefault())
     $('#LOAD_DEFAULTS').on('click', applyDefaults)
     $("#LIFT_TYPE").change((e) => $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display")))
-    if ($("#INPUT_JSON").val() === '')
+
+    const inputJsonValue = getInputJsonValue();
+
+    if (inputJsonValue === '')
         applyDefaults()
     else {
         loadInputValues("configurator");
@@ -143,7 +185,7 @@ function createForm() {
                         <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_BOTH"
                             name="WINDOW_POSITION" desc="Both" code="both" value="both">
                     </div>
-                    <div class="rw-button" tabindex="0"  id="POSITION_CUSTOM" >
+                    <div class="rw-button" tabindex="0"  id="POSITION_CUSTOM" style="display:none;">
                         <label for="WINDOW_POSITION_CUSTOM">Custom</label>
                         <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_CUSTOM"
                             name="WINDOW_POSITION" desc="Custom" code="custom" value="custom">
@@ -154,9 +196,13 @@ function createForm() {
             <div id="CANVAS_PLUGIN">
             </div>
             <!-- Loader -->
-            <div class="canvas-loader" id="canvas-loader" style="display:none; position:absolute; top:50%; left:50%;
-      transform:translate(-50%, -50%);
-      padding:10px 20px; border-radius:8px; z-index:10;"></div>
+           <div id="canvas-loader-backdrop" class="canvas-loader-backdrop" style="display:none;">
+                <div class="canvas-loader" id="canvas-loader" style="position:absolute; top:50%; left:50%;
+                                                            transform:translate(-50%, -50%);
+                                                            padding:10px 20px; border-radius:8px; z-index:10;">
+                </div>
+            </div>
+            
 
         </div>
         <div class="rw-configurator__layout--right">
@@ -1356,7 +1402,7 @@ function createForm() {
                     </button>
 
                     <button type="button" name="nextPageBtn" class="button-configure" onclick="Configure()"
-                        data-qa-selector="continue">Configure</button>
+                        data-qa-selector="continue" id="CONFIGURE_BTN">Configure</button>
 
                     <button class="button-nextpage" onclick="formForward()">
                         Next
@@ -1368,7 +1414,19 @@ function createForm() {
                         </div>
                     </button>
                 </div>
-                <div id="DEFAULTS_PLUGIN"></div>
+                <div id="DEFAULTS_PLUGIN">                                
+                 <div class="defaults-plugin-container">
+                    <div onclick="saveDefaults()" class="defaults-button">
+                        <i class="far fa-bookmark"></i>
+                        <span>Save as Default</span>
+                    </div>
+                    
+                    <div id="LOAD_DEFAULTS" class="defaults-button" onclick = "applyDefaults()">
+                        <i class="fas fa-undo"></i>
+                        <span>Restore Default</span>
+                    </div>
+                </div>
+            </div>
             </div>
         </div>
     </div>
@@ -1380,11 +1438,11 @@ function createForm() {
 function toggleAccordion() {
     //At least one input needs to be loaded in initially to get the title.
     $('#ROOT_0').hide()
-
+    $("#accordion661524662").hide();//Hides TEST_UTIL
     $('#accordion935516314').hide(); // hide load_html page
     $('#accordion991246024').hide(); //weight controller
     //Hides the outputs
-    $('#accordion1406547076').hide()
+    $('#accordion1406547076').hide()  //Hides the outputs
     $("#accordion1094153584").hide()//Hides the global data for JDE
     $("#accordion9757245").hide() //section bundle
     $("#accordion321627220").hide() //Glazing code
@@ -1790,8 +1848,462 @@ function updateCarouselPosition(index) {
     carousel.style.transform = `translateX(-${index * 100}%)`;
 }
 
+//162059085
+
+// function saveDefaults() {
+//     const defaults = {};
+//     Object.values(nodeset).forEach((node) => {
+//         if (node.id !== "SPC_BOM" && node.id !== "INPUT_JSON_1" && node.id !== "SPRING_SOLUTION" && !node.id.startsWith("GL_") && node.id !== "RENDER")
+//             defaults[node.id] = node.value;        
+//     });
+
+//     console.log("data", JSON.stringify(defaults))
+//     $.ajax({
+//         url: `/spr/custom/jpoc/json/849871261?162059085`,
+//         type: "POST",
+//         data: JSON.stringify(defaults),
+//         contentType: "application/json; charset=utf-8",
+//         error: function (err, textStatus, errorThrown) {
+//             console.log(err, textStatus, errorThrown);
+//             simpleConfirm("Error, new defaults not saved.");
+//         },
+//     }).done((res) => {
+//         simpleConfirm("New Defaults Saved");
+//     });
+// }
+
+function saveDefaults() {
+
+    const includedIds = new Set([
+        "DOOR_MODEL",
+        "DOOR_WIDTH_FEET",
+        "DOOR_WIDTH_INCHES",
+        "DOOR_HEIGHT_FEET",
+        "DOOR_HEIGHT_INCHES",
+        "SIZE",
+        "NUM_OF_SEC",
+        "customSwitch",
+        "SIZE_WIDTH",
+        "SIZE_HEIGHT",
+        "FACE",
+        "FINISH",
+        "COLOR",
+        "FRAME_COLOR",
+        "INSERT_COLOR",
+        "GLASS_SHAPE",
+        "GLASS_TYPE",
+        "GLASS_INSERT",
+        "WINDOW_POSITION",
+        "GLASS_TEMPERED",
+        "HARDWARE_SET",
+        "SPRING_TYPE",
+        "INCLINEDTRACK",
+        "LIFT_TYPE",
+        "SPRING_CYCLE",
+        "HANGER_ANGLE",
+        "HANGER_ANGLE_QTY",
+        "OPERATOR",
+        "ADDITIONAL_TRANSMITTER",
+        "ADDITIONAL_TRANSMITTER_QTY",
+        "ADDITIONAL_CONTROL_PANEL",
+        "ADDITIONAL_CONTROL_PANEL_QTY",
+        "ADDITIONAL_KEYLESS_ENTRY",
+        "ADDITIONAL_KEYLESS_ENTRY_QTY",
+        "DRILL",
+        "END_CAPS",
+        "EXTRA_TRUSS",
+        "SHAFT_TYPE"
+    ]);
+
+    const defaults = [];
+
+    Object.values(nodeset).forEach((node) => {
+
+        if (!includedIds.has(node.id)) {
+            return;
+        }
+
+        defaults.push({
+            id: node.id,
+            value: node.value
+        });
+    });
+
+    console.log(JSON.stringify(defaults, null, 2));
+
+    $.ajax({
+        url: "/spr/custom/jpoc/json/849871261?162059085",
+        type: "POST",
+        data: JSON.stringify(defaults),
+        contentType: "application/json; charset=utf-8"
+    })
+        .done(() => {
+            simpleConfirm("New Defaults Saved");
+        })
+        .fail((err, textStatus, errorThrown) => {
+            console.log(err, textStatus, errorThrown);
+            simpleConfirm("Error, new defaults not saved.");
+        });
+}
+
+// function applyDefaults() {
+
+//     $.ajax({
+//         url: "/spr/custom/jpoc/json/849871261?162059085"
+//     })
+//         .done((res) => {
+
+//             console.log("RES:", res);
+
+//             let defaultValues = null;
+
+//             try {
+//                 if (typeof res === "string") {
+//                     res = JSON.parse(res);
+//                 }
+
+//                 if (res && typeof res === "object" && res.INPUT_SETTINGS) {
+//                     defaultValues = typeof res.INPUT_SETTINGS === "string"
+//                         ? JSON.parse(res.INPUT_SETTINGS)
+//                         : res.INPUT_SETTINGS;
+//                 } else if (res && typeof res === "object") {
+//                     defaultValues = res;
+//                 }
+//             } catch (e) {
+//                 console.error("Failed to parse INPUT_SETTINGS");
+//                 console.error(res && res.INPUT_SETTINGS ? res.INPUT_SETTINGS : res);
+//                 console.error(e);
+//                 return;
+//             }
+
+//             if (!defaultValues || typeof defaultValues !== "object") {
+//                 console.warn("No defaults found.");
+//                 return;
+//             }
+
+//             Object.keys(defaultValues).forEach((key) => {
+
+//                 if (!nodeset[key]) {
+//                     return;
+//                 }
+
+//                 const value = defaultValues[key];
+
+//                 if (nodeset[key].type === "RADIO_PARENT") {
+
+//                     $(`input[type=radio][name="${key}"]`)
+//                         .removeAttr("checked");
+
+//                     $(`input[type=radio][name="${key}"][value="${value}"]`)
+//                         .attr("checked", "");
+//                 }
+
+//                 nodeset[key].value = value;
+
+//                 const input = $("#" + key);
+
+//                 if (input.attr("type") !== "radio") {
+//                     input.val(value);
+//                 }
+//             });
+
+//             finalvalidation();
+
+//             $("input[type=radio][checked]").click();
+
+//             if (typeof saveInputValues === "function") {
+//                 saveInputValues("configurator");
+//             } else {
+//                 const json = [];
+//                 $(`#configurator input:not(.navigation-button), #configurator select`).each((index, input) => {
+//                     if (input.getAttribute("ignore") === "true") {
+//                         return;
+//                     }
+
+//                     const id = input.getAttribute("id");
+//                     if (!id || id === "INPUT_JSON" || id === "OUTPUT_JSON") {
+//                         return;
+//                     }
+
+//                     const value = input.getAttribute("type") === "radio"
+//                         ? input.hasAttribute("checked")
+//                         : input.value;
+
+//                     json.push({ id, value, desc: input.innerText ? input.innerText.trim() : "" });
+//                 });
+
+//                 setInputJsonValue(JSON.stringify(json));
+//             }
+
+//         })
+//         .fail((xhr) => {
+
+//             console.error("Apply Defaults Failed");
+//             console.error(xhr);
+
+//         });
+// }
+
+// function applyDefaults() {
+
+//     $.ajax({
+//         url: "/spr/custom/jpoc/json/849871261?162059085"
+//     })
+//     .done((res) => {
+
+//         if (!res || !res.INPUT_SETTINGS) {
+//             return;
+//         }
+
+//         const defaultValues = JSON.parse(res.INPUT_SETTINGS);
+//         console.log("defaultValues", defaultValues);
+
+//         if (!Array.isArray(defaultValues)) {
+//             console.error("INPUT_SETTINGS is not an array:", defaultValues);
+//             return;
+//         }
+
+//         defaultValues.forEach((node) => {
+
+//             if (!node || !node.id) {
+//                 return;
+//             }
+
+//             if (!nodeset[node.id]) {
+//                 console.warn(`Node not found: ${node.id}`);
+//                 return;
+//             }
+
+//             // Update nodeset value
+//             nodeset[node.id].value = node.value;
+
+//             // Handle radio groups
+//             if (nodeset[node.id].type === "RADIO_PARENT") {
+
+//                 $(`input[type="radio"][name="${node.id}"]`)
+//                     .prop("checked", false);
+
+//                 $(`input[type="radio"][name="${node.id}"][value="${node.value}"]`)
+//                     .prop("checked", true);
+
+//                 return;
+//             }
+
+//             const $input = $("#" + node.id);
+
+//             if (!$input.length) {
+//                 return;
+//             }
+
+//             // Handle checkboxes
+//             if ($input.attr("type") === "checkbox") {
+
+//                 $input.prop(
+//                     "checked",
+//                     node.value === true ||
+//                     node.value === "true" ||
+//                     node.value === 1 ||
+//                     node.value === "1"
+//                 );
+
+//                 return;
+//             }
+
+//             // Everything else
+//             $input.val(node.value);
+//         });
+
+//         finalvalidation();
+
+//         $('input[type="radio"]:checked').trigger("click");
+//     })
+//     .fail((res) => {
+//         console.log(res);
+//     });
+// }
+
 function applyDefaults() {
 
+    $.ajax({
+        url: "/spr/custom/jpoc/json/849871261?162059085"
+    })
+        .done((res) => {
+
+            if (!res || !res.INPUT_SETTINGS) {
+                return;
+            }
+
+            const defaultValues = JSON.parse(res.INPUT_SETTINGS);
+            console.log("defaultValues", defaultValues);
+
+            if (!Array.isArray(defaultValues)) {
+                console.error("INPUT_SETTINGS is not an array:", defaultValues);
+                return;
+            }
+
+            // Apply all defaults
+            defaultValues.forEach((node) => {
+
+                if (!node || !node.id) {
+                    return;
+                }
+
+                if (!nodeset[node.id]) {
+                    console.warn(`Node not found: ${node.id}`);
+                    return;
+                }
+
+                // Special handling for color objects
+                if (
+                    node.id === "COLOR" ||
+                    node.id === "FRAME_COLOR" ||
+                    node.id === "INSERT_COLOR"
+                ) {
+                    nodeset[node.id].value = node.value;
+                    return;
+                }
+
+                nodeset[node.id].value = node.value;
+
+                if (nodeset[node.id].type === "RADIO_PARENT") {
+
+                    $(`input[type="radio"][name="${node.id}"]`)
+                        .prop("checked", false);
+
+                    $(`input[type="radio"][name="${node.id}"][value="${node.value}"]`)
+                        .prop("checked", true);
+
+                    return;
+                }
+
+                const $input = $("#" + node.id);
+
+                if (!$input.length) {
+                    return;
+                }
+
+                if ($input.attr("type") === "checkbox") {
+
+                    $input.prop(
+                        "checked",
+                        node.value === true ||
+                        node.value === "true" ||
+                        node.value === 1 ||
+                        node.value === "1"
+                    );
+
+                    return;
+                }
+
+                $input.val(node.value);
+            });
+
+            //
+            // Force dimension fields after dropdowns are rebuilt
+            //
+            const widthFeet = defaultValues.find(x => x.id === "DOOR_WIDTH_FEET");
+            const widthInches = defaultValues.find(x => x.id === "DOOR_WIDTH_INCHES");
+            const heightFeet = defaultValues.find(x => x.id === "DOOR_HEIGHT_FEET");
+            const heightInches = defaultValues.find(x => x.id === "DOOR_HEIGHT_INCHES");
+
+            if (widthFeet) {
+                $("#DOOR_WIDTH_FEET").val(widthFeet.value);
+                nodeset.DOOR_WIDTH_FEET.value = widthFeet.value;
+                setState("DOOR_WIDTH_FEET", widthFeet.value);
+
+                updateDoorWidthInches(parseInt(widthFeet.value, 10));
+            }
+
+            if (heightFeet) {
+                $("#DOOR_HEIGHT_FEET").val(heightFeet.value);
+                nodeset.DOOR_HEIGHT_FEET.value = heightFeet.value;
+                setState("DOOR_HEIGHT_FEET", heightFeet.value);
+
+                refreshHeightInches(parseInt(heightFeet.value, 10));
+            }
+
+            setTimeout(() => {
+
+                if (widthInches) {
+                    $("#DOOR_WIDTH_INCHES").val(widthInches.value);
+                    nodeset.DOOR_WIDTH_INCHES.value = widthInches.value;
+                }
+
+                if (heightInches) {
+                    $("#DOOR_HEIGHT_INCHES").val(heightInches.value);
+                    nodeset.DOOR_HEIGHT_INCHES.value = heightInches.value;
+                }
+
+                if (widthFeet) {
+                    $("#DOOR_WIDTH_FEET").val(widthFeet.value);
+                    nodeset.DOOR_WIDTH_FEET.value = widthFeet.value;
+                    setState("DOOR_WIDTH_FEET", widthFeet.value);
+                }
+
+                if (heightFeet) {
+                    $("#DOOR_HEIGHT_FEET").val(heightFeet.value);
+                    nodeset.DOOR_HEIGHT_FEET.value = heightFeet.value;
+                    setState("DOOR_HEIGHT_FEET", heightFeet.value);
+                }
+
+                console.log("FINAL VALUES:");
+                console.log("WIDTH_FEET", nodeset.DOOR_WIDTH_FEET.value);
+                console.log("WIDTH_INCHES", nodeset.DOOR_WIDTH_INCHES.value);
+                console.log("HEIGHT_FEET", nodeset.DOOR_HEIGHT_FEET.value);
+                console.log("HEIGHT_INCHES", nodeset.DOOR_HEIGHT_INCHES.value);
+
+                // Restore COLOR, FRAME_COLOR, INSERT_COLOR
+                ["COLOR", "FRAME_COLOR", "INSERT_COLOR"].forEach(id => {
+
+                    const colorDefault = defaultValues.find(x => x.id === id);
+
+                    if (!colorDefault) {
+                        return;
+                    }
+
+                    const colorValue =
+                        typeof colorDefault.value === "object"
+                            ? colorDefault.value.value
+                            : colorDefault.value;
+
+                    const $selected =
+                        $(`input[name='${id}'][value='${colorValue}']`);
+
+                    if ($selected.length) {
+
+                        $(`input[name='${id}']`)
+                            .prop("checked", false)
+                            .closest(".color-button-container")
+                            .removeClass("selected");
+
+                        $selected.prop("checked", true);
+
+                        $selected
+                            .closest(".color-button-container")
+                            .addClass("selected");
+
+                        if (getNode(id)) {
+                            rw(getNode(id));
+                        }
+                    }
+                });
+
+                finalvalidation();
+
+                $('input[type="radio"]:checked').trigger("click");
+
+            }, 50);
+
+            console.log({
+                dom: $("#DOOR_WIDTH_FEET").val(),
+                node: nodeset.DOOR_WIDTH_FEET.value,
+                state: getState("DOOR_WIDTH_FEET")
+            });
+
+        })
+        .fail((res) => {
+            console.log(res);
+        });
 }
 
 
@@ -2466,6 +2978,13 @@ function updateDoorWidthInches(feet) {
 
 function appendDrpData() {
 
+    console.log("appendDrpData START",
+        $("#DOOR_WIDTH_FEET").val(),
+        $("#DOOR_WIDTH_INCHES").val(),
+        $("#DOOR_HEIGHT_FEET").val(),
+        $("#DOOR_HEIGHT_INCHES").val()
+    );
+
     // Populate Door Width Feet (4–20)
     $("#DOOR_WIDTH_FEET").html(generateOptions(4, 20));
     $("#DOOR_WIDTH_FEET").val("16");
@@ -2493,6 +3012,13 @@ function appendDrpData() {
             const feet = parseInt($(this).val(), 10);
             refreshHeightInches(feet);
         });
+
+    console.log("appendDrpData END",
+        $("#DOOR_WIDTH_FEET").val(),
+        $("#DOOR_WIDTH_INCHES").val(),
+        $("#DOOR_HEIGHT_FEET").val(),
+        $("#DOOR_HEIGHT_INCHES").val()
+    );
 }
 
 
@@ -2676,9 +3202,26 @@ function isFormValid() {
 
 }
 
+
 function additionalSaves(json) {
 
+    json.push({
+        id: "HANGER_ANGLE_QTY",
+        value: $("#HANGER_ANGLE_QTY").text().trim(),
+        desc: "",
+        text: $("#HANGER_ANGLE_QTY").text().trim()
+    });
+
+    json.push({
+        id: "JAMB_SEAL_SCREW_PACKAGES",
+        value: $("#JAMB_SEAL_SCREW_PACKAGES").text().trim(),
+        desc: "",
+        text: $("#JAMB_SEAL_SCREW_PACKAGES").text().trim()
+    });
+
+    console.log("additionalSaves", json);
 }
+
 
 function loadGlazingUI() {
     // $('#more_glass_shapes').change(function () {

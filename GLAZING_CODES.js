@@ -556,23 +556,23 @@ function addGlazingCodeLogic() {
         }
     }, [""])
 
-    addLogic("SECTION_01_SMARTCOM_CODE", createSmartcomLogic("SECTION_01"), ["SECTION_01", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES"]);
+    addLogic("SECTION_01_SMARTCOM_CODE", createSmartcomLogic("SECTION_01"), ["SECTION_01", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "GLASS_SHAPE"]);
 
-    addLogic("SECTION_02_SMARTCOM_CODE", createSmartcomLogic("SECTION_02"), ["SECTION_02", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES"]);
+    addLogic("SECTION_02_SMARTCOM_CODE", createSmartcomLogic("SECTION_02"), ["SECTION_02", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "GLASS_SHAPE"]);
 
-    addLogic("SECTION_03_SMARTCOM_CODE", createSmartcomLogic("SECTION_03"), ["SECTION_03", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES"]);
+    addLogic("SECTION_03_SMARTCOM_CODE", createSmartcomLogic("SECTION_03"), ["SECTION_03", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "GLASS_SHAPE"]);
 
-    addLogic("SECTION_04_SMARTCOM_CODE", createSmartcomLogic("SECTION_04"), ["SECTION_04", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES"]);
+    addLogic("SECTION_04_SMARTCOM_CODE", createSmartcomLogic("SECTION_04"), ["SECTION_04", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "GLASS_SHAPE"]);
 
-    addLogic("SECTION_05_SMARTCOM_CODE", createSmartcomLogic("SECTION_05"), ["SECTION_05", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES"]);
+    addLogic("SECTION_05_SMARTCOM_CODE", createSmartcomLogic("SECTION_05"), ["SECTION_05", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "GLASS_SHAPE"]);
 
-    addLogic("SECTION_06_SMARTCOM_CODE", createSmartcomLogic("SECTION_06"), ["SECTION_06", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES"]);
+    addLogic("SECTION_06_SMARTCOM_CODE", createSmartcomLogic("SECTION_06"), ["SECTION_06", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "GLASS_SHAPE"]);
 
-    addLogic("SECTION_07_SMARTCOM_CODE", createSmartcomLogic("SECTION_07"), ["SECTION_07", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES"]);
+    addLogic("SECTION_07_SMARTCOM_CODE", createSmartcomLogic("SECTION_07"), ["SECTION_07", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "GLASS_SHAPE"]);
 
-    addLogic("SECTION_08_SMARTCOM_CODE", createSmartcomLogic("SECTION_08"), ["SECTION_08", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES"]);
+    addLogic("SECTION_08_SMARTCOM_CODE", createSmartcomLogic("SECTION_08"), ["SECTION_08", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "GLASS_SHAPE"]);
 
-    addLogic("SECTION_09_SMARTCOM_CODE", createSmartcomLogic("SECTION_09"), ["SECTION_09", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES"]);
+    addLogic("SECTION_09_SMARTCOM_CODE", createSmartcomLogic("SECTION_09"), ["SECTION_09", "FACE", "PANEL_SPACING", "CENTER_HINGE_CODE", "DRILL", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "GLASS_SHAPE"]);
 
     addLogic("GLZ_CODE_SECTION_01", function () {
         this.value = buildGlzCode(1);
@@ -1243,18 +1243,22 @@ function createSmartcomLogic(sectionField) {
         let window_position = getState("WINDOW_POSITION");
         let glass_shape = getState("GLASS_SHAPE");
 
-        if (glass_shape.includes("slim")) {
-            this.value = "";
-            return;
-        }
+        // if (glass_shape.includes("slim")) {
+        //     this.value = "";
+        //     return;
+        // }
 
         if (panel_style === "F" || panel_style === "V") {
             if (custom_window === true || window_position === 'top') {
                 prefix = liteCodeMap[glass_shape] ?? "";
             }
+
+            if (glass_shape.includes("slim")) {
+                prefix = liteCodeMap[glass_shape] ?? "";
+            }
         } else prefix = panel_style;
 
-        var code = prefix + panel_spacing + hinge_code + "S" + drill_code + "-" + width_ft + width_inch;
+        var code = prefix + panel_spacing + hinge_code + "S" + drill_code + "-" + width_ft + width_inch;        
 
         // ✅ Apply rule
         if (sectionValue !== "" && sectionValue !== null && sectionValue !== undefined) {

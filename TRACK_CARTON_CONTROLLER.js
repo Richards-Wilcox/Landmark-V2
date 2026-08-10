@@ -88,7 +88,13 @@ function addTrackDrivers() {
             let widthFeet = getState("DOOR_WIDTH_FEET");
             let heightInches = getState("DOOR_HEIGHT_INCHES");
             let heightFeet = getState("DOOR_HEIGHT_FEET");
-            let liftType = getSelected("LIFT_TYPE").getAttribute("hwdesc");
+            
+		  let selectedLiftType = getSelected("LIFT_TYPE");
+		  let liftType =
+    selectedLiftType
+        ? (selectedLiftType.getAttribute("hwdesc") || "")
+        : "";
+		
             let doorModel = '';
             let product_id = getState("GL_PRODUCT_ID");
             let hwType = "+";
@@ -97,10 +103,11 @@ function addTrackDrivers() {
             let highlift = '';
 
             if (product_id == "162059085") {
-                doorModel = getSelected("DOOR_MODEL").getAttribute("desc");
-                springCycle = getState("SPRING_CYCLE");
-                highlift = liftType === "I" ? getState("HIGHLIFT") : "";
-            } else {
+    			const selectedModel = getSelected("DOOR_MODEL");
+    			doorModel = selectedModel ? selectedModel.getAttribute("desc") : "";
+			springCycle = getState("SPRING_CYCLE");
+    			highlift = liftType === "I" ? getState("HIGHLIFT") : "";
+		  } else {
                 doorModel = "Stilo";
                 springCycle = "20M";
                 highlift = liftType === "HL" ? getState("HIGHLIFT") : "";
@@ -122,7 +129,7 @@ function addTrackDrivers() {
 
             this.value = value;
         },
-        ["HEIGHT", "LIFT_TYPE", "WIDTH", "HIGHLIFT", "END_CAPS", "GL_PRODUCT_ID"]
+        ["HEIGHT", "LIFT_TYPE", "WIDTH", "HIGHLIFT", "END_CAPS", "GL_PRODUCT_ID","DOOR_MODEL","SPRING_CYCLE"]
     );
 
     addLogic(
@@ -160,7 +167,10 @@ function addTrackDrivers() {
                 return;
             }
 
-            let liftTypePrefix = getSelected("LIFT_TYPE").getAttribute("trackcode");
+           const selectedLiftType = getSelected("LIFT_TYPE");
+
+		 let liftTypePrefix = selectedLiftType ? selectedLiftType.getAttribute("trackcode") : "";
+		
             let trackSetDoorType = getState("DOOR_WIDTH_FEET") < 12 ? "SC" : "DC";
 
             let tracksetcode = `${getGlobalDoorHeight()}-${liftTypePrefix}-${trackSetDoorType}`;
@@ -311,16 +321,17 @@ function addTrackDrivers() {
 
 async function getSpringSolutionsRW() {
 
-
+    const selectedLiftType = getSelected("LIFT_TYPE");
+	 
     const doorData = {
-        DOOR_WEIGHT: "" + getState("WEIGHT") ?? 240.03,
+        DOOR_WEIGHT: String(getState("WEIGHT") ?? 240.03),
         DOOR_HEIGHT: "" + getState("HEIGHT"),
         DOOR_WIDTH: "" + getState("WIDTH"),
         BORE_SIZE: "1.0",
         CYCLES: "10",
         SPRING_GALVANIZED: "1.0",
         COUPLINGS_QTY: "0",
-        LIFT_TYPE: getSelected("LIFT_TYPE").getAttribute("numval"),
+        LIFT_TYPE: selectedLiftType ? (selectedLiftType.getAttribute("numval") || "") : "",
         HILIFT: getState("HIGHLIFT") + "",
         SPRING_QTY: "2",
         CYCLE_FACTOR: "1.131",
@@ -334,12 +345,19 @@ async function getSpringSolutionsRW() {
         DRUM_RORISE_VALUE: "0.21875",
     };
     const trackData = {
-        TRACK_RADIUS: getSelected("LIFT_TYPE").getAttribute("radius"),
+        TRACK_RADIUS: selectedLiftType ? (selectedLiftType.getAttribute("radius") || "") : "",
         TRACK_ANGLE: "0.0",
     };
     console.log(doorData);
     //Need to check for validation
-    if (JSON.stringify(doorData).includes("NaN")) return;
+    // Need to check for validation
+	if (JSON.stringify(doorData).includes("NaN")) {
+    	console.warn(
+        "Spring calculation skipped due to NaN values",
+        doorData
+    );
+    		return getState("SPRING_SOLUTION");
+	}
 
     const body = JSON.stringify({
         door: doorData,
@@ -366,6 +384,12 @@ async function getSpringSolutionsRW() {
         // Return a valid default object
         return getState("SPRING_SOLUTION");
     }
+	 
+	 if (!Array.isArray(solutions)) {
+         console.warn("Spring API returned invalid response");
+    		return getState("SPRING_SOLUTION");
+	}
+	 
     //Remove Invalid spring solutions
     solutions = solutions.filter(
         (a) =>
@@ -389,5 +413,14 @@ async function getSpringSolutionsRW() {
         return cycleLifeDiff;
     });
 
-    return solutions[0];
+   if (!solutions.length) {
+
+    console.warn(
+        "No valid spring solutions found"
+    );
+
+    return getState("SPRING_SOLUTION");
+}
+
+return solutions[0];
 }
