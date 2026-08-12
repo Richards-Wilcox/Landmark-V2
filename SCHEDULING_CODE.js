@@ -1,78 +1,57 @@
 function addSchedulingCodeLogic() {
 
-    addLogic("BTM_SECTION_DOOR_MODEL", function () {
-        let btm_section = getState("BTM_SECTION");
+    addLogic("SECTION_01_SC_CODE", createSectionScCodeLogic(0), ["SECTION_01", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_02_SC_CODE", createSectionScCodeLogic(1), ["SECTION_02", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_03_SC_CODE", createSectionScCodeLogic(2), ["SECTION_03", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_04_SC_CODE", createSectionScCodeLogic(3), ["SECTION_04", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_05_SC_CODE", createSectionScCodeLogic(4), ["SECTION_05", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_06_SC_CODE", createSectionScCodeLogic(5), ["SECTION_06", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_07_SC_CODE", createSectionScCodeLogic(6), ["SECTION_07", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_08_SC_CODE", createSectionScCodeLogic(7), ["SECTION_08", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+    addLogic("SECTION_09_SC_CODE", createSectionScCodeLogic(8), ["SECTION_09", "WINDOW_POSITION", "GLASS_SHAPE", "COLOR", "END_CAPS"]);
+}
 
-        if (btm_section) {
-            this.value = getState("LM_DOOR_MODEL")
-        } else this.value = '';
 
-    }, ["BTM_SECTION", "LM_DOOR_MODEL"])
 
-    // addLogic("TOP_SECTION_DOOR_MODEL", function () {
-    //     let top_section = getState("TOP_SECTION");
+function generateScCode(glazed, btm_retainer, panel_seq, section_height, sc_code) {
 
-    //     if (top_section) {
-    //         this.value = getState("LM_DOOR_MODEL")
-    //     } else this.value = '';
+    // smartcom_code, width_code, panel_per_sb, setup_code
+    const door_model = getState("LM_DOOR_MODEL");
+    const panel_style = getState("FACE");
+    const door_color = getState("COLOR")?.value;
+    const drill = getState("DRILL");
+    let drill_code = `${panel_style}${getState("PANEL_SPACING")}`;
+    let end_caps = getState("END_CAPS") === 'Y' ? 1 : 0;
+    let width_code = `${section_height}-R${door_color}`;
+    let panel_per_sb = 1;
 
-    // }, ["TOP_SECTION", "LM_DOOR_MODEL"])
+    return `${door_model},${panel_style},${door_color},${drill},${drill_code},${glazed},${btm_retainer},${end_caps},${panel_seq},${sc_code},${width_code},${panel_per_sb}`;
+}
 
-    addLogic("INT1_SECTION_DOOR_MODEL", function () {
-        let INT1_SECTION = getState("INT1_SECTION");
 
-        if (INT1_SECTION) {
-            this.value = getState("LM_DOOR_MODEL")
-        } else this.value = '';
+function createSectionScCodeLogic(sectionIndex) {
+    return function () {
 
-    }, ["INT1_SECTION", "LM_DOOR_MODEL"])
+        const section = getSectionInfo();
 
-    addLogic("INT2_SECTION_DOOR_MODEL", function () {
-        let INT2_SECTION = getState("INT2_SECTION");
+        if (section?.length && section[sectionIndex] != null && section[sectionIndex] !== "") {
 
-        if (INT2_SECTION) {
-            this.value = getState("LM_DOOR_MODEL")
-        } else this.value = '';
+            let sequence = section.map((_, index) => {
+                if (index === 0) return 3;
+                if (index === section.length - 1) return 1;
+                return 2;
+            });
 
-    }, ["INT2_SECTION", "LM_DOOR_MODEL"])
-
-    addLogic("INT3_SECTION_DOOR_MODEL", function () {
-        let INT3_SECTION = getState("INT3_SECTION");
-
-        if (INT3_SECTION) {
-            this.value = getState("LM_DOOR_MODEL")
-        } else this.value = '';
-
-    }, ["INT3_SECTION", "LM_DOOR_MODEL"])
-
-    addLogic("INT4_SECTION_DOOR_MODEL", function () {
-        let INT4_SECTION = getState("INT4_SECTION");
-
-        if (INT4_SECTION) {
-            this.value = getState("LM_DOOR_MODEL")
-        } else this.value = '';
-    }, ["INT4_SECTION", "LM_DOOR_MODEL"])
-
-    addLogic("INT5_SECTION_DOOR_MODEL", function () {
-        let INT5_SECTION = getState("INT5_SECTION");
-
-        if (INT5_SECTION) {
-            this.value = getState("LM_DOOR_MODEL")
-        } else this.value = '';
-    }, ["INT5_SECTION", "LM_DOOR_MODEL"])
-
-    addLogic("INT6_SECTION_DOOR_MODEL", function () {
-        let INT6_SECTION = getState("INT6_SECTION");
-        if (INT6_SECTION) {
-            this.value = getState("LM_DOOR_MODEL")
-        } else this.value = '';
-    }, ["INT6_SECTION", "LM_DOOR_MODEL"])
-
-    addLogic("INT7_SECTION_DOOR_MODEL", function () {
-        let INT7_SECTION = getState("INT7_SECTION");
-        if (INT7_SECTION) {
-            this.value = getState("LM_DOOR_MODEL")
-        } else this.value = '';
-    }, ["INT7_SECTION", "LM_DOOR_MODEL"])
-
+            let glazed = section?.[sectionIndex]?.enabled?.some(v => v) ? 1 : 0;
+            let btm_retainer = sectionIndex === 0 ? 1 : 0;
+            let panel_seq = sequence[sectionIndex] ?? 0;
+            let section_height = section?.[sectionIndex].height;
+            let sc_code = getState(`SECTION_0${sectionIndex+1}_SMARTCOM_CODE`);
+            
+            
+            this.value = generateScCode(glazed, btm_retainer, panel_seq, section_height, sc_code);
+        } else {
+            this.value = null; // optional safety
+        }
+    };
 }

@@ -1,0 +1,346 @@
+//TODO: Rename to Residential Hardware Carton
+function addHardwareDrivers() {  
+
+  addLogic("END_HINGE_OUTPUT", function(){
+	this.value = "327-040"
+  }, ["DOOR_WIDTH_FEET"])
+  addLogic("END_HINGE_QTY", function(){
+	const width = getState("DOOR_WIDTH_FEET")
+    const isDouble = getState("END_CAPS") === "double"
+    if(!isDouble)
+	 this.value = 6
+    else 
+	 this.value = 12
+  }, ["END_CAPS"])
+  
+  addLogic("CENTER_HINGE_QTY", function(){
+    const width = getState("DOOR_WIDTH_FEET")
+    if(width <= 9)
+	 this.value = 6
+    else
+	 this.value = 12
+  }, ["DOOR_WIDTH_FEET"])
+  //*** CENTER HINGES ***//
+  addLogic("CENTER_HINGE_OUTPUT", function(){
+    this.value = '327-041'
+  }, ["DOOR_WIDTH_FEET"])
+  addLogic("HARDWARE_SET_CODE", function(){
+   
+    let doorHeightFeet = getState("DOOR_HEIGHT_FEET");
+  let heightCode = ""
+  if(doorHeightFeet <= 7){
+    heightCode = "070"
+  }else if(doorHeightFeet <= 8){
+    heightCode = "080"
+  }else if(doorHeightFeet <= 9){
+    heightCode = "090"
+  }else if(doorHeightFeet < 11){
+    heightCode = "100"
+  }else{
+    heightCode = "120"
+  }
+  const numSections = getNumberOfSections();
+  let sectionCode = numSections
+  if(numSections <= 4)
+    sectionCode = "4"
+  //If >4 then the value has to be D
+  const numCenterHinges = "0BCDEDDDDDDDDDDDDDDDDD".charAt(getTotalCenterHingeQTY());
+    /**Not part of current Implementation. Here for future-proofing. **/
+  const hardwareType = "N"
+  const springType = "H" //H = torsion F = extension
+  const partNum = "LHC"
+  const hardwareSetCode = `${partNum}-B${springType}${heightCode}${sectionCode}-${numCenterHinges}11${hardwareType}SBN`;
+
+ this.value = (hardwareSetCode);
+  },["DOOR_HEIGHT_FEET","LIFT_TYPE","WIDTH", "CENTER_HINGE_QTY"] )
+  
+  addLogic("DRUMS_CABLES_KIT", function(){
+    if(getState("LIFT_TYPE") !== "High_Lift"){
+    this.value = "NONE"
+    return;
+  }
+    
+  const height = getState("HEIGHT")/12
+  if(height <= 7)
+    this.value = ("327-431")
+  else if(height <= 8)
+    this.value = ("327-432")
+  else if(height <= 9)
+       this.value = ("327-433")
+  else if(height <= 10)
+       this.value = ("327-434")
+    
+  }, ["LIFT_TYPE", "HEIGHT"])
+
+  addLogic("QTY_215306", function(){
+    if(getState("TRUSS_QTY") !== 0)
+	 this.value = 1
+    else
+	 this.value = 0
+  }, ["TRUSS_QTY"])
+
+  
+ addLogic("DOUBLE_END_HINGES_OUTPUT", function(){
+    const numSections = getNumberOfSections()
+  const isDBLEnabled = getState("END_CAPS") === "double"
+  
+  if(!isDBLEnabled){
+    this.value = ("NONE")
+    return;
+  }
+  if(numSections === 4)
+    this.value = ("327-395")
+  else if(numSections === 5)
+    this.value = ("327-396")
+  else if(numSections === 6)
+    this.value = ("327-398")
+ }, ["END_CAPS", "NUM_SECTIONS"])
+  
+  addLogic("CONVERSION_KIT", function(){
+  const liftType = getState("LIFT_TYPE")
+  if(liftType === "LHR_Fr_Mnt"){
+    this.value = ("327-391")
+  }else if(liftType === "LHR_Rr_Mnt"){
+    this.value = ("327-392")
+
+  }else{
+    this.value = ("NONE")
+  }}, ["LIFT_TYPE"])
+  
+ addLogic("CABLE", function(){
+   
+  const doorHeight = getState("HEIGHT");
+  const liftType = getState("LIFT_TYPE")
+  
+    this.value = ("NONE")
+  switch(liftType){
+    case('Std_Lift_12R'):
+    case('Std_Lift_15R'):
+	case('LHR_Fr_Mnt'):
+	   if(doorHeight >= (10*12 + 3) && doorHeight <= (10*12 + 9))
+	  this.value = ("133-099")
+	   break;
+ case("Std_Lift_32R"):
+    if(doorHeight <= 7*12)
+	 this.value = '133-086'
+    if(doorHeight <= 8*12)
+	 this.value = '133-087'
+  break;
+	 case("LHR_Rr_Mnt"):
+	 if(doorHeight <= 6*12)
+	   this.value = '133-072'
+	 else if(doorHeight <= 7*12)
+	   this.value = '133-077'
+	 else if(doorHeight <= 8*12)
+	   this.value = '133-078'
+	 else if(doorHeight <= 9*12)
+	   this.value = '133-079'
+	 else if(doorHeight <= 10*12)
+	   this.value = '133-080'
+	 else if(doorHeight <= 11*12)
+	   this.value = '13-021-2990-1'
+	 else if(doorHeight <= 12*12)
+	   this.value = '13-021-323201'
+  }
+  
+  
+  
+
+ }, ["HEIGHT", "LIFT_TYPE"])
+  
+  addLogic("SLICE_KIT", function(){
+   
+  if(getState("LIFT_TYPE") !== "High_Lift"){
+    this.value = ("NONE")
+    return;
+  }
+  const hiLift = getHiLift()
+  if(hiLift > 36)
+     this.value = ("327-414")
+  else
+         this.value = ("327-404")
+	
+
+
+  }, ["LIFT_TYPE", "HIGHLIFT", "HEIGHT"])
+
+  addLogic("HARDWARE_DESC", function(){
+    
+      const widthInches = getState("DOOR_WIDTH_INCHES") === "0" ? "" : "-" + getState("DOOR_WIDTH_INCHES")
+  const widthFeet = getState("DOOR_WIDTH_FEET")
+  const heightInches = getState("DOOR_HEIGHT_INCHES")
+  const heightFeet = getState("DOOR_HEIGHT_FEET")
+  const liftType = getSelected("LIFT_TYPE").getAttribute("hwdesc")
+  //const doorModel = getState("DOOR_MODEL")
+  const doorModel = "Stilo"
+  const hwType = "+"
+  const endStiles = getState("END_CAPS") === 'double' ? "DE" : ""
+  
+ this.value = (`HC ${widthFeet}${widthInches}x${heightFeet}-${heightInches} ${doorModel} ${liftType}${hwType} ${endStiles}`)
+  	
+  }, ["WIDTH", "HEIGHT", "END_CAPS", "LIFT_TYPE"])
+  
+  addNode({id: "UPDATE_HINGE_PACKS",value:0, logic:function(){
+  
+    updateHingePacks()
+    
+  }}, ["CENTER_HINGE_QTY", "HEIGHT"])
+
+  
+ 
+  addLogic("QTY_950188", function() {
+		 if(getState("END_CAPS") == "single" && getState("WEIGHT") > 600)
+  this.value = 1;
+  else
+    this.value = 0;
+	}, ["END_CAPS", "WEIGHT"])
+	  addLogic("QTY_950189", function() {
+		 if(getState("END_CAPS") == "single" && getState("WEIGHT") > 600)
+  this.value = 1;
+  else
+    this.value = 0;
+	}, ["END_CAPS", "WEIGHT"])
+	 addLogic("QTY_950192", function() {
+		 if(getState("END_CAPS") == "single" && getState("WEIGHT") > 600)
+  this.value = 2;
+  else
+    this.value = 0;
+	}, ["END_CAPS", "WEIGHT"])
+	 addLogic("QTY_40021", function() {
+		 if( getState("WEIGHT") > 600)
+  this.value = 2;
+  else
+    this.value = 0;
+	}, ["WEIGHT"])
+  addLogic("QTY_950190", function() {
+		 if(getState("END_CAPS") == "double" && getState("WEIGHT") > 600)
+  this.value = 1;
+  else
+    this.value = 0;
+	}, ["END_CAPS", "WEIGHT"])
+	 addLogic("QTY_950191", function() {
+		 if(getState("END_CAPS") == "double" && getState("WEIGHT") > 600)
+  this.value = 1;
+  else
+    this.value = 0;
+	}, ["END_CAPS", "WEIGHT"])
+	 addLogic("QTY_950195", function() {
+		 if(getState("END_CAPS") == "double" && getState("WEIGHT") > 600)
+  this.value = 2;
+  else
+    this.value = 0;
+	}, ["END_CAPS", "WEIGHT"])
+	addLogic("QTY_950176", function() {
+		 if( getState("HEIGHT") > 8*12 && getState("WEIGHT") < 600 )
+  this.value = 1;
+  else
+    this.value = 0;
+	}, ["HEIGHT", "WEIGHT"])
+  
+	addLogic("QTY_950177", function() {
+		 if( getState("HEIGHT") > 8*12 && getState("WEIGHT") < 600)
+  this.value = 1;
+  else
+    this.value = 0;
+	}, ["HEIGHT", "WEIGHT"])
+  
+  //Needed for some completely asinine shaft behaviour
+  $("#DOOR_WIDTH_INCHES").change( () =>  $("#GLOBAL_DOOR_WIDTH_INPUT").val(getGlobalDoorWidth()));
+  $("#DOOR_WIDTH_FEET").change( () =>  $("#GLOBAL_DOOR_WIDTH_INPUT").val(getGlobalDoorWidth()));
+ 
+
+}
+function resiCartonCodeMap(doorWidth){
+  if(doorWidth < 48)
+    return '0'
+  if(doorWidth < 111)
+    return 'B'
+  if(doorWidth < 147)
+    return 'C'
+  if(doorWidth < 195)
+    return 'D'
+  return 'E'
+}
+
+
+function updateHingePacks(){
+  const numSections = getNumberOfSections()
+  //TODO: Probably inaccurate
+  const hingeCount = getTotalCenterHingeQTY();
+  const hingecode = numSections + "" + hingeCount
+  
+  $("#HINGE_PACK_1").val("NONE")
+  $("#HINGE_PACK_1_QTY").val(0)
+  $("#HINGE_PACK_2").val("NONE")
+  $("#HINGE_PACK_2_QTY").val(0)
+  
+  
+  switch(hingecode){
+	 case('44'):
+	 
+	 	$("#HINGE_PACK_1").val("327-393")
+	 	$("#HINGE_PACK_1_QTY").val("1")
+	 break;
+	 case('45'):
+	 case('64'):
+	 case('74'):
+	 	$("#HINGE_PACK_1").val("327-393")
+	 	$("#HINGE_PACK_1_QTY").val("2")
+	 break;
+	  case('46'):
+	 	$("#HINGE_PACK_1").val("327-393")
+	 	$("#HINGE_PACK_1_QTY").val("3")
+	 break;
+	  case('54'):
+	 	$("#HINGE_PACK_2").val("327-394")
+	 	$("#HINGE_PACK_2_QTY").val("1")
+	 break;
+	  case('55'):
+	 	$("#HINGE_PACK_2").val("327-394")
+	 	$("#HINGE_PACK_2_QTY").val("2")
+	 break;
+	  case('56'):
+	 case('75'):
+	 	$("#HINGE_PACK_2").val("327-394")
+	 	$("#HINGE_PACK_2_QTY").val("3")
+	 break;
+	 case('65'):
+	 $("#HINGE_PACK_1").val("327-393")
+	 	$("#HINGE_PACK_1_QTY").val("2")
+	 $("#HINGE_PACK_2").val("327-394")
+	 	$("#HINGE_PACK_2_QTY").val("1")
+	 break;
+	case('66'):
+	  $("#HINGE_PACK_1").val("327-393")
+	 	$("#HINGE_PACK_1_QTY").val("1")
+	 $("#HINGE_PACK_2").val("327-394")
+	 	$("#HINGE_PACK_2_QTY").val("3")
+	 break;
+	 case('76'):
+	 $("#HINGE_PACK_1").val("327-393")
+	 	$("#HINGE_PACK_1_QTY").val("2")
+	 $("#HINGE_PACK_2").val("327-394")
+	 	$("#HINGE_PACK_2_QTY").val("3")
+	 break;
+	  case('84'):
+	 $("#HINGE_PACK_1").val("327-393")
+	 	$("#HINGE_PACK_1_QTY").val("1")
+	 $("#HINGE_PACK_2").val("327-394")
+	 	$("#HINGE_PACK_2_QTY").val("1")
+	 break;
+	  case('85'):
+	 $("#HINGE_PACK_1").val("327-393")
+	 	$("#HINGE_PACK_1_QTY").val("2")
+	 $("#HINGE_PACK_2").val("327-394")
+	 	$("#HINGE_PACK_2_QTY").val("2")
+	 break;
+    case('86'):
+	 $("#HINGE_PACK_1").val("327-393")
+	 	$("#HINGE_PACK_1_QTY").val("3")
+	 $("#HINGE_PACK_2").val("327-394")
+	 	$("#HINGE_PACK_2_QTY").val("3")
+	 break;
+  }
+  
+}
+

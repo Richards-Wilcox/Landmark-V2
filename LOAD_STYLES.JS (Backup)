@@ -1,21 +1,4 @@
 function loadStyles() {
-
-  const COLORS = {
-    gray900: "#333333",
-    gray700: "#666666",
-    gray500: "#999999",
-    gray300: "#D9D9D9",
-    gray200: "#E4E4E4",
-    gray100: "#F5F5F5",
-  };
-
-  const radius = {
-    radius15: "15px",
-    radius20: "20px",
-    radius10: "10px"
-  };
-
-
   const styles = `
 
 // #ROOT_0,
@@ -32,85 +15,8 @@ function loadStyles() {
 //     overflow: hidden !important;
 // }
 
-.translationPopupTrigger.js-messagePopupTrigger{
-  display: none;
-}
-
-#DEFAULTS_PLUGIN {
-    			width: 100%;
-    			display: block;
-		}
-
-            #DEFAULTS_PLUGIN .defaults-plugin-container {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-                margin-top: 10px;
-            }
-
-            #DEFAULTS_PLUGIN .defaults-button {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-
-                cursor: pointer;
-                user-select: none;
-
-                color: #000;
-                text-decoration: none;
-
-                font-size: 12px;
-                font-weight: 600;
-                line-height: 1;
-            }
-
-            #DEFAULTS_PLUGIN .defaults-button i {
-                font-size: 14px;
-                color: #000;
-                line-height: 1;
-                width: 14px;
-                text-align: center;
-            }
-
-		  #DEFAULTS_PLUGIN .defaults-button .fas:before,
-		  #DEFAULTS_PLUGIN .defaults-button .far:before{
-			font-size: 12px;
-		  }
-
-            #DEFAULTS_PLUGIN .defaults-button span {
-                font-size: 14px;
-                font-weight: 600;
-                color: #000;
-                line-height: 1;
-                white-space: nowrap;
-            }
-
-            #DEFAULTS_PLUGIN .defaults-button:hover {
-                opacity: 0.7;
-            }
-                
-#CANVAS_PLUGIN {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    height: 60vh;
-}
-
-.canvas-loader-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-}
-
 
 .canvas-loader {
-  position: relative;
   width: 60px;
   height: 60px;
   border-radius: 50% !important;
@@ -120,7 +26,6 @@ function loadStyles() {
   box-sizing: border-box;
   animation: rotation 1s linear infinite;
 }
-
 .canvas-loader::after {
   content: '';  
   box-sizing: border-box;
@@ -171,7 +76,6 @@ function loadStyles() {
 
 .dropdown-item h3{
   margin-bottom: 5px
-  font-size:12px;
 }
 
 .cobalt.autodesk360 .custom-dimension-item{
@@ -215,7 +119,7 @@ function loadStyles() {
 }
 
 .cobalt.autodesk360 .dropdown-item select:hover {
-  background: ${COLORS.gray200} !important
+  background: #e4e4e4 !important
 }
 
 .cobalt.autodesk360 .dropdown-item select:focus {
@@ -303,7 +207,7 @@ function loadStyles() {
   height: 0;
   border-style: solid;
   border-width: 5px;
-  border-color:  ${COLORS.gray900} transparent transparent transparent;
+  border-color:  #383636DD transparent transparent transparent;
   position: absolute;
   left: 40%;
 }
@@ -379,52 +283,35 @@ function loadStyles() {
   left: 0;
   right: 0;
   bottom: 0;
-  // background-color: ${COLORS.gray500};
-  background-color: #fff;
-  border: 1px solid #000;
-  color:#000;
+  background-color: #ccc;
   -webkit-transition: .4s;
   transition: .4s;
 }
 
 .slider:before {
   position: absolute;
-  content: "X";
-
-  height: 20px;
-  width: 20px;
-
+  content: "";
+  height: 22px;
+  width: 22px;
   left: 4px;
   bottom: 4px;
-
-  background-color: #000;
-  color: #fff;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-
+  background-color: white;
   -webkit-transition: .4s;
   transition: .4s;
 }
 
-input:checked + .slider:before {
-  content: "✓";
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);  
-}
-
-input:checked + .slider{
-    background:${COLORS.gray300};
+input:checked + .slider {
+  background-color: #000;
 }
 
 input:focus + .slider {
   box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
 }
 
 /* Rounded sliders */
@@ -447,7 +334,7 @@ input:focus + .slider {
    width: 100%;
     height: 10px;
     border-radius: 5px;
-    background:${COLORS.gray300};
+    background: #d3d3d3;
     outline: none;
     opacity: 0.7;
     transition: background 0.3s;
@@ -503,7 +390,7 @@ input:focus + .slider {
 .range-slider::-moz-range-track {
     height: 8px;
     border-radius: 5px;
-    background:${COLORS.gray300};
+    background: #ddd;
 }
 
 /* Track for IE/Edge */
@@ -541,8 +428,8 @@ input:focus + .slider {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background-color:${COLORS.gray200};
-  color: ${COLORS.gray900};
+  background-color: #e0e0e0;
+  color: #333;
   font-size: 12px;
   font-weight: bold;
   cursor: pointer;
@@ -551,7 +438,7 @@ input:focus + .slider {
 }
 
 .cobalt.autodesk360 .info-icon:hover {
-  background-color:${COLORS.gray300};
+  background-color: #d0d0d0;
 }
 
 #configurator div.panel-layout{
@@ -642,7 +529,7 @@ input:focus + .slider {
 }
 
 .divider {
-    background-color:${COLORS.gray300};
+    background-color: #d8d8d8;
     height: 3rem;
     width: 2px;
 }
@@ -707,9 +594,9 @@ input:focus + .slider {
 .rw-button{
 	height: var(--height--button);
 	min-width: var(--min-width--button);
-  border:1px solid black;
-	border-radius: 10px;
-  box-shadow: var(--box-shadow--primary-button);
+     border:1px solid black;
+	border-radius: 15px;
+     box-shadow: var(--box-shadow--primary-button);
 
 	& label{
 	    color: black;
@@ -733,7 +620,7 @@ input:focus + .slider {
 }
 
 .rw-button:hover{
-  background: ${COLORS.gray200};
+  background: #E4E4E4;
   color: #000;
 
 }
@@ -741,12 +628,11 @@ input:focus + .slider {
 
 
 .btn-checked{
-	// background:#000;
- background:${COLORS.gray300};
+	background:#000;
 }
 
 .btn-checked label{
-  font-weight:900 !important;
+	color: #fff !important;
 }
 
 
@@ -757,7 +643,6 @@ input:focus + .slider {
 	flex-direction: column;
 	margin-top: auto;
 	padding: 0 0 10px 0;
-  margin-bottom: 10px;
 }
 
 .finish-container, .doorOpt-container, .springType-container{
@@ -776,7 +661,24 @@ input:focus + .slider {
   min-width: 100px;
 }
 
+#DEFAULTS_PLUGIN {
+	margin: 20px 0 0 0;
+	width: 100%;
 
+	.defaults-button {
+		all: unset;
+		width: 125px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0 0 5px 0;
+		font-size: 16px;
+		color: black;
+		text-decoration: underline;
+		font-weight: bold;
+		cursor: pointer;
+	}
+}
 
 
 #NEXT_PAGE_BUTTONS {
@@ -796,7 +698,7 @@ input:focus + .slider {
      width: 100%;
      font-size: 16px;
      font-weight: bold;
-     border-radius:${radius.radius10};
+     border-radius: 20px;
      padding: 15px 0;
      text-align: center;
      display: flex;
@@ -805,11 +707,11 @@ input:focus + .slider {
 	margin: 10px 0 10px 0;
 }
 #NEXT_PAGE_BUTTONS button.button-nextpage{
-	background: ${COLORS.gray900};
+	background: #3f3f3f;
      width: 100%;
      font-size: 16px;
      font-weight: bold;
-    border-radius:${radius.radius15};
+     border-radius: 20px;
 
      padding: 20px 0;
      text-align: center;
@@ -885,43 +787,15 @@ div.radio-layout{
 	.window-position-container {
 		 display:flex;
 		 width: 700px;
-		 justify-content:center;
+		 justify-content:space-between;
 		 flex-wrap: wrap;
-		 gap: 8px;
+		 row-gap: 8px
 
 		.rw-button {
-		  min-width: 70px;
-      height: 30px !important;
-      padding: 0 10px;
-      border-radius: 8px;
-      background: #fff;
-
-        label {
-          font-size: 14px;
-          font-weight: 500;
-          line-height: 42px;
-          color: #000;
-        }
+			padding: 8px;
 		}
-
-    .disabled{
-      background-color: ${COLORS.gray500} !important;
-      border-color: ${COLORS.gray500};
-
-        label{
-          color: #fff;
-        }
-    }
-
-    .disabled:hover{
-      cursor: not-allowed;
-    }
 	 }
 }
-
-
-
-.window-position-container .rw-button 
 
 // .slim-options-container {
 // 	display: flex;
@@ -967,7 +841,7 @@ div.radio-layout{
 .slim-close {
     cursor: pointer;
     font-size: 16px;
-    color: ${COLORS.gray700};
+    color: #888;
 }
 .slim-close:hover {
     color: #000;
@@ -976,14 +850,14 @@ div.radio-layout{
 /* ✅ Step title */
 .slim-step-title {
     font-size: 13px;
-    color: ${COLORS.gray700};
+    color: #666;
     margin-bottom: 6px;
 }
 
 /* ✅ Buttons */
 .slim-option {
     padding: 8px 10px;
-    border-radius:${radius.radius15};
+    border-radius: 15px;
     border: 1px solid #000;
     cursor: pointer;
     margin-bottom: 6px;
@@ -992,13 +866,13 @@ div.radio-layout{
 }
 
 .slim-option:hover {
-    background: ${COLORS.gray200};
+    background: #E4E4E4;
     border-color: #000;
 }
 
 .slim-option.active {
-    background: ${COLORS.gray300};
-    color: #000;
+    background: #000;
+    color: white;
     border-color: #000;
 }
 
@@ -1020,23 +894,22 @@ div.radio-layout{
 
 #configurator div.rw-configurator__layout{
 	background: #fff;
-	 border-radius:${radius.radius20};
-  height: calc(100vh - 150px);
+	border-radius: 20px;
+	/* height: 80vh;
+	min-height: 940px; */
+  height: calc(100vh - 110px);
   overflow: hidden;
-  box-shadow:0 4px 18px rgba(0,0,0,.09);
-   display: flex;
-     justify-content:space-evenly;
-     align-items:flex-start;
-     margin-top:20px;
+   box-shadow:0 4px 18px rgba(0,0,0,.09);
 }
 
 #configurator div.rw-configurator__layout--left{
-	 background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(180,180,180,1) 100%);
+	//background:lightgray;
+     //background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(136,136,136,1) 100%);
+	background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(180,180,180,1) 100%);
 	width:60%;
 	border-radius: 20px 0px 0px 20px;
 	height: 100%;
 }
-
 #configurator div.rw-configurator__layout--right{
 	width:40%;
 	display:flex;
@@ -1105,12 +978,12 @@ div.radio-layout{
 }
 
 .color-button-container.selected{
-	 border: 2px solid ${COLORS.gray900};
+	 border: 2px solid #4d4a4a;
     background-color: #4d4a4a15;
 }
 
 #configurator div.color-button-container.selected {
-    border: 2px solid ${COLORS.gray900};
+    border: 2px solid #4d4a4a;
     background-color: #4d4a4a15;
 }
 
@@ -1154,7 +1027,7 @@ div.radio-layout{
 	   min-width: 185px;
 	   padding: 5px;
 	   background-color: #fff;
-	   border-radius:${radius.radius15};
+	   border-radius: 13px;
      border: 1px solid black;
 
 
@@ -1169,8 +1042,8 @@ div.radio-layout{
 		    background: transparent;
 		    font-size: 12px;
 		    font-family: Helvetica;
-		    color: ${COLORS.gray900};
-		    border-radius:${radius.radius15};
+		    color: #333;
+		    border-radius: 13px;
 		    box-sizing: border-box;
 		    width: 100px;
 		    transition: background color 0.2s ease;
@@ -1185,6 +1058,7 @@ div.radio-layout{
 			 width: 100%;
 			 height: 100%;
 			 color: #000;
+       font-weight:600;
 			 line-height: 2;
 			 padding-right: 0 !important;
 		    }
@@ -1195,12 +1069,11 @@ div.radio-layout{
 		}
 
 		.rw-sliding-button.selected {
-		 // background: #000;
-     background: ${COLORS.gray300};
+		  background: #000;
 		}
 
 		.rw-sliding-button.selected label {
-		  //color: #fff;
+		  color: #fff;
 		  font-weight: 600;
 		}
 
@@ -1247,7 +1120,7 @@ div.radio-layout{
     	border: 2px solid grey;
 
      &:active{
-	    background: ${COLORS.gray500};
+	    background: #b8b8b8;
      }
 }
 
@@ -1266,9 +1139,7 @@ div.radio-layout{
   }
 }
 
-#configurator .color-button.btn-checked{
-  background: none;
-}
+
 
 #configurator div.dimension-layout{
     display: flex;
@@ -1281,34 +1152,8 @@ div.radio-layout{
  #configurator .dimension-layout .rw-button {
       flex: 1 1 calc(33.333% - 10px);
     min-width: 140px; /* prevents shrinking too much */
-    position: relative;
 }
 
-
-#configurator .dimension-layout .rw-button.btn-checked::after, 
-#configurator .panel-layout .rw-button.btn-checked::after,
-.window-position-container .rw-button.btn-checked::after,
-.slim-option.active::after
-  {
-    content: "✓";
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background: #000;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 9px;
-    font-weight: 700;
-    line-height: 1;
-    text-align: center;
-    box-sizing: border-box;
-}
 
 .dim-button-container{
 display:flex;justify-content:space-evenly;
@@ -1382,7 +1227,7 @@ height: 75px;
 	font-size: 1.2rem;
 	line-height: 1.5rem;
 	font-weight: normal;
-	color: ${COLORS.gray900};
+	color: #3f3f3f;
 	text-align: center;
 }
 
@@ -1399,32 +1244,7 @@ height: 75px;
 	font-weight: normal;
 }
 
-.window-position-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 16px;
 
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-   
-    letter-spacing: 0.5px;
-}
-
-.window-position-title::before,
-.window-position-title::after {
-    content: "";
-    width: 60px;
-    height: 1px;
-    background: ${COLORS.gray500};
-}
-
-.window-position-title span {
-    white-space: nowrap;
-     color:${COLORS.gray500};
-}
 
 
 #rw-diff-text {
@@ -1466,7 +1286,12 @@ row-gap:30px;
 
 }
 
-
+.rw-configurator__layout {
+     display: flex;
+     justify-content:space-evenly;
+     align-items:flex-start;
+     margin-top:20px;
+}
 
 .rw-configurator__select{
     width:auto;
@@ -1481,7 +1306,7 @@ row-gap:30px;
 }
 
 #NAVIGATION_SPC::-webkit-scrollbar-thumb {
-    background:${COLORS.gray500}
+    background: #999;
     border-radius: 10px;
 }
 
@@ -1615,8 +1440,8 @@ option--disabled {
 
 .operator-card{
     background:#fff;
-    border:1px solid ${COLORS.gray200};
-    border-radius: ${radius.radius20};
+    border:1px solid #e9edf3;
+    border-radius:20px;
     padding:24px;
     //margin-bottom:20px;
     box-shadow:0 4px 18px rgba(0,0,0,.05);
@@ -1658,7 +1483,7 @@ option--disabled {
     justify-content: center;
 
     border-radius: 50%;
-    border: 1px solid ${COLORS.gray300};
+    border: 1px solid #d7dbe4;
     background: #fff;
 
     cursor: pointer;
@@ -1669,7 +1494,7 @@ option--disabled {
 }
 
 .cobalt.autodesk360 .operator-carousel-wrapper .operator-arrow:hover {
-    background: ${COLORS.gray100};
+    background: #f5f7fb;
 }
 
 .cobalt.autodesk360 .operator-carousel-wrapper .operator-arrow svg {
@@ -1742,7 +1567,7 @@ option--disabled {
 		font-size: 1.2rem;
 		line-height: 1.5rem;
 		font-weight: normal;
-		color: ${COLORS.gray900};
+		color: #3f3f3f;
 		text-align: center;
 	}
 
@@ -1770,7 +1595,7 @@ option--disabled {
     border: none !important;
     border-radius: 50% !important;
 
-    background:${COLORS.gray300} !important;
+    background: #d9d9d9 !important;
 
     cursor: pointer;
     flex: 0 0 10px !important;
@@ -1780,7 +1605,7 @@ option--disabled {
 }
 
 .cobalt.autodesk360 .operator-pagination .operator-dot:hover {
-    background: ${COLORS.gray500} !important;
+    background: #bdbdbd !important;
 }
 
 .cobalt.autodesk360 .operator-pagination .operator-dot.operator-dot-active {
@@ -1795,7 +1620,7 @@ option--disabled {
     height: 10px !important;
 
     border-radius: 50% !important;
-    background: ${COLORS.gray300}  !important;
+    background: #d9d9d9 !important;
 
     cursor: pointer;
     display: block;
@@ -1809,8 +1634,8 @@ option--disabled {
     width: 80px;
     height: 80px;
     position: relative;
-    border: 1px solid ${COLORS.gray300} ;
-    background: ${COLORS.gray100};
+    border: 1px solid #d9d9d9;
+    background: #f8f8f8;
     overflow: hidden;
     border-radius: 8px;
 }
@@ -1824,7 +1649,7 @@ option--disabled {
     align-items: center;
     text-align: center;
     padding: 10px;
-    color:${COLORS.gray700};
+    color: #8a8a8a;
     font-size: 11px;
     line-height: 1.2;
     font-weight: 500;
@@ -1847,7 +1672,7 @@ option--disabled {
 	font-size: 1.2rem;
 	line-height: 1.5rem;
 	font-weight: normal;
-	color: ${COLORS.gray900};
+	color: #3f3f3f;
 	text-align: center;
 }
 
@@ -1947,7 +1772,7 @@ option--disabled {
 	    display: flex;
 	    justify-content: center;
 	    align-items: center;
-      padding: 5px;
+         padding: 5px;
 	    font-size: 14px;
       text-wrap:auto;
 	}
@@ -1985,6 +1810,9 @@ option--disabled {
 }
 
 
+.window-position-container {
+		 width: 400px;
+	 }
 
 #DOOR_PROPERTIES{
    display: flex;
@@ -2018,7 +1846,7 @@ option--disabled {
 }
 
 .cobalt.autodesk360 .quantity-field .value-button:hover {
-  background:${COLORS.gray200};
+  background: #E4E4E4
 }
 
 .cobalt.autodesk360 .quantity-field .value-button:active{
@@ -2055,68 +1883,6 @@ option--disabled {
 }
 
 
-
-
-.rw-button-container-inner {
-	  //  display: flex;
-	  //  justify-content: center;
-	  //  align-items: center;
-	  //  padding: 5px;
-	  //  background-color: #fff;
-	  //  border-radius: 13px;
-		// border: 1px solid black;
-
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    /* ✅ Use relative sizing */
-    width: 2.5rem;
-    height: 2.2rem;
-
-    margin-left: 0.6rem;
-
-    background-color: #ffffff;
-    border-radius: 999px;
-
-    border: 1px solid${COLORS.gray300};
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-
-    cursor: pointer;
-    transition: all 0.25s ease;
-
-
-}
-
-
-.rw-button-container-inner i,
-.rw-button-container-inner svg  {
-    font-size: 0.75rem;
-    color: ${COLORS.gray900};
-}
-
-
-.rw-button-container-inner:hover {
-    background-color:${COLORS.gray200};
-    transform: translateY(-2px) scale(1.05);
-}
-
-
-.rw-button-container-inner.selected {
-	// background-color: yellow;
-  
- 
-    background: linear-gradient(135deg, #e21f2e, #c01824, #9f101b);
-    border-color: #c01824;
-
-}
-
-
-.rw-button-container-inner.selected i {
-    color: #ffffff;
-}
-
 @media (max-width: 1024px) {
 
   #configurator div.rw-configurator__layout{
@@ -2137,8 +1903,7 @@ option--disabled {
     }
 
     #configurator .dimension-layout .rw-button {
-        flex: 0 1 40%;
-      
+        flex: 0 1 40%
     }
     #configurator div.panel-layout{
           grid-template-columns: repeat(2, 1fr);
@@ -2174,6 +1939,68 @@ option--disabled {
 	}
 
 }
+
+.rw-button-container-inner {
+	  //  display: flex;
+	  //  justify-content: center;
+	  //  align-items: center;
+	  //  padding: 5px;
+	  //  background-color: #fff;
+	  //  border-radius: 13px;
+		// border: 1px solid black;
+
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* ✅ Use relative sizing */
+    width: 2.5rem;
+    height: 2.2rem;
+
+    margin-left: 0.6rem;
+
+    background-color: #ffffff;
+    border-radius: 999px;
+
+    border: 1px solid #d0d0d0;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+
+}
+
+
+.rw-button-container-inner i,
+.rw-button-container-inner svg  {
+    font-size: 0.75rem;
+    color: #444;   
+}
+
+
+.rw-button-container-inner:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px) scale(1.05);
+}
+
+
+.rw-button-container-inner.selected {
+	// background-color: yellow;
+  
+ 
+    background: linear-gradient(135deg, #e21f2e, #c01824, #9f101b);
+    border-color: #c01824;
+
+}
+
+
+.rw-button-container-inner.selected i {
+    color: #ffffff;
+}
+
+
 
 @media (min-width: 1600px) and (max-width: 2600px) {
 

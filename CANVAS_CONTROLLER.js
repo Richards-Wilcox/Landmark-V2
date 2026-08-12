@@ -3,6 +3,9 @@ const canvas_mouse = {
 	is_down: false,
 };
 
+let initialCanvasRendered = false;
+let renderRequestId = 0;
+
 function addRenderNode() {
 	const GLAZING_SECTION = 1;
 
@@ -27,6 +30,7 @@ function addRenderNode() {
 				'B': 'colonial_grooved',
 				'S': 'ranch_grooved',
 				'T': 'smooth_ranch',
+				'M': 'mixed'
 			};
 
 			const face = face_map[getState('FACE')];
@@ -35,20 +39,116 @@ function addRenderNode() {
 		value: "",
 	}, ["FACE"]);
 
-	addLogic("GLASS_SHAPE", function () {
-		const glass_shape = $("input[name='GLASS_SHAPE']:checked").val();
-		this.value = glass_shape;
-		addSlimUi();
+	addNode({
+		id: "CUSTOM_WINDOWS",
+		value: false
 	}, []);
 
-	addLogic("GLASS_INSERT", function () {
-		const glass_shape = $("input[name='GLASS_INSERT']:checked").val();
+	addLogic("GLASS_SHAPE", function () {
+
+		const glass_shape = $("input[name='GLASS_SHAPE']:checked").val() || "";
+		const prevGlassShape = this._prevGlassShape || "";
+
 		this.value = glass_shape;
 
-		const glass = getState("GLASS_SHAPE");
-		if (glass.includes('slim')) {
-			this.value = "";
+		const $all = $("input[name='WINDOW_POSITION']");
+		const $top = $("input[name='WINDOW_POSITION'][value='top']");
+		const $left = $("input[name='WINDOW_POSITION'][value='left']");
+
+		if (glass_shape && glass_shape !== prevGlassShape) {
+
+			const state = getState("WINDOW_STATE");
+
+			if (state && Array.isArray(state.sections)) {
+				state.sections.forEach(section => {
+					section.shape = glass_shape;
+					section.enabled = [];
+					section.selected = false;
+				});
+
+				recalcWindowState();
+			}
+
+			$all.prop("checked", false)
+				.closest(".rw-button")
+				.removeClass("selected btn-checked");
+
+			if (glass_shape.includes("slim")) {
+
+				$("#POSITION_TOP").hide();
+
+				$left.prop("checked", true)
+					.closest(".rw-button")
+					.addClass("selected btn-checked");
+
+
+				setTimeout(() => {
+					setState("WINDOW_POSITION", "left");
+					forceRedraw();
+				}, 0);
+
+			} else {
+
+				$("#POSITION_TOP").show();
+
+				$top.prop("checked", true)
+					.closest(".rw-button")
+					.addClass("selected btn-checked");
+
+				console.log("GLASS_SHAPE setting WINDOW_POSITION top", {
+					face: getState("FACE_desc"),
+					glass_shape,
+					prevGlassShape
+				});
+
+				setTimeout(() => {
+					setState("WINDOW_POSITION", "top");
+					forceRedraw();
+				}, 0);
+			}
 		}
+
+		if (!glass_shape) {
+
+			$all.prop("checked", false)
+				.closest(".rw-button")
+				.removeClass("selected btn-checked");
+
+			$("#POSITION_TOP").show();
+
+			setState("WINDOW_POSITION", "");
+		}
+
+		addSlimUi();
+
+		this._prevGlassShape = glass_shape;
+
+	}, []);
+
+
+	addNode({
+		id: "GLASS_INSERT",
+		value: "",
+		logic: function () {
+			const glass_insert = $("input[name='GLASS_INSERT']:checked");
+			const glass_shape = getState("GLASS_SHAPE") || "";
+
+			if (glass_shape.includes("slim")) {
+				this.value = "";
+				return;
+			}
+
+			if (!glass_insert.length) {
+				this.value = "";
+				return;
+			}
+
+			this.value = {
+				value: glass_insert.attr("value"),
+				insertCode: glass_insert.attr("insertCode"),
+			};
+		}
+
 	}, ["GLASS_SHAPE"]);
 
 	addNode({
@@ -76,12 +176,24 @@ function addRenderNode() {
 			const num_sections = getState("NUM_OF_SEC");
 			const special = getState("SPECIAL_FACE");
 			const glass_shape = getState("GLASS_SHAPE") ?? "";
-			const single_endcap = getState("EndCaps") == "N";
+			const single_endcap = getState("END_CAPS") == "N";
 			const width = getState("WIDTH");
 
+			const mixedPatternKey =
+				face === "mixed"
+					? getMixedPanelPattern().join("")
+					: "";
+
 			const state = this.value;
+
+			// Force stale hints off outside Glazing
+			if (typeof currentSection !== "undefined" && currentSection != 1) {
+				state.hints = false;
+			}
+
+			// console.log("state value", this.value);
+
 			const sections = state.sections;
-			const num_add = Math.abs(sections.length)
 
 			while (sections.length != num_sections) {
 				if (sections.length > num_sections) {
@@ -90,6 +202,7 @@ function addRenderNode() {
 					sections.push({
 						selected: false,
 						slim_one: false,
+						slim_position_mode: false,
 						slim_spacing: 'even',
 						shape: glass_shape,
 						positions: [],
@@ -105,6 +218,14 @@ function addRenderNode() {
 			});
 
 			for (const section of sections) {
+
+				const wasSpecial = section._wasSpecial || false;
+
+				// ✅ RESET when exiting special
+				if (wasSpecial && !special) {
+					section.enabled = Array(section.positions?.length || 0).fill(false);
+				}
+
 				let shape = face;
 				if (flush) {
 					shape = glass_shape;
@@ -113,10 +234,27 @@ function addRenderNode() {
 					shape = "window_gv";
 				}
 
-				let positions = getPanelPositions(shape, width);
+				let positions;
+				let mixedDesignChanged = false;
 
+				if (face === "mixed") {
+					const mixedLayout = getMixedPanelLayout(width);
+
+					positions = mixedLayout.map(panel => panel.x);
+
+					mixedDesignChanged =
+						section._mixedPatternKey !== mixedPatternKey;
+
+				} else {
+					positions = getPanelPositions(shape, width);
+				}
+				// ✅ Reset enabled if glass_shape is deselected
+				if (!glass_shape && face !== "mixed") {
+					section.enabled = Array(positions.length).fill(false);
+				}
 				const section_enabled = section.enabled;
 				const section_glass = section_enabled.some(x => x == true);
+
 				if (section_glass && special) {
 					shape = glass_shape;
 				}
@@ -126,13 +264,20 @@ function addRenderNode() {
 				}
 
 				const slim_one = section.slim_one;
+				const slim_position_mode = section.slim_position_mode;
 				const slim_spacing = section.slim_spacing;
-				if (["slim_single", "slim_double"].includes(glass_shape)) {
-					if (section.shape.includes("slim")) {
-						shape = section.shape;
-					}
 
-					if (slim_one) {
+				if (glass_shape.includes("slim")) {
+					// if (section.shape.includes("slim")) {
+					// 	shape = section.shape;						
+					// }
+
+					shape = section.shape?.includes("slim")
+						? section.shape
+						: glass_shape;
+
+
+					if (slim_one || slim_position_mode) {
 						const slim_s = 34.344;
 						const slim_l = 68.344;
 						const endcap_single = 4.8125;
@@ -146,8 +291,17 @@ function addRenderNode() {
 					}
 				}
 
-				const enabled = (section_enabled.length != positions.length) ?
-					Array(positions.length).fill(false) : Array.from(section_enabled);
+				// const enabled = (section_enabled.length != positions.length) ?
+				// Array(positions.length).fill(false) : Array.from(section_enabled);
+
+				let enabled;
+
+				if (section_enabled.length === positions.length && !mixedDesignChanged) {
+					enabled = section_enabled; // ✅ preserve existing clicks
+				} else {
+					enabled = Array(positions.length).fill(false);
+				}
+
 				if (special && section_glass) {
 					enabled.fill(true);
 				}
@@ -159,385 +313,1030 @@ function addRenderNode() {
 				section.positions = positions;
 				section.shape = shape;
 				section.enabled = enabled;
+				section.glass_qty = enabled.filter(v => v === true).length;
 				section.slim_one = slim_one;
 				section.slim_spacing = slim_spacing;
-				section.panel_width = panelConfigurations[shape]?.panelWidth;
-				section.panel_height = panelConfigurations[shape]?.panelHeight;
+				//section.panel_width = panelConfigurations[shape]?.panelWidth;
+				//section.panel_height = panelConfigurations[shape]?.panelHeight;
+
+				if (face === "mixed") {
+					section.panel_width =
+						panelConfigurations.mixed?.panelWidthCol;
+
+					section.panel_height =
+						panelConfigurations.mixed?.panelHeightCol;
+				} else {
+
+					section.panel_width =
+						panelConfigurations[shape]?.panelWidth;
+
+					section.panel_height =
+						panelConfigurations[shape]?.panelHeight;
+				}
+				section._wasSpecial = special;
+				section._mixedPatternKey = mixedPatternKey;
 			}
 		}
 	},
-		["WIDTH", "NUM_OF_SEC", "GLASS_SHAPE", "EndCaps", "FACE_desc", "SPECIAL_FACE",
-			"SLIM_WINDOW_SPACING", "SLIM_WINDOW_LITES"]);
+		["WIDTH", "NUM_OF_SEC", "GLASS_SHAPE", "END_CAPS", "FACE_desc", "SPECIAL_FACE",
+			"SLIM_WINDOW_SPACING", "SLIM_WINDOW_LITES", "DESIGN_CODE"]);
 
 	addLogic("WINDOW_POSITION", function () {
-		const glass_shape = getState("GLASS_SHAPE");
+		const face = getState("FACE_desc");
+		const glass_shape = getState("GLASS_SHAPE") || "";
 		const special = getState("SPECIAL_FACE");
-		let position = $("input[name='WINDOW_POSITION']:checked").val() ?? "";
 
-		const should_disable = special || glass_shape.includes("grand");
-		$(`input[name='WINDOW_POSITION']:not([value="top"])`).prop('disabled', special);
-		if (glass_shape.includes("grand")) {
-			position = "top";
-		}
+		const $all = $("input[name='WINDOW_POSITION']");
+		const $top = $("input[name='WINDOW_POSITION'][value='top']");
+		const $left = $("input[name='WINDOW_POSITION'][value='left']");
+		const $nonTop = $("input[name='WINDOW_POSITION']:not([value='top'])");
 
-		const sections = getState("WINDOW_STATE").sections;
-		const has_glass = sections.some(section => {
-			return section.enabled.some(x => x == true);
-		});
-		if (special && has_glass) {
-			position = "top";
-		}
+		// reset when glass shape is empty
+		if (!glass_shape && face !== "mixed") {
 
-		this.value = position;
-		//if (glass_shape.includes("slim") || position == "") {
-		if (position == "") {
+			$all.prop("checked", false)
+				.closest(".rw-button")
+				.removeClass("selected btn-checked disabled")
+				.css("cursor", "pointer");
+
+			$("#POSITION_TOP").show();
+
+			this.value = "";
+			addSlimUi();
 			return;
 		}
 
-		setWindowPositions(position);
+		// Slim windows: hide TOP
+		if (glass_shape.includes("slim")) {
+
+			$("#POSITION_TOP").hide();
+			$("#POSITION_CUSTOM").show();
+
+			const wasTopSelected = $top.is(":checked");
+
+			$top.prop("checked", false)
+				.closest(".rw-button")
+				.removeClass("selected btn-checked");
+
+			if (wasTopSelected) {
+				$left.prop("checked", true)
+					.closest(".rw-button")
+					.addClass("selected btn-checked");
+			}
+
+		} else {
+
+			$("#POSITION_TOP").show();
+			$("#POSITION_CUSTOM").hide();
+		}
+
+		let position = $("input[name='WINDOW_POSITION']:checked").val() ?? "";
+
+		const customSelected =
+			$("input[name='WINDOW_POSITION'][value='custom']").is(":checked");
+
+		const isSpecial = special || glass_shape.includes("grand");
+
+		// reset UI
+		$all.prop("disabled", false)
+			.closest(".rw-button")
+			.removeClass("disabled")
+			.css("cursor", "pointer");
+
+		// special/grand force TOP
+		if (isSpecial && !glass_shape.includes("slim")) {
+
+			$nonTop.prop("disabled", true)
+				.closest(".rw-button")
+				.addClass("disabled");
+
+			$all.prop("checked", false)
+				.closest(".rw-button")
+				.removeClass("selected btn-checked");
+
+			$top.prop("checked", true)
+				.closest(".rw-button")
+				.addClass("selected btn-checked");
+
+			position = "top";
+		}
+
+		const state = getState("WINDOW_STATE");
+
+		const has_glass = state.sections.some(section =>
+			section.enabled.some(v => v === true)
+		);
+
+		// IMPORTANT:
+		// If user manually clicked glass on canvas,
+		// don't re-apply default left/top positions.
+		// IMPORTANT:
+		// If user manually clicked glass on canvas,
+		// don't re-apply default left/top positions.	
+		if (!position && has_glass && !special) {
+			if (customSelected) {
+				position = "custom";
+			} else {
+				this.value = "";
+				addSlimUi();
+				return;
+			}
+		}
+
+		// Apply defaults ONLY when no glass exists yet
+		if (!position && !has_glass) {
+
+			console.log("WINDOW_POSITION defaulting", {
+				face,
+				glass_shape,
+				position,
+				has_glass
+			});
+
+			if (face === "mixed") {
+				this.value = "";
+				forceRedraw();
+				return;
+			}
+
+			position = glass_shape.includes("slim")
+				? "left"
+				: "top";
+
+			$all.prop("checked", false)
+				.closest(".rw-button")
+				.removeClass("selected btn-checked");
+
+			$(`input[name='WINDOW_POSITION'][value='${position}']`)
+				.prop("checked", true)
+				.closest(".rw-button")
+				.addClass("selected btn-checked");
+		}
+
+		if (position === "custom") {
+
+			this.value = "custom";
+
+			addSlimUi();
+
+			forceRedraw();
+
+			return;
+		}
+
+		this.value = position;
+		addSlimUi();
+
+		if (position && position !== "custom") {
+			this._lastPosition = position;
+			setWindowPositions(position);
+		}
+
+		forceRedraw();
+
 	}, ["GLASS_SHAPE", "SPECIAL_FACE", "WINDOW_STATE"]);
+
 
 	addNode({
 		id: "RENDER",
 		logic: renderDoor,
 		value: null,
 	}, ["WIDTH", "HEIGHT", "COLOR", "NUM_OF_SEC", "FACE_desc", "FINISH", "WINDOW_STATE", "WINDOW_POSITION",
-		"GLASS_INSERT", "FRAME_COLOR", "INSERT_COLOR"]);
+		"GLASS_INSERT", "FRAME_COLOR", "INSERT_COLOR", "DESIGN_CODE"]);
+
+	addNode({
+		id: "CANVAS_CURSOR",
+		value: "",
+		logic: function () {
+
+			const isSpecial = getState("SPECIAL_FACE");
+			const glass_shape = getState("GLASS_SHAPE") || "";
+
+			const $canvas = $("#CONFIG_CANVAS");
+
+			if (isSpecial || glass_shape.includes("grand")) {
+				$canvas.css("cursor", "not-allowed");
+			} else {
+				$canvas.css("cursor", "pointer"); // ✅ reset properly
+			}
+		}
+	}, ["SPECIAL_FACE", "GLASS_SHAPE"])
 
 	addLogic("JSON_OBJ", function () {
 		this.value = JSON.stringify(getState("RENDER"))
 	}, ["RENDER"]);
 
-	$(`input[name="FACE"]`).on('change', function () {
-		const face = $(this).val();
-		if (face == 'C') {
-			$(`#GLASS_SHAPE_COLONIAL`).click();
-			setState("GLASS_SHAPE", "colonial");
-		} else if (face == 'R') {
-			$(`#GLASS_SHAPE_RANCH`).click();
-			setState("GLASS_SHAPE", "ranch");
+
+	$(document).off('click.canvasFix');
+
+	$(document).on('click.canvasFix', '#CONFIG_CANVAS', function (event) {
+		const isSpecial = getState("SPECIAL_FACE");
+		const glass_shape = getState("GLASS_SHAPE") || "";
+		const node = getNode("WINDOW_POSITION");
+		const windows = getState("WINDOW_STATE");
+		const door_width = getState("WIDTH");
+		const door_height = getState("HEIGHT");
+		const num_sections = getState("NUM_OF_SEC");
+
+		const scale = getScale(door_width, door_height);
+		const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
+
+		const section_heights = getSectionHeights(door_height, num_sections);
+		const mixedPanels =
+			getState("FACE_desc") === "mixed"
+				? getMixedPanelLayout(door_width)
+				: [];
+
+		let changed = false;
+		const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
+
+		if (typeof currentSection !== "undefined" && currentSection != 1) {
+			return;
+		}
+
+		if (!windows?.hints) {
+			return;
+		}
+
+		if (glass_shape.includes("slim") && node?.value !== "custom") {
+			return;
+		}
+
+
+		if (isSpecial || glass_shape.includes("grand")) {
+			return;
+		}
+
+
+		for (const [sIndex, section] of windows.sections.entries()) {
+			const ypos = section_heights.slice(0, sIndex).reduce((a, b) => a + b, 0);
+
+			for (let i = 0; i < section.positions.length; i++) {
+
+				let panel_width = section.panel_width * scale;
+				let panel_height = section.panel_height * scale;
+				let px = section.positions[i] * scale + canvas_x;
+
+				if (getState("FACE_desc") === "mixed") {
+
+					const panel = mixedPanels[i];
+
+					if (panel) {
+						panel_width = panel.width * scale;
+						panel_height = panel.height * scale;
+						px = panel.x * scale + canvas_x;
+					}
+				}
+
+				const y_offset = (section_heights[sIndex] * scale - panel_height) / 2;
+				const py = ypos * scale + canvas_y + y_offset;
+
+				const hit =
+					mouse_x >= px &&
+					mouse_x <= px + panel_width &&
+					mouse_y >= py &&
+					mouse_y <= py + panel_height;
+
+				// if (hit) {
+				// 	section.enabled[i] = !section.enabled[i];
+				// 	changed = true;
+				// 	break;
+				// }
+				if (hit) {
+					if (section.slim_one) {
+						// ✅ ONLY ONE window allowed
+						section.enabled.fill(false);   // clear all
+						section.enabled[i] = true;     // enable only clicked one
+					} else {
+						// ✅ normal behavior
+						section.enabled[i] = !section.enabled[i];
+					}
+					changed = true;
+					setState("CUSTOM_WINDOWS", changed);
+					break;
+				}
+
+			}
+
+			if (changed) break;
+		}
+
+		if (changed) {
+
+			const face = getState("FACE_desc");
+
+			setState("CUSTOM_WINDOWS", true);
+
+			// Mixed should enter custom mode internally only.
+			// Do not select or show the hidden custom button.
+
+			// if (face === "mixed") {
+
+			// 	if (node) {
+			// 		node.value = "custom";
+			// 	}
+
+			// 	forceRedraw();
+			// 	return;
+			// }
+
+			// Non-mixed behavior stays the same.
+			if ((!glass_shape.includes("slim") && node?.value !== "custom") || face === "mixed") {
+
+				$("input[name='WINDOW_POSITION']")
+					.prop("checked", false)
+					.removeAttr("checked")
+					.closest(".rw-button")
+					.removeClass("selected btn-checked");
+
+				$("input[name='WINDOW_POSITION'][value='custom']")
+					.prop("checked", true)
+					.attr("checked", "checked")
+					.closest(".rw-button")
+					.addClass("selected btn-checked");
+
+				if (node) {
+					node.value = "custom";
+				}
+			}
+
+			forceRedraw();
 		}
 	});
 
-	$('#CONFIG_CANVAS')
-		.on('mousemove', function (event) {
-			canvas_mouse.x = event.offsetX;
-			canvas_mouse.y = event.offsetY;
+	$(document).on("click", "input[name='WINDOW_POSITION']", function () {
+		setState("CUSTOM_WINDOWS", false);
 
-			if (getState("SLIM_WINDOW_LITES") == "one" && getState("GLASS_SHAPE").includes("slim")) {
-				const layer_obj = getDoorInfo();
-				layer_obj.windows = getState("WINDOW_STATE");
-				CANVAS_PLUGIN.draw(layer_obj);
-			}
-		})
-		.on('mousedown', function (event) {
-			canvas_mouse.is_down = true;
-		})
-		.on('mouseup', function (event) {
-			canvas_mouse.is_down = false;
-		})
-		.on('click', function (event) {
-			if (currentSection != GLAZING_SECTION) return;
+		const position = $(this).val();
 
-			const door_width = getState("WIDTH");
-			const door_height = getState("HEIGHT");
-			const num_sections = getState("NUM_OF_SEC");
-			const scale = getScale(door_width, door_height);
-			const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
-			const special_panel_config = getState("SPECIAL_FACE");
+		if (position === "custom") {
+			resetSlimCustomState();
+			setState("CUSTOM_WINDOWS", true);
+		}
 
-			let changed = false;
-			const windows = getState("WINDOW_STATE");
-			const section_heights = getSectionHeights(door_height, num_sections);
-			for (const [i, section] of windows.sections.entries()) {
-				const panel_width = section.panel_width * scale;
-				const panel_height = section.panel_height * scale;
 
-				const y_offset = (section_heights[i] * scale - panel_height) / 2;
-				const ypos = section_heights.slice(0, i).reduce((acc, val) => acc + val, 0);
-				const py = ypos * scale + canvas_y + y_offset;
-				const positions = section.positions
-					.map(pos => ({ x: pos * scale + canvas_x, y: py }));
+	});
 
-				let index = -1;
-				if (section.slim_one) {
-					if (!section.selected) continue;
-					const section_intersects = isMouseIntersect(canvas_x, ypos * scale + canvas_y,
-						door_width * scale, section_heights[i] * scale);
-					if (!section_intersects) continue;
+	$(document).off('mousemove.canvasFix');
 
-					const [mouse_x, mouse_y] = getCanvasMousePos();
-					index = section.positions.map(x => x * scale + canvas_x + panel_width / 2)
-						.reduce((bestIdx, currVal, currIdx, arr) => {
-							const currentDist = Math.abs(currVal - mouse_x);
-							const bestDist = Math.abs(arr[bestIdx] - mouse_x);
-							return currentDist < bestDist ? currIdx : bestIdx;
-						}, 0);
-				} else {
-					for (const [i, pos] of positions.entries()) {
-						const intersects = isMouseIntersect(pos.x, pos.y, panel_width, panel_height);
-						if (intersects) {
-							index = i;
-							break;
-						}
-					}
+	$(document).on('mousemove.canvasFix', '#CONFIG_CANVAS', function (event) {
+		const canvas = this;
+		const rect = canvas.getBoundingClientRect();
+
+		canvas_mouse.x = event.clientX - rect.left;
+		canvas_mouse.y = event.clientY - rect.top;
+	});
+
+	$(document)
+		.off("change.glassVisualFix")
+		.on(
+			"change.glassVisualFix",
+			"input[name='GLASS_INSERT'], input[name='FRAME_COLOR'], input[name='INSERT_COLOR'], #DESIGN_CODE",
+			function () {
+				const insertNode = getNode("GLASS_INSERT");
+
+				if (insertNode && typeof insertNode.logic === "function") {
+					insertNode.logic.call(insertNode);
 				}
 
-				if (index != -1) {
-					if (special_panel_config) {
-						const enabled = section.enabled[0];
-						windows.sections.forEach(section => section.enabled.fill(false));
-						section.enabled.fill(!enabled);
-					} else if (section.slim_one) {
-						const val = section.enabled[index];
-						section.enabled.fill(false);
-						if (!val) section.enabled[index] = true;
-					} else {
-						section.enabled[index] = !section.enabled[index];
-					}
-					changed = true;
-					break;
-				}
-			}
-
-			if (changed) {
-				$(`input[name='WINDOW_POSITION']`)
-					.prop("checked", false)
-					.removeAttr("checked")
-					.data('wasChecked', false)
-					.parent().removeClass("btn-checked");
+				recalcWindowState();
 				forceRedraw();
 			}
-		});
+		);
+
+
+
 }
+
+function selectCenterOneLite(section) {
+
+	if (!section || !section.enabled || section.enabled.length === 0) {
+		return;
+	}
+
+	section.enabled.fill(false);
+
+	const centerIndex = Math.floor(section.enabled.length / 2);
+
+	section.enabled[centerIndex] = true;
+}
+
+function recalcWindowState() {
+	const node = getNode("WINDOW_STATE");
+
+	if (node && typeof node.logic === "function") {
+		node.logic.call(node);
+	}
+}
+
+
 
 function addSlimUi() {
 	$(`[data-id="section_slim_temp"]`).remove();
-	const glass_shape = getState("GLASS_SHAPE") ?? "";
 
+	const glass_shape = getState("GLASS_SHAPE") ?? "";
 	const windows = getState("WINDOW_STATE");
+
+	if (!windows || !Array.isArray(windows.sections)) {
+		return;
+	}
+
 	if (!glass_shape.includes("slim")) {
-		$(`#slim_spacing_container`).remove();
+		$("#slim_spacing_container").remove();
+
 		windows.sections.forEach(section => {
 			section.selected = false;
 			section.slim_one = false;
 		});
+
+		return;
+	}
+
+
+	const windowPosition = getNode("WINDOW_POSITION")?.value;
+
+	// ✅ Pencil only visible in CUSTOM mode
+	if (windowPosition !== "custom") {
+
+		$('[data-id="section_slim_temp"]').remove();
+		$('#slim_spacing_container').remove();
+
+		windows.sections.forEach(section => {
+			section.selected = false;
+		});
+
 		return;
 	}
 
 	const door_width = getState("WIDTH");
 	const door_height = getState("HEIGHT");
 	const scale = getScale(door_width, door_height);
+
 	const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
+
 	const canvas = $("#CONFIG_CANVAS")[0];
 	const canvas_pos = $("#CONFIG_CANVAS").offset();
+
+	if (!canvas || !canvas_pos) {
+		return;
+	}
+
 	const rect = canvas.getBoundingClientRect();
+
 	const cx = door_width * scale + canvas_x;
-	const menu_y = canvas_pos.top + (canvas_y + door_height * scale / 2) * (rect.height / canvas.height);
+	const menu_y =
+		canvas_pos.top +
+		(canvas_y + (door_height * scale) / 2) *
+		(rect.height / canvas.height);
 
 	const num_sections = getState("NUM_OF_SEC");
 	const section_heights = getSectionHeights(door_height, num_sections);
-	for (const [i, section] of windows.sections.entries()) {
-		const ypos = section_heights.slice(0, i).reduce((acc, val) => acc + val, 0);
-		const cy = (ypos + section_heights[i] / 2) * scale + canvas_y;
-		const x = cx * rect.width / canvas.width + canvas_pos.left;
-		const y = cy * rect.height / canvas.height + canvas_pos.top;
 
-		$(`
-			<div class="rw-button-container-inner" data-id="section_slim_temp">
-				<div class="rw-sliding-button">
-					<i class="fas fa-pencil"></i>
-					<input type="radio" style="display:none;" id="section_slim_single_${i}" name="section_slim_${i}"
-						value="slim_single" />
-				</div>
-			</div>`)
+	const state = getState("WINDOW_STATE");
+	const activeIndex = state.sections.findIndex(s => s.selected);
+
+	for (const [i, section] of windows.sections.entries()) {
+
+		const ypos = section_heights.slice(0, i).reduce((a, b) => a + b, 0);
+		const cy = (ypos + section_heights[i] / 2) * scale + canvas_y;
+
+		const x = (cx * rect.width) / canvas.width + canvas_pos.left;
+		const y = (cy * rect.height) / canvas.height + canvas_pos.top;
+
+		const $btn = $(`
+            <div class="rw-button-container-inner" data-id="section_slim_temp">
+                <div class="rw-sliding-button">
+                    <i class="fas fa-pencil"></i>
+                </div>
+            </div>
+        `);
+
+		if (i === activeIndex) {
+			$btn.addClass('selected');
+		}
+
+		$btn
 			.css({
-				'position': 'absolute',
-				'left': `${x}px`,
-				'top': `${y}px`,
-				'transform': 'translate(0%, -50%)',
-				'min-width': '0',
-				'width': '40px',
-			}).appendTo('body')
+				position: 'absolute',
+				left: `${x}px`,
+				top: `${y}px`,
+				transform: 'translate(0%, -50%)',
+				width: '40px'
+			})
+			.appendTo('body')
 			.on('click', function (event) {
+
 				event.stopPropagation();
+
+				const freshState = getState("WINDOW_STATE");
+
+				freshState.sections.forEach((sec, idx) => {
+					sec.selected = idx === i;
+				});
+
 				$(`[data-id="section_slim_temp"]`).removeClass('selected');
 				$(this).addClass('selected');
+
 				$("#slim_spacing_container").remove();
-				$(`
-			   <div class="slim-options-container" id="slim_spacing_container">
-					 <div class="rw-button" id="SLIM_WINDOW_LITES_ONE" >
-					   <label for="SLIM_WINDOW_LITES_ONE">One Lite</label>
-					   <input type="radio" style="display:none;" name="SLIM_WINDOW_LITES" desc="One Lite" value="one" code="one" checked >
-					 </div>
-					 <div class="rw-button" id="SLIM_WINDOW_LITES_MORE" >
-					   <label for="SLIM_WINDOW_LITES_MORE">More than One</label>
-					   <input type="radio" style="display:none;"  name="SLIM_WINDOW_LITES" desc="More than One" value="more" code="more" >
-					 </div>
-					 <div class="rw-button" id="SLIM_WINDOW_SPACING_EVEN" >
-					   <label for="SLIM_WINDOW_SPACING_EVEN">Evenly Spaced</label>
-					   <input type="radio" style="display:none;" name="SLIM_WINDOW_SPACING" desc="Evenly Spaced" value="even" code="even" checked >
-					 </div>
-					 <div class="rw-button" id="SLIM_WINDOW_SPACING_FIXED" >
-					   <label for="SLIM_WINDOW_SPACING_FIXED">Fixed End</label>
-					   <input type="radio" style="display:none;" name="SLIM_WINDOW_SPACING" desc="Evenly Spaced Fixed End" value="fixed" code="fixed" >
-					 </div>
 
-					<div class="rw-button panel-button" id="SLIM_WINDOW_SINGLE">
-						<label for="GLASS_SHAPE_3">Slim Single</label>
-						<input type="radio" id="GLASS_SHAPE_3" name="GLASS_SHAPE" value="slim_single" >
-					</div>
+				const $menu = $(`
+                    <div class="slim-options-container show" id="slim_spacing_container">
 
-					<div class="panel-layout" id="SLIM_WINDOW_DOUBLE">
-						<div class="rw-button panel-button">
-							<label for="GLASS_SHAPE_MORE_0">Slim Double</label>
-							<input type="radio" id="GLASS_SHAPE_MORE_0" name="GLASS_SHAPE" value="slim_double" >
-						</div>
-					</div>
-			   </div>`)
+                        <div class="slim-header">
+                            <span>Configure</span>
+                            <span class="slim-close">&times;</span>
+                        </div>
+
+                        <div id="STEP_SHAPE">
+                            <div class="slim-step-title">Select Shape</div>
+                            <div class="slim-option" data-step="shape" data-value="slim_single">Slim Single</div>
+                            <div class="slim-option" data-step="shape" data-value="slim_double">Slim Double</div>
+                        </div>
+
+                        <div id="STEP_LITES" style="display:none;">
+                            <div class="slim-step-title">Select Lites</div>
+                            <div class="slim-option" data-step="lites" data-value="one">One Lite</div>
+                            <div class="slim-option" data-step="lites" data-value="more">More than One</div>
+                        </div>
+
+                        <div id="STEP_SPACING" style="display:none;">
+                            <div class="slim-step-title">Select Spacing</div>
+                            <div class="slim-option" data-step="spacing" data-value="even">Evenly Spaced</div>
+                            <div class="slim-option" data-step="spacing" data-value="fixed">Fixed End</div>
+                        </div>
+
+                    </div>
+                `)
 					.css({
-						'position': 'absolute',
-						'left': `${x + 60}px`,
-						'top': `${menu_y}px`,
-						'transform': 'translate(0%, -50%)',
+						left: `${x + 60}px`,
+						top: `${menu_y}px`,
+						transform: 'translate(0%, -50%)'
 					})
 					.appendTo('body');
 
-				$(document).on('click.slim_menu', function (event) {
-					const $menu = $('#slim_spacing_container');
-					// If the click was NOT on the menu AND not on a child of the menu
-					if (!$menu.is(event.target) && $menu.has(event.target).length === 0) {
-						$menu.remove();
-						$document.off('click.slim_menu');
-					}
-				});
+				const currentShape = section.shape || getState("GLASS_SHAPE");
+				const currentLite = section.slim_one ? "one" : "more";
+				const currentSpacing = section.slim_spacing || "even";
 
-				$("#SLIM_WINDOW_LITES_ONE").on('click', function () {
-					const state = getState("WINDOW_STATE");
-					state.sections[i].slim_one = true;
-					setState("SLIM_WINDOW_LITES", "one");
-				});
+				$menu
+					.find(`[data-step="shape"][data-value="${currentShape}"]`)
+					.addClass("active");
 
-				$("#SLIM_WINDOW_LITES_MORE").on('click', function () {
-					const state = getState("WINDOW_STATE");
-					state.sections[i].slim_one = false;
-					setState("SLIM_WINDOW_LITES", "more");
-				});
+				$menu.find("#STEP_LITES").show();
 
-				$("#SLIM_WINDOW_SPACING_EVEN").on('click', function () {
-					const state = getState("WINDOW_STATE");
-					state.sections[i].slim_spacing = 'even';
-					setState("SLIM_WINDOW_SPACING", "even");
-				});
+				$menu
+					.find(`[data-step="lites"][data-value="${currentLite}"]`)
+					.addClass("active");
 
-				$("#SLIM_WINDOW_SPACING_FIXED").on('click', function () {
-					const state = getState("WINDOW_STATE");
-					state.sections[i].slim_spacing = 'fixed';
-					setState("SLIM_WINDOW_SPACING", "fixed");
-				});
+				if (currentLite === "one") {
+					$menu.find("#STEP_SPACING").hide();
+				} else {
+					// More Than One selected					
+					$menu.find("#STEP_SPACING").show();
+					$menu.find(`[data-step="spacing"][data-value="${currentSpacing}"]`).addClass("active");
+				}
 
-				$("#SLIM_WINDOW_SINGLE").on('click', function () {
-					const state = getState("WINDOW_STATE");
-					state.sections[i].shape = "slim_single";
-					setState("GLASS_SHAPE", "slim_single");
-				});
-
-				$("#SLIM_WINDOW_DOUBLE").on('click', function () {
-					const state = getState("WINDOW_STATE");
-					state.sections[i].shape = "slim_double";
-					setState("GLASS_SHAPE", "slim_double");
-				});
-
-				const state = getState("WINDOW_STATE");
-				state.sections.forEach(section => {
-					section.selected = false;
-				});
-				state.sections[i].selected = true;
 				forceRedraw();
+
+				$(document)
+					.off('click.keepPencil')
+					.on('click.keepPencil', '#slim_spacing_container', function (e) {
+						e.stopPropagation();
+					});
+
+				$(document)
+					.off('click.slim')
+					.on('click.slim', '#slim_spacing_container .slim-option', function () {
+
+						const $el = $(this);
+						const step = $el.data("step");
+						const value = $el.data("value");
+
+						$el.siblings().removeClass('active');
+						$el.addClass('active');
+
+						const currentState = getState("WINDOW_STATE");
+						const currentSection = currentState.sections[i];
+
+						if (!currentSection) return;
+
+						currentState.sections.forEach((sec, idx) => {
+							sec.selected = idx === i;
+						});
+
+						if (step === "shape") {
+							currentSection.shape = value;
+							currentSection.enabled = [];
+
+							recalcWindowState();
+
+							$("#STEP_LITES").fadeIn();
+
+							forceRedraw();
+							return;
+						}
+
+						if (step === "lites") {
+							currentSection.slim_one = value === "one";
+
+							if (value === "one") {
+								currentSection.enabled = [];
+
+								recalcWindowState();
+
+								const updatedState = getState("WINDOW_STATE");
+								const updatedSection = updatedState.sections[i];
+
+								selectCenterOneLite(updatedSection);
+
+								$("#STEP_SPACING").hide();
+							} else {
+								recalcWindowState();
+								$("#STEP_SPACING").fadeIn();
+							}
+
+							setState("SLIM_WINDOW_LITES", value);
+							forceRedraw();
+							return;
+						}
+
+						if (step === "spacing") {
+							currentSection.slim_spacing = value;
+
+							recalcWindowState();
+
+							setState("SLIM_WINDOW_SPACING", value);
+							forceRedraw();
+							return;
+						}
+					});
+
+				$(document)
+					.off('click.slimClose')
+					.on('click.slimClose', '.slim-close', function () {
+
+						$('#slim_spacing_container').remove();
+
+						const state = getState("WINDOW_STATE");
+
+						if (state && Array.isArray(state.sections)) {
+							state.sections.forEach(sec => {
+								sec.selected = false;
+							});
+						}
+
+						// ✅ remove active red pencil state
+						$('[data-id="section_slim_temp"]')
+							.removeClass('selected');
+
+						forceRedraw();
+
+						$(document).off('click.slim');
+					});
 			});
 	}
 }
 
-function getCanvasMousePos() {
+function getCanvasMousePosFromEvent(event) {
 	const canvas = $("#CONFIG_CANVAS")[0];
+
+	if (!canvas) {
+		return [0, 0];
+	}
+
 	const rect = canvas.getBoundingClientRect();
 
-	const mouse_x = canvas_mouse.x * (canvas.width / rect.width);
-	const mouse_y = canvas_mouse.y * (canvas.height / rect.height);
+	// Fallback when no event is provided
+	if (!event) {
+		const mouse_x = canvas_mouse.x * (canvas.width / rect.width);
+		const mouse_y = canvas_mouse.y * (canvas.height / rect.height);
+
+		return [mouse_x, mouse_y];
+	}
+
+	const mouse_x = (event.clientX - rect.left) * (canvas.width / rect.width);
+	const mouse_y = (event.clientY - rect.top) * (canvas.height / rect.height);
+
 	return [mouse_x, mouse_y];
 }
 
 function isMouseIntersect(x, y, width, height) {
-	const [mouse_x, mouse_y] = getCanvasMousePos();
+	const [mouse_x, mouse_y] = getCanvasMousePosFromEvent();
 	const intersect_x = mouse_x > x && mouse_x < (x + width);
 	const intersect_y = mouse_y > y && mouse_y < (y + height);
 	return intersect_x && intersect_y;
 }
 
 function forceRedraw() {
-	setState("WINDOW_STATE", getState("WINDOW_STATE"));
+
+	if (configureInProgress) {
+		return;
+	}
+
+	CANVAS_PLUGIN.draw(getDoorInfo());
+
 }
 
 async function renderDoor() {
-	// const layer_obj = getDoorInfo();
-	// this.value = layer_obj;
-	// await CANVAS_PLUGIN.draw(layer_obj);
 
-	$("#canvas-loader").show(); // ✅ show BEFORE anything
-
-	// force browser paint before heavy work
-	await new Promise(requestAnimationFrame);
+	// Show loader only before first draw
+	if (!initialCanvasRendered) {
+		showConfigureLoader();
+	}
 
 	try {
+
 		const layer_obj = getDoorInfo();
 
 		this.value = layer_obj;
 
+		await new Promise(requestAnimationFrame);
+
 		await CANVAS_PLUGIN.draw(layer_obj);
 
-	} finally {
-		$("#canvas-loader").hide(); // ✅ always hide even if error
-	}
+		initialCanvasRendered = true;
 
+	} finally {
+
+		if (initialCanvasRendered && !configureInProgress) {
+			hideConfigureLoader();
+		}
+	}
 }
 
-function setWindowPositions(position) {
-	const state = getState("WINDOW_STATE");
-	const num_sections = getState("NUM_OF_SEC");
 
+// function setWindowPositions(position) {
+// 	const state = getState("WINDOW_STATE");
+
+// 	state.sections.forEach(section => {
+// 		section.enabled.fill(false);
+// 	});
+
+// 	const enableOneLitePosition = (section, position) => {
+// 		const enabled = section.enabled;
+
+// 		if (!enabled || enabled.length === 0) return;
+
+// 		if (position === "left") {
+// 			enabled[0] = true;
+// 			return;
+// 		}
+
+
+// 		if (position === "center" || position === "top") {
+// 			const centerIndex = Math.floor(enabled.length / 2);
+// 			enabled[centerIndex] = true;
+// 			return;
+// 		}
+
+// 		if (position === "right") {
+// 			enabled[enabled.length - 1] = true;
+// 			return;
+// 		}
+
+// 		// For "both", one-lite cannot show both.
+// 		// Pick center by default, or change to left if business wants.
+// 		if (position === "both") {
+// 			const centerIndex = Math.floor(enabled.length / 2);
+// 			enabled[centerIndex] = true;
+// 		}
+// 	};
+
+// 	if (position == "top") {
+// 		const section = state.sections[0];
+
+// 		if (!section) return;
+
+// 		if (section.slim_one) {
+// 			enableOneLitePosition(section, "top");
+// 		} else {
+// 			section.enabled.fill(true);
+// 		}
+
+// 		if (getState("SPECIAL_FACE")) {
+// 			// getNode("WINDOW_STATE").logic();
+// 			recalcWindowState();
+// 		}
+// 	}
+
+// 	if (position == "left") {
+// 		state.sections.forEach(section => {
+// 			if (section.slim_one) {
+// 				enableOneLitePosition(section, "left");
+// 			} else {
+// 				section.enabled[0] = true;
+// 			}
+// 		});
+// 	}
+
+// 	if (position == "center") {
+// 		state.sections.forEach(section => {
+// 			if (section.slim_one) {
+// 				enableOneLitePosition(section, "center");
+// 			} else {
+// 				const enabled = section.enabled;
+// 				const offset = Math.floor(enabled.length / 2);
+
+// 				enabled[offset] = true;
+
+// 				if (enabled.length % 2 == 0) {
+// 					enabled[offset - 1] = true;
+// 				}
+// 			}
+// 		});
+// 	}
+
+// 	if (position == "right") {
+// 		state.sections.forEach(section => {
+// 			if (section.slim_one) {
+// 				enableOneLitePosition(section, "right");
+// 			} else {
+// 				const enabled = section.enabled;
+// 				enabled[enabled.length - 1] = true;
+// 			}
+// 		});
+// 	}
+
+// 	if (position == "both") {
+// 		state.sections.forEach(section => {
+// 			if (section.slim_one) {
+// 				enableOneLitePosition(section, "both");
+// 			} else {
+// 				const enabled = section.enabled;
+// 				enabled[0] = true;
+// 				enabled[enabled.length - 1] = true;
+// 			}
+// 		});
+// 	}
+// }
+
+
+function setWindowPositions(position) {
+
+	const state = getState("WINDOW_STATE");
+
+	if (
+		getState("FACE_desc") === "mixed" &&
+		typeof currentSection !== "undefined" &&
+		currentSection != 1
+	) {
+		return;
+	}
+
+	// clear existing selections
 	state.sections.forEach(section => {
 		section.enabled.fill(false);
 	});
 
-	if (position == "top") {
+	if (position === "top") {
+
 		const section = state.sections[0];
-		section.enabled.fill(true);
-		if (getState("SPECIAL_FACE")) {
-			getNode("WINDOW_STATE").logic();
+
+		if (!section) {
+			return;
 		}
+
+		if (section.shape?.includes("slim")) {
+
+			section.slim_one = true;
+			section.enabled = [];
+
+			recalcWindowState();
+
+			selectCenterOneLite(section);
+
+		} else {
+
+			section.enabled.fill(true);
+
+		}
+
+		if (getState("SPECIAL_FACE")) {
+			recalcWindowState();
+		}
+
+		return;
 	}
-	if (position == "left" || position == "both") {
+
+	if (position === "left") {
+
+		state.sections.forEach(prepareSlimPositionMode);
+
+		recalcWindowState();
+
 		state.sections.forEach(section => {
+
+			section.enabled.fill(false);
 			section.enabled[0] = true;
+
 		});
+
+		return;
 	}
-	if (position == "center") {
+
+	if (position === "center") {
+		state.sections.forEach(prepareSlimPositionMode);
+
+		recalcWindowState();
+
 		state.sections.forEach(section => {
+
+			if (section.shape?.includes("slim")) {
+
+				section.enabled.fill(false);
+
+				const centerIndex =
+					Math.floor(section.enabled.length / 2);
+
+				section.enabled[centerIndex] = true;
+
+				return;
+			}
+
 			const enabled = section.enabled;
 			const offset = Math.floor(enabled.length / 2);
+
 			enabled[offset] = true;
-			if (enabled.length % 2 == 0) {
+
+			if (enabled.length % 2 === 0) {
 				enabled[offset - 1] = true;
 			}
+
 		});
+
+		return;
 	}
-	if (position == "right" || position == "both") {
+
+	if (position === "right") {
+
+		state.sections.forEach(prepareSlimPositionMode);
+
+		recalcWindowState();
+
 		state.sections.forEach(section => {
-			if (section.slim_one && position == "both")
-				return;
-			const enabled = section.enabled;
-			enabled[enabled.length - 1] = true;
+
+			if (section.shape?.includes("slim")) {
+
+				section.enabled.fill(false);
+
+				section.enabled[
+					section.enabled.length - 1
+				] = true;
+
+			} else {
+
+				section.enabled[
+					section.enabled.length - 1
+				] = true;
+			}
+
 		});
+
+		return;
+	}
+	// if (position === "both") {
+
+
+	// 	state.sections.forEach(prepareSlimPositionMode);
+
+
+	// 	recalcWindowState();
+
+	// 	state.sections.forEach(section => {
+
+	// 		if (section.shape?.includes("slim")) {
+
+	// 			selectCenterOneLite(section);
+
+	// 		} else {
+
+	// 			section.enabled[0] = true;
+	// 			section.enabled[section.enabled.length - 1] = true;
+
+	// 		}
+	// 	});
+
+	// 	return;
+	// }
+	if (position === "both") {
+
+		state.sections.forEach(prepareSlimPositionMode);
+
+		recalcWindowState();
+
+		state.sections.forEach(section => {
+
+			if (!section.enabled?.length) {
+				return;
+			}
+
+			section.enabled.fill(false);
+
+			section.enabled[0] = true;
+			section.enabled[section.enabled.length - 1] = true;
+		});
+
+		return;
 	}
 }
 
@@ -759,7 +1558,7 @@ function getSectionHeights(door_height, num_sections) {
 
 function getScale(door_width, door_height) {
 	const canvas = $("#CONFIG_CANVAS")[0];
-	const multiplier = 0.75;
+	const multiplier = 0.85;
 	return Math.min(canvas.width * multiplier / door_width, canvas.height * multiplier / door_height);
 }
 
@@ -768,7 +1567,10 @@ function getCanvasDoorPosition(door_width, door_height) {
 
 	const canvas = $("#CONFIG_CANVAS")[0];
 	const w = door_width * scale, h = door_height * scale;
-	const x = (canvas.width - w) / 2, y = (canvas.height - h) / 2;
+	const x = (canvas.width - w) / 2;
+	// const y = ((canvas.height - h) / 2) - 60;
+	const y = ((canvas.height - h) / 2);
+
 	return [x, y];
 }
 
@@ -798,6 +1600,74 @@ function getPanelPositions(panel_type, door_width, special = false) {
 	}
 
 	return positions_x;
+}
+
+// The legacy configurator stores mixed designs as a C/R pattern.  Read that
+// pattern from the option text (for example, "CRRCRC (MP-7)") so the display
+// works even when the option value itself is only "MP-7".
+function getMixedPanelPattern() {
+	const select = document.getElementById("DESIGN_CODE");
+	if (!select || !select.selectedOptions.length) return [];
+
+	const option = select.selectedOptions[0];
+	const source = option.dataset.pattern || option.text || option.value || "";
+	const pattern = source.match(/[CR]+/i)?.[0]?.toUpperCase();
+	if (pattern) return pattern.split("");
+
+	// Keep the code value usable if its label does not contain the pattern.
+	const codePatterns = { "MP-7": "CRRCRC" };
+	return (codePatterns[option.value] || "").split("");
+}
+
+function getMixedPanelLayout(door_width) {
+	const pattern = getMixedPanelPattern();
+	if (!pattern.length) return [];
+
+	// Mixed doors do not use the normal Colonial/Ranch panel widths.  The
+	// mixed configuration contains the narrower C/R dimensions that make the
+	// complete code fit within each door-width rule.
+	const mixed = panelConfigurations.mixed;
+	const rule = getRule("mixed", door_width);
+	if (!mixed || !rule) return [];
+
+	const spacing = rule.muttSpacing ?? 0;
+	const panels = pattern.map(style => {
+		const colonial = style === "C";
+		return {
+			style: style,
+			width: colonial ? mixed.panelWidthCol : mixed.panelWidthRnc,
+			height: colonial ? mixed.panelHeightCol : mixed.panelHeightRnc,
+		};
+	});
+	if (panels.some(panel => !Number.isFinite(panel.width) || !Number.isFinite(panel.height))) {
+		return [];
+	}
+
+	// Match the end-stile margin used by a normal Colonial section, then fit
+	// the entire mixed sequence into the remaining door width.  The source
+	// mixed dimensions establish the C:R ratio; this step makes that ratio work
+	// for every configured door width instead of allowing it to overrun a 16'.
+	const colonialPositions = getPanelPositions("colonial", door_width);
+	const endStile = Math.max(0, colonialPositions[0] ?? 0);
+	const usableWidth = Math.max(0, door_width - 2 * endStile);
+	const rawWidth = panels.reduce((sum, panel) => sum + panel.width, 0)
+		+ spacing * (panels.length - 1);
+	const fitScale = rawWidth > 0 ? usableWidth / rawWidth : 1;
+	const fittedSpacing = spacing * fitScale;
+
+	panels.forEach(panel => {
+		panel.width *= fitScale;
+	});
+
+	const totalWidth = panels.reduce((sum, panel) => sum + panel.width, 0)
+		+ fittedSpacing * (panels.length - 1);
+	let x = endStile + (usableWidth - totalWidth) / 2;
+
+	return panels.map(panel => {
+		const positionedPanel = { ...panel, x: x };
+		x += panel.width + fittedSpacing;
+		return positionedPanel;
+	});
 }
 
 function getDoorInfo() {
@@ -831,16 +1701,46 @@ function getDoorInfo() {
 	const height = getState("HEIGHT");
 	const num_sections = getState("NUM_OF_SEC");
 
-	const [mouse_x, mouse_y] = getCanvasMousePos();
+	// const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
+	const [mouse_x, mouse_y] = getCanvasMousePosFromEvent();
 	const window_info = getState("WINDOW_STATE");
 	const section_heights = getSectionHeights(height, num_sections);
+	const mixed_panels = face === "mixed" ? getMixedPanelLayout(width) : [];
+
+	const insert = getNode("GLASS_INSERT").value;
+	const selectedInsertValue = getSelectedInsertValue(insert);
 
 	let sum = 0;
 	const sections = [];
+
 	for (const [i, section_info] of window_info.sections.entries()) {
 		const info = { ...section_info };
+
 		info.height = section_heights[i];
 		info.ypos = sum;
+
+		info.mixed_panels =
+			face === "mixed"
+				? mixed_panels.map(panel => {
+					return {
+						...panel,
+						insertValue: getMixedInsertValue(
+							selectedInsertValue,
+							panel.style
+						)
+					};
+				})
+				: [];
+
+		// calculation to count the glass qty for each section
+		info.glass_qty = section_info.enabled.filter(v => v === true).length;
+
+		info.max_window_qty = getMaxSlimWindowQty(
+			info.shape,
+			width,
+			info.slim_spacing,
+			getState("END_CAPS") === "N"
+		);
 
 		sections.push(info);
 		sum += section_heights[i];
@@ -849,15 +1749,20 @@ function getDoorInfo() {
 	const color = getState("COLOR");
 	const frame_color = getState("FRAME_COLOR");
 	const insert_color = getState("INSERT_COLOR");
-	const insert = getState("GLASS_INSERT");
+
 
 	const [x, y] = getCanvasDoorPosition(width, height);
 
 	let hints = window_info.hints;
-	if (glass_shape.includes('grand') || special) {
+
+	// Force hints off unless Glazing tab is active
+	if (typeof currentSection !== "undefined" && currentSection != 1) {
 		hints = false;
 	}
 
+	if (glass_shape.includes('grand') || special) {
+		hints = false;
+	}
 	return {
 		mouse_x: mouse_x,
 		mouse_y: mouse_y,
@@ -880,7 +1785,6 @@ function getDoorInfo() {
 		},
 
 		insert: insert,
-
 		sections: sections,
 		scale: getScale(width, height),
 
@@ -888,11 +1792,248 @@ function getDoorInfo() {
 		misc: {
 			labels: true,
 		},
-
 		draw_hints: hints,
+		custom_windows: getState("CUSTOM_WINDOWS"),
+
 	}
 }
 
 function addChangeEvents() {
 	addRenderNode()
+}
+
+
+function getMaxSlimWindowQty(shape, doorWidth, spacing, singleEndcap) {
+
+	let rules = [];
+
+	if (shape === "slim_single") {
+
+		// Even Spaced + Single Endcap
+		if (spacing === "even" && singleEndcap) {
+
+			rules = [
+				{ min: 96, max: 132, qty: 2 },
+				{ min: 133, max: 175, qty: 3 },
+				{ min: 176, max: 217, qty: 4 },
+				{ min: 218, max: 242, qty: 5 }
+			];
+		}
+
+		// Fixed End + Single Endcap
+		else if (spacing === "fixed" && singleEndcap) {
+
+			rules = [
+				{ min: 96, max: 128, qty: 2 },
+				{ min: 129, max: 170, qty: 3 },
+				{ min: 171, max: 213, qty: 4 },
+				{ min: 214, max: 242, qty: 5 }
+			];
+		}
+
+		// Even Spaced + Double Endcap
+		else if (spacing === "even" && !singleEndcap) {
+
+			rules = [
+				{ min: 96, max: 136, qty: 2 },
+				{ min: 137, max: 179, qty: 3 },
+				{ min: 180, max: 222, qty: 4 },
+				{ min: 223, max: 242, qty: 5 }
+			];
+		}
+
+		// Fixed End + Double Endcap
+		else {
+
+			rules = [
+				{ min: 96, max: 134, qty: 2 },
+				{ min: 135, max: 177, qty: 3 },
+				{ min: 178, max: 219, qty: 4 },
+				{ min: 220, max: 242, qty: 5 }
+			];
+		}
+	}
+
+	else if (shape === "slim_double") {
+
+		// Even Spaced + Single Endcap
+		if (spacing === "even" && singleEndcap) {
+
+			rules = [
+				{ min: 96, max: 158, qty: 1 },
+				{ min: 159, max: 234, qty: 2 },
+				{ min: 235, max: 242, qty: 3 }
+			];
+		}
+
+		// Fixed End + Single Endcap
+		else if (spacing === "fixed" && singleEndcap) {
+
+			rules = [
+				{ min: 96, max: 154, qty: 1 },
+				{ min: 155, max: 230, qty: 2 },
+				{ min: 231, max: 242, qty: 3 }
+			];
+		}
+
+		// Even Spaced + Double Endcap
+		else if (spacing === "even" && !singleEndcap) {
+
+			rules = [
+				{ min: 96, max: 161, qty: 1 },
+				{ min: 162, max: 238, qty: 2 },
+				{ min: 239, max: 242, qty: 3 }
+			];
+		}
+
+		// Fixed End + Double Endcap
+		else {
+
+			rules = [
+				{ min: 96, max: 160, qty: 1 },
+				{ min: 161, max: 236, qty: 2 },
+				{ min: 237, max: 242, qty: 3 }
+			];
+		}
+	}
+
+	const rule = rules.find(r =>
+		doorWidth >= r.min &&
+		doorWidth <= r.max
+	);
+
+	return rule ? rule.qty : 0;
+}
+
+
+// function showConfigureLoader() {
+// 	// var $loader = $("#canvas-loader");
+// 	const $loader = $("#canvas-loader-backdrop");
+
+// 	if (!$loader.length) {
+// 		console.warn("Loader element #canvas-loader not found");
+// 		return;
+// 	}
+
+// 	$loader.show();
+
+// 	// Force reflow so browser applies display change immediately
+// 	$loader[0].offsetHeight;
+// }
+
+// function hideConfigureLoader() {
+// 	var $loader = $("#canvas-loader");
+
+// 	if ($loader.length) {
+// 		$loader.hide();
+// 	}
+// }
+
+function showConfigureLoader() {
+	$("#canvas-loader-backdrop").css("display", "flex");
+	$("#canvas-loader").show();
+}
+
+function hideConfigureLoader() {
+	$("#canvas-loader-backdrop").hide();
+	$("#canvas-loader").hide();
+}
+
+function prepareSlimPositionMode(section) {
+	if (!section.shape?.includes("slim")) return;
+
+	section.slim_position_mode = true;
+	section.enabled = [];
+}
+
+function enableSlimCustomMode(section) {
+
+	if (!section.shape?.includes("slim")) {
+		return;
+	}
+
+	section.slim_position_mode = false;
+
+	section.positions = slim_getWindowPositions(
+		section.shape,
+		getState("WIDTH"),
+		section.slim_spacing === "fixed",
+		getState("END_CAPS") == "N"
+	);
+
+	if (section.enabled.length !== section.positions.length) {
+
+		section.enabled =
+			Array(section.positions.length).fill(false);
+
+		if (section.enabled.length) {
+			//section.enabled[0] = true;
+		}
+	}
+}
+
+function resetSlimCustomState() {
+
+	const state = getState("WINDOW_STATE");
+	const glass_shape = getState("GLASS_SHAPE");
+
+	const lastPosition =
+		getNode("WINDOW_POSITION")?._lastPosition || "left";
+
+	state.sections.forEach(section => {
+
+		section.selected = false;
+		section.slim_one = false;
+		section.slim_position_mode = false;
+		section.slim_spacing = "even";
+		section.shape = glass_shape;
+		section.enabled = [];
+
+	});
+
+	recalcWindowState();
+
+	// IMPORTANT:
+	// recalcWindowState() creates positions but selects nothing.
+	state.sections.forEach(section => {
+
+		if (!section.enabled?.length) {
+			return;
+		}
+
+		section.enabled.fill(false);
+
+		switch (lastPosition) {
+
+			case "left":
+				section.enabled[0] = true;
+				break;
+
+			case "right":
+				section.enabled[
+					section.enabled.length - 1
+				] = true;
+				break;
+
+			case "center": {
+				const center =
+					Math.floor(section.enabled.length / 2);
+
+				section.enabled[center] = true;
+				break;
+			}
+
+			case "both":
+				section.enabled[0] = true;
+				section.enabled[
+					section.enabled.length - 1
+				] = true;
+				break;
+
+			default:
+				section.enabled[0] = true;
+		}
+	});
+
+	forceRedraw();
 }
