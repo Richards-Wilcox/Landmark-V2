@@ -815,127 +815,453 @@ function drawWindowFrame(ctx, px, py, pW, pH, info) {
 	ctx.restore()
 }
 
+function getSelectedInsertValue(insert) {
+	if (!insert) {
+		return "";
+	}
+
+	if (typeof insert === "object") {
+		return insert.value || "";
+	}
+
+	return insert;
+}
+
+function getMixedInsertValue(selectedInsertValue, panelStyle) {
+	if (!selectedInsertValue || !panelStyle) {
+		return selectedInsertValue;
+	}
+
+	if (panelStyle === "C") {
+		return selectedInsertValue.replace(/_ranch$/, "_colonial");
+	}
+
+	if (panelStyle === "R") {
+		return selectedInsertValue.replace(/_colonial$/, "_ranch");
+	}
+
+	return selectedInsertValue;
+}
+
+
+
+// async function drawWindows(ctx, section, info, hints) {
+
+// 	const drawInsertFn = {
+// 		'stockton_colonial': (ctx, x, y, width, height, scale, color, idx) => {
+// 			drawInsertStockton(ctx, x, y, width, height, scale, color, 1, false, false);
+// 		},
+// 		'stockton_ranch': (ctx, x, y, width, height, scale, color, idx) => {
+// 			drawInsertStockton(ctx, x, y, width, height, scale, color, 4, false, false);
+// 		},
+// 		'waterton_colonial': (ctx, x, y, width, height, scale, color, idx) => {
+// 			drawInsertWaterton(ctx, x, y, width, height, scale, color, 1);
+// 		},
+// 		'waterton_ranch': (ctx, x, y, width, height, scale, color, idx) => {
+// 			drawInsertWaterton(ctx, x, y, width, height, scale, color, 2);
+// 		},
+// 		'cascade_colonial': (ctx, x, y, width, height, scale, color, idx) => {
+// 			drawInsertCascade(ctx, x, y, width, height, scale, color, 1);
+// 		},
+// 		'cascade_ranch': (ctx, x, y, width, height, scale, color, idx) => {
+// 			drawInsertCascade(ctx, x, y, width, height, scale, color, 4);
+// 		},
+// 		'prairie': drawInsertPrairie,
+// 		'arched_stockton': (ctx, x, y, width, height, scale, color, idx) => {
+// 			drawInsertStockton(ctx, x, y, width, height, scale, color, 4, true, idx % 2);
+// 		},
+// 		'arched_stockbridge': (ctx, x, y, width, height, scale, color, idx) => {
+// 			drawInsertStockbridge(ctx, x, y, width, height, scale, color, 3, true, idx % 2);
+// 		},
+// 		'stockbridge': (ctx, x, y, width, height, scale, color, idx) => {
+// 			drawInsertStockbridge(ctx, x, y, width, height, scale, color, 3, false, false);
+// 		},
+// 		'arched_stockton_3': (ctx, x, y, width, height, scale, color, idx) => {
+// 			if (idx == 0) {
+// 				drawInsertStockton(ctx, x, y, width, height, scale, color, 4, true, false);
+// 			} else if (idx == 1) {
+// 				drawInsertStockton(ctx, x, y, width, height, scale, color, 4, false, false);
+// 			} else if (idx == 2) {
+// 				drawInsertStockton(ctx, x, y, width, height, scale, color, 4, true, true);
+// 			}
+// 		},
+// 		'arched_stockbridge_3': (ctx, x, y, width, height, scale, color, idx) => {
+// 			if (idx == 0) {
+// 				drawInsertStockbridge(ctx, x, y, width, height, scale, color, 4, true, false);
+// 			} else if (idx == 1) {
+// 				drawInsertStockbridge(ctx, x, y, width, height, scale, color, 4, false, false);
+// 			} else if (idx == 2) {
+// 				drawInsertStockbridge(ctx, x, y, width, height, scale, color, 4, true, true);
+// 			}
+// 		},
+// 		'arched_stockton_4': (ctx, x, y, width, height, scale, color, idx) => {
+// 			if (idx == 0) {
+// 				drawInsertStockton(ctx, x, y, width, height, scale, color, 4, true, false);
+// 			} else if (idx == 1 || idx == 2) {
+// 				drawInsertStockton(ctx, x, y, width, height, scale, color, 4, false, false);
+// 			} else if (idx == 3) {
+// 				drawInsertStockton(ctx, x, y, width, height, scale, color, 4, true, true);
+// 			}
+// 		},
+// 		'arched_stockbridge_4': (ctx, x, y, width, height, scale, color, idx) => {
+// 			if (idx == 0) {
+// 				drawInsertStockbridge(ctx, x, y, width, height, scale, color, 4, true, false);
+// 			} else if (idx == 1 || idx == 2) {
+// 				drawInsertStockbridge(ctx, x, y, width, height, scale, color, 4, false, false);
+// 			} else if (idx == 3) {
+// 				drawInsertStockbridge(ctx, x, y, width, height, scale, color, 4, true, true);
+// 			}
+// 		},
+// 	};
+
+// 	const pW = section.panel_width * info.scale;
+// 	const pH = section.panel_height * info.scale;
+
+// 	// NEW LOGIC UPDATED FOR SLIM
+// 	const windowPosition = getState("WINDOW_POSITION");
+// 	const customMode = windowPosition === "custom";
+// 	const isSlimGlass = info.glass_shape?.includes("slim");
+
+// 	ctx.save();
+
+
+
+// 	for (const [i, pos] of section.positions.entries()) {
+// 		let winX = pos * info.scale + info.xpos;
+// 		let winW = pW;
+// 		let winH = pH;
+
+// 		if (info.face === "mixed") {
+
+// 			const panel = section.mixed_panels?.[i];
+
+// 			if (panel) {
+
+// 				winX = panel.x * info.scale + info.xpos;
+// 				winW = panel.width * info.scale;
+// 				winH = panel.height * info.scale;
+// 			}
+// 		}
+// 		const y_offset = (section.height * info.scale - winH) / 2;
+// 		const py = section.ypos * info.scale + info.ypos + y_offset;
+// 		let isWindowVisible = false;
+
+// 		//NEW LOGIC IMPLEMENTED FOR SLIM
+// 		if (!isSlimGlass) {
+
+// 			isWindowVisible = section.enabled[i];
+
+// 		}
+// 		else if (customMode) {
+
+// 			isWindowVisible = section.enabled[i];
+
+// 		}
+// 		else {
+
+// 			const count = section.positions.length;
+
+// 			switch (windowPosition) {
+
+// 				case "left":
+// 					isWindowVisible = (i === 0);
+// 					break;
+
+// 				case "center":
+// 					isWindowVisible = (i === Math.floor(count / 2));
+// 					break;
+
+// 				case "right":
+// 					isWindowVisible = (i === count - 1);
+// 					break;
+
+// 				case "both":
+// 					isWindowVisible = (i === 0 || i === count - 1);
+// 					break;
+
+// 				default:
+// 					isWindowVisible = section.enabled[i];
+// 					break;
+// 			}
+// 		}
+
+
+// 		// console.log({
+// 		// 	position: windowPosition,
+// 		// 	customMode,
+// 		// 	enabled: section.enabled,
+// 		// 	index: i
+// 		// });
+
+// 		//	ENDS HERE
+// 		// if (section.enabled[i]) {
+// 		if (isWindowVisible) {
+// 			const gradx = winX + winW / 2 - winH / 2;
+// 			const grady = py + winH / 2 - winW / 2;
+
+// 			const gradient = ctx.createLinearGradient(
+// 				gradx,
+// 				grady,
+// 				gradx + winH,
+// 				grady + winW
+// 			);
+// 			gradient.addColorStop(0, "#a8d0ff");
+// 			gradient.addColorStop(0.5, "#ffffff");
+// 			gradient.addColorStop(1, "#a8d0ff");
+
+// 			ctx.fillStyle = gradient;
+
+// 			if (info.glass_shape.includes('grand')) {
+// 				if (info.glass_shape.includes('arched')) {
+// 					await drawGrandviewArched(
+// 						ctx,
+// 						winX,
+// 						py,
+// 						winW,
+// 						winH,
+// 						info,
+// 						i
+// 					);
+// 				} else {
+// 					await drawGrandview(ctx,
+// 						winX,
+// 						py,
+// 						winW,
+// 						winH,
+// 						info,
+// 						i);
+// 				}
+// 			} else {
+// 				ctx.fillRect(winX, py, winW, winH);
+// 				if (info.insert in drawInsertFn) {
+// 					drawInsertFnctx,
+// 						winX,
+// 						py,
+// 						winW,
+// 						winH,
+// 						info.scale,
+// 						info.background.insert_color,
+// 						i;
+// 				}
+
+// 				drawWindowFrame(
+// 					ctx,
+// 					winX,
+// 					py,
+// 					winW,
+// 					winH,
+// 					info,
+// 				);
+// 			}
+// 		}
+
+// 		if (isSlimGlass && !customMode && !isWindowVisible) {
+// 			continue;
+// 		}
+
+
+// 		if (hints) {
+// 			if (section.slim_one) {
+
+// 				if (!section.selected) continue;
+
+// 				const size = 10;
+// 				const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
+// 				const x = px + pW / 2;
+
+// 				ctx.save();
+
+// 				ctx.beginPath();
+// 				// 1. Move to the top-left corner
+// 				ctx.moveTo(x - size / 2, py - size);
+// 				// 2. Draw line to the top-right corner
+// 				ctx.lineTo(x + size / 2, py - size);
+// 				// 3. Draw line to the bottom center (the "tip")
+// 				ctx.lineTo(x, py);
+// 				ctx.closePath(); // Automatically connects back to the start
+
+// 				ctx.fillStyle = "red";
+// 				ctx.fill();
+// 				ctx.restore();
+// 			} else {
+// 				ctx.save();
+// 				ctx.strokeStyle = info.colors.isDark ? "#aaaaaa" : "#666666";
+// 				// ctx.strokeStyle = "red";
+// 				ctx.lineWidth = 2;
+// 				ctx.setLineDash([16, 8]);
+// 				ctx.strokeRect(winX, py, winW, winH);
+// 				ctx.restore();
+// 			}
+
+// 			const section_intersects = section.slim_one && isMouseIntersect(info.xpos, section.ypos * info.scale + info.ypos,
+// 				info.door_width * info.scale, section.height * info.scale);
+// 			if (section_intersects) {
+// 				const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
+// 				const x = mouse_x - pW / 2;
+// 				const size = 10;
+
+// 				ctx.save();
+
+// 				ctx.beginPath();
+// 				// 1. Move to the top-left corner
+// 				ctx.moveTo(mouse_x - size / 2, py - size);
+// 				// 2. Draw line to the top-right corner
+// 				ctx.lineTo(mouse_x + size / 2, py - size);
+// 				// 3. Draw line to the bottom center (the "tip")
+// 				ctx.lineTo(mouse_x, py);
+// 				ctx.closePath(); // Automatically connects back to the start
+
+// 				ctx.fillStyle = "red";
+// 				ctx.fill();
+
+// 				ctx.strokeStyle = info.colors.isDark ? "#aaaaaa" : "#666666";
+// 				ctx.lineWidth = 2;
+// 				ctx.setLineDash([16, 8]);
+// 				// ctx.strokeRect(x, py, pW, pH);
+// 				ctx.strokeRect(x, py, winW, winH);
+// 				ctx.restore();
+// 			}
+// 		}
+// 	}
+
+// 	ctx.restore();
+// }
+
 async function drawWindows(ctx, section, info, hints) {
 	const drawInsertFn = {
-		'stockton_colonial': (ctx, x, y, width, height, scale, color, idx) => {
+		"stockton_colonial": (ctx, x, y, width, height, scale, color, idx) => {
 			drawInsertStockton(ctx, x, y, width, height, scale, color, 1, false, false);
 		},
-		'stockton_ranch': (ctx, x, y, width, height, scale, color, idx) => {
+
+		"stockton_ranch": (ctx, x, y, width, height, scale, color, idx) => {
 			drawInsertStockton(ctx, x, y, width, height, scale, color, 4, false, false);
 		},
-		'waterton_colonial': (ctx, x, y, width, height, scale, color, idx) => {
+
+		"waterton_colonial": (ctx, x, y, width, height, scale, color, idx) => {
 			drawInsertWaterton(ctx, x, y, width, height, scale, color, 1);
 		},
-		'waterton_ranch': (ctx, x, y, width, height, scale, color, idx) => {
+
+		"waterton_ranch": (ctx, x, y, width, height, scale, color, idx) => {
 			drawInsertWaterton(ctx, x, y, width, height, scale, color, 2);
 		},
-		'cascade_colonial': (ctx, x, y, width, height, scale, color, idx) => {
+
+		"cascade_colonial": (ctx, x, y, width, height, scale, color, idx) => {
 			drawInsertCascade(ctx, x, y, width, height, scale, color, 1);
 		},
-		'cascade_ranch': (ctx, x, y, width, height, scale, color, idx) => {
+
+		"cascade_ranch": (ctx, x, y, width, height, scale, color, idx) => {
 			drawInsertCascade(ctx, x, y, width, height, scale, color, 4);
 		},
-		'prairie': drawInsertPrairie,
-		'arched_stockton': (ctx, x, y, width, height, scale, color, idx) => {
+
+		"prairie": drawInsertPrairie,
+
+		"arched_stockton": (ctx, x, y, width, height, scale, color, idx) => {
 			drawInsertStockton(ctx, x, y, width, height, scale, color, 4, true, idx % 2);
 		},
-		'arched_stockbridge': (ctx, x, y, width, height, scale, color, idx) => {
+
+		"arched_stockbridge": (ctx, x, y, width, height, scale, color, idx) => {
 			drawInsertStockbridge(ctx, x, y, width, height, scale, color, 3, true, idx % 2);
 		},
-		'stockbridge': (ctx, x, y, width, height, scale, color, idx) => {
+
+		"stockbridge": (ctx, x, y, width, height, scale, color, idx) => {
 			drawInsertStockbridge(ctx, x, y, width, height, scale, color, 3, false, false);
 		},
-		'arched_stockton_3': (ctx, x, y, width, height, scale, color, idx) => {
-			if (idx == 0) {
+
+		"arched_stockton_3": (ctx, x, y, width, height, scale, color, idx) => {
+			if (idx === 0) {
 				drawInsertStockton(ctx, x, y, width, height, scale, color, 4, true, false);
-			} else if (idx == 1) {
+			} else if (idx === 1) {
 				drawInsertStockton(ctx, x, y, width, height, scale, color, 4, false, false);
-			} else if (idx == 2) {
+			} else if (idx === 2) {
 				drawInsertStockton(ctx, x, y, width, height, scale, color, 4, true, true);
 			}
 		},
-		'arched_stockbridge_3': (ctx, x, y, width, height, scale, color, idx) => {
-			if (idx == 0) {
+
+		"arched_stockbridge_3": (ctx, x, y, width, height, scale, color, idx) => {
+			if (idx === 0) {
 				drawInsertStockbridge(ctx, x, y, width, height, scale, color, 4, true, false);
-			} else if (idx == 1) {
+			} else if (idx === 1) {
 				drawInsertStockbridge(ctx, x, y, width, height, scale, color, 4, false, false);
-			} else if (idx == 2) {
+			} else if (idx === 2) {
 				drawInsertStockbridge(ctx, x, y, width, height, scale, color, 4, true, true);
 			}
 		},
-		'arched_stockton_4': (ctx, x, y, width, height, scale, color, idx) => {
-			if (idx == 0) {
+
+		"arched_stockton_4": (ctx, x, y, width, height, scale, color, idx) => {
+			if (idx === 0) {
 				drawInsertStockton(ctx, x, y, width, height, scale, color, 4, true, false);
-			} else if (idx == 1 || idx == 2) {
+			} else if (idx === 1 || idx === 2) {
 				drawInsertStockton(ctx, x, y, width, height, scale, color, 4, false, false);
-			} else if (idx == 3) {
+			} else if (idx === 3) {
 				drawInsertStockton(ctx, x, y, width, height, scale, color, 4, true, true);
 			}
 		},
-		'arched_stockbridge_4': (ctx, x, y, width, height, scale, color, idx) => {
-			if (idx == 0) {
+
+		"arched_stockbridge_4": (ctx, x, y, width, height, scale, color, idx) => {
+			if (idx === 0) {
 				drawInsertStockbridge(ctx, x, y, width, height, scale, color, 4, true, false);
-			} else if (idx == 1 || idx == 2) {
+			} else if (idx === 1 || idx === 2) {
 				drawInsertStockbridge(ctx, x, y, width, height, scale, color, 4, false, false);
-			} else if (idx == 3) {
+			} else if (idx === 3) {
 				drawInsertStockbridge(ctx, x, y, width, height, scale, color, 4, true, true);
 			}
-		},
+		}
 	};
 
-	const pW = section.panel_width * info.scale;
-	const pH = section.panel_height * info.scale;
+	const basePW = section.panel_width * info.scale;
+	const basePH = section.panel_height * info.scale;
 
-	// NEW LOGIC UPDATED FOR SLIM
 	const windowPosition = getState("WINDOW_POSITION");
 	const customMode = windowPosition === "custom";
-	const isSlimGlass = info.glass_shape?.includes("slim");
-
-
+	const glassShape = info.glass_shape || "";
+	const isSlimGlass = glassShape.includes("slim");
+	const isGrandGlass = glassShape.includes("grand");
 
 	ctx.save();
 
-	const y_offset = (section.height * info.scale - pH) / 2;
-	const py = section.ypos * info.scale + info.ypos + y_offset;
-
-
 	for (const [i, pos] of section.positions.entries()) {
-		const px = pos * info.scale + info.xpos;
+		let winX = pos * info.scale + info.xpos;
+		let winW = basePW;
+		let winH = basePH;
+		let mixedPanel = null;
 
-		//NEW LOGIC IMPLEMENTED FOR SLIM
+		if (info.face === "mixed") {
+			mixedPanel = section.mixed_panels?.[i];
+
+			if (mixedPanel) {
+				winX = mixedPanel.x * info.scale + info.xpos;
+				winW = mixedPanel.width * info.scale;
+				winH = mixedPanel.height * info.scale;
+			}
+		}
+
+		const yOffset = (section.height * info.scale - winH) / 2;
+		const py = section.ypos * info.scale + info.ypos + yOffset;
 
 		let isWindowVisible = false;
 
 		if (!isSlimGlass) {
-
 			isWindowVisible = section.enabled[i];
-
-		}
-		else if (customMode) {
-
+		} else if (customMode) {
 			isWindowVisible = section.enabled[i];
-
-		}
-		else {
-
+		} else {
 			const count = section.positions.length;
 
 			switch (windowPosition) {
-
 				case "left":
-					isWindowVisible = (i === 0);
+					isWindowVisible = i === 0;
 					break;
 
 				case "center":
-					isWindowVisible = (i === Math.floor(count / 2));
+					isWindowVisible = i === Math.floor(count / 2);
 					break;
 
 				case "right":
-					isWindowVisible = (i === count - 1);
+					isWindowVisible = i === count - 1;
 					break;
 
 				case "both":
-					isWindowVisible = (i === 0 || i === count - 1);
+					isWindowVisible = i === 0 || i === count - 1;
 					break;
 
 				default:
@@ -944,39 +1270,80 @@ async function drawWindows(ctx, section, info, hints) {
 			}
 		}
 
-
-		// console.log({
-		// 	position: windowPosition,
-		// 	customMode,
-		// 	enabled: section.enabled,
-		// 	index: i
-		// });
-
-		//	ENDS HERE
-		// if (section.enabled[i]) {
 		if (isWindowVisible) {
-			const gradx = px + pW / 2 - pH / 2;
-			const grady = py + pH / 2 - pW / 2;
-			const gradient = ctx.createLinearGradient(gradx, grady, gradx + pH, grady + pW);
+			const gradx = winX + winW / 2 - winH / 2;
+			const grady = py + winH / 2 - winW / 2;
+
+			const gradient = ctx.createLinearGradient(
+				gradx,
+				grady,
+				gradx + winH,
+				grady + winW
+			);
+
 			gradient.addColorStop(0, "#a8d0ff");
 			gradient.addColorStop(0.5, "#ffffff");
 			gradient.addColorStop(1, "#a8d0ff");
 
 			ctx.fillStyle = gradient;
 
-			if (info.glass_shape.includes('grand')) {
-				if (info.glass_shape.includes('arched')) {
-					await drawGrandviewArched(ctx, px, py, pW, pH, info, i);
+			if (isGrandGlass) {
+				if (glassShape.includes("arched")) {
+					await drawGrandviewArched(
+						ctx,
+						winX,
+						py,
+						winW,
+						winH,
+						info,
+						i
+					);
 				} else {
-					await drawGrandview(ctx, px, py, pW, pH, info, i);
+					await drawGrandview(
+						ctx,
+						winX,
+						py,
+						winW,
+						winH,
+						info,
+						i
+					);
 				}
 			} else {
-				ctx.fillRect(px, py, pW, pH);
-				if (info.insert in drawInsertFn) {
-					drawInsertFn[info.insert](ctx, px, py, pW, pH, info.scale, info.background.insert_color, i);
+				ctx.fillRect(winX, py, winW, winH);
+
+				let insertKey = "";
+
+				if (info.face === "mixed" && mixedPanel) {
+					insertKey = mixedPanel.insertValue || "";
+				} else {
+					insertKey = getSelectedInsertValue(info.insert);
 				}
 
-				drawWindowFrame(ctx, px, py, pW, pH, info);
+				console.log("draw insert", {
+					index: i,
+					face: info.face,
+					panelStyle: mixedPanel?.style,
+					insertKey: insertKey
+				});
+
+				if (
+					insertKey &&
+					typeof drawInsertFn[insertKey] === "function"
+				) {
+					drawInsertFn[insertKey](
+						ctx,
+						winX,
+						py,
+						winW,
+						winH,
+						info.scale,
+						info.background.insert_color,
+						i
+					);
+				}
+
+				drawWindowFrame(ctx, winX, py, winW, winH, info);
 			}
 		}
 
@@ -984,67 +1351,72 @@ async function drawWindows(ctx, section, info, hints) {
 			continue;
 		}
 
-
-
-
 		if (hints) {
 			if (section.slim_one) {
-
-				if (!section.selected) continue;
+				if (!section.selected) {
+					continue;
+				}
 
 				const size = 10;
-				const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
-				const x = px + pW / 2;
+				const markerX = winX + winW / 2;
 
 				ctx.save();
 
 				ctx.beginPath();
-				// 1. Move to the top-left corner
-				ctx.moveTo(x - size / 2, py - size);
-				// 2. Draw line to the top-right corner
-				ctx.lineTo(x + size / 2, py - size);
-				// 3. Draw line to the bottom center (the "tip")
-				ctx.lineTo(x, py);
-				ctx.closePath(); // Automatically connects back to the start
+				ctx.moveTo(markerX - size / 2, py - size);
+				ctx.lineTo(markerX + size / 2, py - size);
+				ctx.lineTo(markerX, py);
+				ctx.closePath();
 
 				ctx.fillStyle = "red";
 				ctx.fill();
+
 				ctx.restore();
 			} else {
 				ctx.save();
-				ctx.strokeStyle = info.colors.isDark ? "#aaaaaa" : "#666666";
-				// ctx.strokeStyle = "red";
+
+				ctx.strokeStyle =
+					info.colors.isDark ? "#aaaaaa" : "#666666";
+
 				ctx.lineWidth = 2;
 				ctx.setLineDash([16, 8]);
-				ctx.strokeRect(px, py, pW, pH);
+				ctx.strokeRect(winX, py, winW, winH);
+
 				ctx.restore();
 			}
 
-			const section_intersects = section.slim_one && isMouseIntersect(info.xpos, section.ypos * info.scale + info.ypos,
-				info.door_width * info.scale, section.height * info.scale);
-			if (section_intersects) {
-				const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
-				const x = mouse_x - pW / 2;
+			const sectionIntersects =
+				section.slim_one &&
+				isMouseIntersect(
+					info.xpos,
+					section.ypos * info.scale + info.ypos,
+					info.door_width * info.scale,
+					section.height * info.scale
+				);
+
+			if (sectionIntersects) {
+				const [mouseX] = getCanvasMousePosFromEvent();
+				const hoverX = mouseX - winW / 2;
 				const size = 10;
 
 				ctx.save();
 
 				ctx.beginPath();
-				// 1. Move to the top-left corner
-				ctx.moveTo(mouse_x - size / 2, py - size);
-				// 2. Draw line to the top-right corner
-				ctx.lineTo(mouse_x + size / 2, py - size);
-				// 3. Draw line to the bottom center (the "tip")
-				ctx.lineTo(mouse_x, py);
-				ctx.closePath(); // Automatically connects back to the start
+				ctx.moveTo(mouseX - size / 2, py - size);
+				ctx.lineTo(mouseX + size / 2, py - size);
+				ctx.lineTo(mouseX, py);
+				ctx.closePath();
 
 				ctx.fillStyle = "red";
 				ctx.fill();
 
-				ctx.strokeStyle = info.colors.isDark ? "#aaaaaa" : "#666666";
+				ctx.strokeStyle =
+					info.colors.isDark ? "#aaaaaa" : "#666666";
+
 				ctx.lineWidth = 2;
 				ctx.setLineDash([16, 8]);
-				ctx.strokeRect(x, py, pW, pH);
+				ctx.strokeRect(hoverX, py, winW, winH);
+
 				ctx.restore();
 			}
 		}
@@ -1072,7 +1444,7 @@ const CANVAS_PLUGIN = {
 			'colonial_grooved': drawColonialGroovedSection,
 			'ranch_grooved': drawRanchGroovedSection,
 			'smooth_ranch': drawSmoothRanchSection,
-		  	'mixed': drawMixedSection
+			'mixed': drawMixedSection
 		};
 
 		const canvas = $("#CONFIG_CANVAS")[0];
@@ -1102,6 +1474,8 @@ const CANVAS_PLUGIN = {
 		const section_heights = door_info.section_heights;
 		const hints = door_info.draw_hints;
 
+
+
 		for (const section of door_info.sections) {
 			const sH = section.height * scale;
 			const sY = y + section.ypos * scale;
@@ -1125,8 +1499,10 @@ const CANVAS_PLUGIN = {
 
 			ctx.restore();
 
+
 			drawSection[door_info.face](ctx, section, door_info);
 			if (section.shape.length) {
+
 				await drawWindows(ctx, section, door_info, hints);
 			}
 		}

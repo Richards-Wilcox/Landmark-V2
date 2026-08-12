@@ -3343,27 +3343,57 @@ function loadGlazingUI() {
         }
     });
 
-    $("#NAVIGATION_SPC").on('click', function (event) {
+    $("#NAVIGATION_SPC").off("click.windowHints").on("click.windowHints", function (event) {
+
+        console.log("NAVIGATION_SPC", currentSection);
+
+        const state = getState("WINDOW_STATE");
+
+        if (!state) {
+            return;
+        }
+
         if (currentSection == 1) {
+
             $("#window_position_container").show();
-            const glass_shape = getState("GLASS_SHAPE") ?? "";
+
+            const glass_shape = getState("GLASS_SHAPE") || "";
+
             if (glass_shape.includes("slim")) {
                 $(`[data-id="section_slim_temp"]`).show();
             }
+
             addSlimUi();
 
-            const state = getState("WINDOW_STATE");
             state.hints = true;
-            setState("WINDOW_STATE", state);
+
         } else {
+
             $("#window_position_container").hide();
             $(`[data-id="section_slim_temp"]`).remove();
             $(`#slim_spacing_container`).remove();
 
-            const state = getState("WINDOW_STATE");
             state.hints = false;
-            setState("WINDOW_STATE", state);
+
+            if (Array.isArray(state.sections)) {
+                state.sections.forEach(section => {
+                    section.selected = false;
+                });
+            }
         }
+
+        setState("WINDOW_STATE", {
+            ...state,
+            sections: [...state.sections]
+        });
+
+        forceRedraw();
+
+        console.log("WINDOW_STATE hints after nav", {
+            currentSection,
+            hints: getState("WINDOW_STATE")?.hints,
+            face: getState("FACE_desc")
+        });
     });
 }
 

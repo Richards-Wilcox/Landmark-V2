@@ -81,6 +81,7 @@ function addRenderNode() {
 					.closest(".rw-button")
 					.addClass("selected btn-checked");
 
+
 				setTimeout(() => {
 					setState("WINDOW_POSITION", "left");
 					forceRedraw();
@@ -93,6 +94,12 @@ function addRenderNode() {
 				$top.prop("checked", true)
 					.closest(".rw-button")
 					.addClass("selected btn-checked");
+
+				console.log("GLASS_SHAPE setting WINDOW_POSITION top", {
+					face: getState("FACE_desc"),
+					glass_shape,
+					prevGlassShape
+				});
 
 				setTimeout(() => {
 					setState("WINDOW_POSITION", "top");
@@ -124,10 +131,14 @@ function addRenderNode() {
 		value: "",
 		logic: function () {
 			const glass_insert = $("input[name='GLASS_INSERT']:checked");
-
-			const glass_shape = getState("GLASS_SHAPE") ?? "";
+			const glass_shape = getState("GLASS_SHAPE") || "";
 
 			if (glass_shape.includes("slim")) {
+				this.value = "";
+				return;
+			}
+
+			if (!glass_insert.length) {
 				this.value = "";
 				return;
 			}
@@ -168,7 +179,18 @@ function addRenderNode() {
 			const single_endcap = getState("END_CAPS") == "N";
 			const width = getState("WIDTH");
 
+			const mixedPatternKey =
+				face === "mixed"
+					? getMixedPanelPattern().join("")
+					: "";
+
 			const state = this.value;
+
+			// Force stale hints off outside Glazing
+			if (typeof currentSection !== "undefined" && currentSection != 1) {
+				state.hints = false;
+			}
+
 			// console.log("state value", this.value);
 
 			const sections = state.sections;
@@ -212,11 +234,22 @@ function addRenderNode() {
 					shape = "window_gv";
 				}
 
-				let positions = getPanelPositions(shape, width);
+				let positions;
+				let mixedDesignChanged = false;
 
+				if (face === "mixed") {
+					const mixedLayout = getMixedPanelLayout(width);
 
+					positions = mixedLayout.map(panel => panel.x);
+
+					mixedDesignChanged =
+						section._mixedPatternKey !== mixedPatternKey;
+
+				} else {
+					positions = getPanelPositions(shape, width);
+				}
 				// ✅ Reset enabled if glass_shape is deselected
-				if (!glass_shape) {
+				if (!glass_shape && face !== "mixed") {
 					section.enabled = Array(positions.length).fill(false);
 				}
 				const section_enabled = section.enabled;
@@ -263,7 +296,7 @@ function addRenderNode() {
 
 				let enabled;
 
-				if (section_enabled.length === positions.length) {
+				if (section_enabled.length === positions.length && !mixedDesignChanged) {
 					enabled = section_enabled; // ✅ preserve existing clicks
 				} else {
 					enabled = Array(positions.length).fill(false);
@@ -283,18 +316,34 @@ function addRenderNode() {
 				section.glass_qty = enabled.filter(v => v === true).length;
 				section.slim_one = slim_one;
 				section.slim_spacing = slim_spacing;
-				section.panel_width = panelConfigurations[shape]?.panelWidth;
-				section.panel_height = panelConfigurations[shape]?.panelHeight;
+				//section.panel_width = panelConfigurations[shape]?.panelWidth;
+				//section.panel_height = panelConfigurations[shape]?.panelHeight;
+
+				if (face === "mixed") {
+					section.panel_width =
+						panelConfigurations.mixed?.panelWidthCol;
+
+					section.panel_height =
+						panelConfigurations.mixed?.panelHeightCol;
+				} else {
+
+					section.panel_width =
+						panelConfigurations[shape]?.panelWidth;
+
+					section.panel_height =
+						panelConfigurations[shape]?.panelHeight;
+				}
 				section._wasSpecial = special;
+				section._mixedPatternKey = mixedPatternKey;
 			}
 		}
 	},
 		["WIDTH", "NUM_OF_SEC", "GLASS_SHAPE", "END_CAPS", "FACE_desc", "SPECIAL_FACE",
-			"SLIM_WINDOW_SPACING", "SLIM_WINDOW_LITES"]);
+			"SLIM_WINDOW_SPACING", "SLIM_WINDOW_LITES", "DESIGN_CODE"]);
 
 	addLogic("WINDOW_POSITION", function () {
-
-		const glass_shape = getState("GLASS_SHAPE");
+		const face = getState("FACE_desc");
+		const glass_shape = getState("GLASS_SHAPE") || "";
 		const special = getState("SPECIAL_FACE");
 
 		const $all = $("input[name='WINDOW_POSITION']");
@@ -303,7 +352,7 @@ function addRenderNode() {
 		const $nonTop = $("input[name='WINDOW_POSITION']:not([value='top'])");
 
 		// reset when glass shape is empty
-		if (!glass_shape) {
+		if (!glass_shape && face !== "mixed") {
 
 			$all.prop("checked", false)
 				.closest(".rw-button")
@@ -397,6 +446,19 @@ function addRenderNode() {
 		// Apply defaults ONLY when no glass exists yet
 		if (!position && !has_glass) {
 
+			console.log("WINDOW_POSITION defaulting", {
+				face,
+				glass_shape,
+				position,
+				has_glass
+			});
+
+			if (face === "mixed") {
+				this.value = "";
+				forceRedraw();
+				return;
+			}
+
 			position = glass_shape.includes("slim")
 				? "left"
 				: "top";
@@ -440,7 +502,7 @@ function addRenderNode() {
 		logic: renderDoor,
 		value: null,
 	}, ["WIDTH", "HEIGHT", "COLOR", "NUM_OF_SEC", "FACE_desc", "FINISH", "WINDOW_STATE", "WINDOW_POSITION",
-		"GLASS_INSERT", "FRAME_COLOR", "INSERT_COLOR"]);
+		"GLASS_INSERT", "FRAME_COLOR", "INSERT_COLOR", "DESIGN_CODE"]);
 
 	addNode({
 		id: "CANVAS_CURSOR",
@@ -480,9 +542,17 @@ function addRenderNode() {
 		const [canvas_x, canvas_y] = getCanvasDoorPosition(door_width, door_height);
 
 		const section_heights = getSectionHeights(door_height, num_sections);
+		const mixedPanels =
+			getState("FACE_desc") === "mixed"
+				? getMixedPanelLayout(door_width)
+				: [];
 
 		let changed = false;
 		const [mouse_x, mouse_y] = getCanvasMousePosFromEvent(event);
+
+		if (typeof currentSection !== "undefined" && currentSection != 1) {
+			return;
+		}
 
 		if (!windows?.hints) {
 			return;
@@ -499,15 +569,27 @@ function addRenderNode() {
 
 
 		for (const [sIndex, section] of windows.sections.entries()) {
-			const panel_width = section.panel_width * scale;
-			const panel_height = section.panel_height * scale;
-
 			const ypos = section_heights.slice(0, sIndex).reduce((a, b) => a + b, 0);
-			const y_offset = (section_heights[sIndex] * scale - panel_height) / 2;
-			const py = ypos * scale + canvas_y + y_offset;
 
 			for (let i = 0; i < section.positions.length; i++) {
-				const px = section.positions[i] * scale + canvas_x;
+
+				let panel_width = section.panel_width * scale;
+				let panel_height = section.panel_height * scale;
+				let px = section.positions[i] * scale + canvas_x;
+
+				if (getState("FACE_desc") === "mixed") {
+
+					const panel = mixedPanels[i];
+
+					if (panel) {
+						panel_width = panel.width * scale;
+						panel_height = panel.height * scale;
+						px = panel.x * scale + canvas_x;
+					}
+				}
+
+				const y_offset = (section_heights[sIndex] * scale - panel_height) / 2;
+				const py = ypos * scale + canvas_y + y_offset;
 
 				const hit =
 					mouse_x >= px &&
@@ -540,11 +622,28 @@ function addRenderNode() {
 		}
 
 		if (changed) {
-			CANVAS_PLUGIN.draw(getDoorInfo());
 
-			if (!glass_shape.includes("slim") && node.value !== "custom") {
+			const face = getState("FACE_desc");
 
-				$(`input[name='WINDOW_POSITION']`)
+			setState("CUSTOM_WINDOWS", true);
+
+			// Mixed should enter custom mode internally only.
+			// Do not select or show the hidden custom button.
+
+			// if (face === "mixed") {
+
+			// 	if (node) {
+			// 		node.value = "custom";
+			// 	}
+
+			// 	forceRedraw();
+			// 	return;
+			// }
+
+			// Non-mixed behavior stays the same.
+			if ((!glass_shape.includes("slim") && node?.value !== "custom") || face === "mixed") {
+
+				$("input[name='WINDOW_POSITION']")
 					.prop("checked", false)
 					.removeAttr("checked")
 					.closest(".rw-button")
@@ -552,16 +651,16 @@ function addRenderNode() {
 
 				$("input[name='WINDOW_POSITION'][value='custom']")
 					.prop("checked", true)
+					.attr("checked", "checked")
 					.closest(".rw-button")
 					.addClass("selected btn-checked");
 
-				node.value = "custom";
+				if (node) {
+					node.value = "custom";
+				}
 			}
 
 			forceRedraw();
-			// setState("WINDOW_POSITION", "");
-		} else {
-			// console.log("❌ NO PANEL HIT");
 		}
 	});
 
@@ -592,7 +691,7 @@ function addRenderNode() {
 		.off("change.glassVisualFix")
 		.on(
 			"change.glassVisualFix",
-			"input[name='GLASS_INSERT'], input[name='FRAME_COLOR'], input[name='INSERT_COLOR']",
+			"input[name='GLASS_INSERT'], input[name='FRAME_COLOR'], input[name='INSERT_COLOR'], #DESIGN_CODE",
 			function () {
 				const insertNode = getNode("GLASS_INSERT");
 
@@ -600,9 +699,11 @@ function addRenderNode() {
 					insertNode.logic.call(insertNode);
 				}
 
+				recalcWindowState();
 				forceRedraw();
 			}
 		);
+
 
 
 }
@@ -1073,6 +1174,14 @@ async function renderDoor() {
 function setWindowPositions(position) {
 
 	const state = getState("WINDOW_STATE");
+
+	if (
+		getState("FACE_desc") === "mixed" &&
+		typeof currentSection !== "undefined" &&
+		currentSection != 1
+	) {
+		return;
+	}
 
 	// clear existing selections
 	state.sections.forEach(section => {
@@ -1598,17 +1707,40 @@ function getDoorInfo() {
 	const section_heights = getSectionHeights(height, num_sections);
 	const mixed_panels = face === "mixed" ? getMixedPanelLayout(width) : [];
 
+	const insert = getNode("GLASS_INSERT").value;
+	const selectedInsertValue = getSelectedInsertValue(insert);
+
 	let sum = 0;
 	const sections = [];
+
 	for (const [i, section_info] of window_info.sections.entries()) {
 		const info = { ...section_info };
+
 		info.height = section_heights[i];
 		info.ypos = sum;
-		info.mixed_panels = mixed_panels;
 
-		//calculation to count the glass qty for each section 
+		info.mixed_panels =
+			face === "mixed"
+				? mixed_panels.map(panel => {
+					return {
+						...panel,
+						insertValue: getMixedInsertValue(
+							selectedInsertValue,
+							panel.style
+						)
+					};
+				})
+				: [];
+
+		// calculation to count the glass qty for each section
 		info.glass_qty = section_info.enabled.filter(v => v === true).length;
-		info.max_window_qty = getMaxSlimWindowQty(info.shape, width, info.slim_spacing, getState("END_CAPS") === "N");
+
+		info.max_window_qty = getMaxSlimWindowQty(
+			info.shape,
+			width,
+			info.slim_spacing,
+			getState("END_CAPS") === "N"
+		);
 
 		sections.push(info);
 		sum += section_heights[i];
@@ -1617,12 +1749,17 @@ function getDoorInfo() {
 	const color = getState("COLOR");
 	const frame_color = getState("FRAME_COLOR");
 	const insert_color = getState("INSERT_COLOR");
-	const insert = getNode("GLASS_INSERT").value;
 
 
 	const [x, y] = getCanvasDoorPosition(width, height);
 
 	let hints = window_info.hints;
+
+	// Force hints off unless Glazing tab is active
+	if (typeof currentSection !== "undefined" && currentSection != 1) {
+		hints = false;
+	}
+
 	if (glass_shape.includes('grand') || special) {
 		hints = false;
 	}
