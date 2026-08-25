@@ -95,7 +95,7 @@ function saveInputValues(configuratorID = "configurator") {
   $(`#${configuratorID} input:not(.navigation-button), #${configuratorID} select`)
     .each((index, input) => {
 
-     
+
 
       if (input.getAttribute("ignore") === "true")
         return;
@@ -124,6 +124,21 @@ function saveInputValues(configuratorID = "configurator") {
           value = selected.val();
           desc = selected.attr("desc") || "";
 
+          if (name === "GLASS_TYPE") {
+
+            const glazingType =
+              selected.attr("glazingType") ||
+              "";
+
+            json.push({
+              id: "GLAZING_TYPE",
+              value: glazingType,
+              desc: glazingType,
+              text: glazingType
+            });
+
+          }
+
           if (
             name === "COLOR" ||
             name === "FRAME_COLOR" ||
@@ -140,7 +155,7 @@ function saveInputValues(configuratorID = "configurator") {
               id: name,
               value: value,
               desc: desc,
-              text: text,              
+              text: text,
             });
 
           } else {
@@ -229,6 +244,14 @@ function saveInputValues(configuratorID = "configurator") {
       });
 
     });
+
+  json.push({
+    id: "WEIGHT",
+    value: getState("WEIGHT"),
+    desc: getState("WEIGHT"),
+    text: getState("WEIGHT")
+  });
+
 
   additionalSaves(json);
   saveOutputValues();

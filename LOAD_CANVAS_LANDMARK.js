@@ -1319,14 +1319,7 @@ async function drawWindows(ctx, section, info, hints) {
 				} else {
 					insertKey = getSelectedInsertValue(info.insert);
 				}
-
-				console.log("draw insert", {
-					index: i,
-					face: info.face,
-					panelStyle: mixedPanel?.style,
-					insertKey: insertKey
-				});
-
+				
 				if (
 					insertKey &&
 					typeof drawInsertFn[insertKey] === "function"

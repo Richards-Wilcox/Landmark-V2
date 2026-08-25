@@ -1,14 +1,68 @@
 const LITE_RESULT_CACHE = {};
 
 function loadDrivenInputEvents() {
+  // createNode(
+  //   "HIGHLIFT_LAYOUT",
+  //   function () {
+  //     this.setVisibility(getState("LIFT_TYPE") === 'HL')
+  //   },
+  //   "",
+  //   $("#HIGHLIFT_LAYOUT")[0],
+  //   ["LIFT_TYPE"])
+
   createNode(
     "HIGHLIFT_LAYOUT",
     function () {
-      this.setVisibility(getState("LIFT_TYPE") === 'HL')
+
+      const isCommercial =
+        getState("HARDWARE_SET") === "C";
+
+      const maxValue = isCommercial ? 164 : 54;
+
+      const $slider = $("#HIGHLIFT");
+
+      $slider.attr("max", maxValue);
+      $slider.prop("max", maxValue);
+
+      const currentValue =
+        Number(getState("HIGHLIFT")) || 17;
+
+      // Reset value when current value exceeds new max
+      if (currentValue > maxValue) {
+
+        const newValue = isCommercial
+          ? 54
+          : 17;
+
+        $slider.val(newValue);
+
+        setState("HIGHLIFT", newValue);
+
+        const highliftNode = getNode("HIGHLIFT_VALUE");
+        if (highliftNode) {
+          highliftNode.value = newValue;
+        }
+
+        const headroomNode = getNode("HEADROOM_VALUE");
+        if (headroomNode) {
+          headroomNode.value = Number(newValue) + 9;
+        }
+      }
+
+      $slider.trigger("input");
+      $slider.trigger("change");
+
+      this.setVisibility(
+        getState("LIFT_TYPE") === "HL"
+      );
     },
     "",
     $("#HIGHLIFT_LAYOUT")[0],
-    ["LIFT_TYPE"])
+    ["LIFT_TYPE", "HARDWARE_SET"]
+  );
+
+
+
 
   addLogic("HIGHLIFT_VALUE", function () {
     this.value = getState("HIGHLIFT")
@@ -158,11 +212,63 @@ function loadDrivenInputEvents() {
     }
   }, ["COLOR"]);
 
-  addLogic("MIXED", function () {
-    if (getState("DOOR_MODEL") === "D" && getState("WIDTH") >= 96) {
-      $(".mixed-panel").show();
-    } else $(".mixed-panel").hide();
-  }, ["DOOR_MODEL", "WIDTH"])
+  // addLogic("MIXED", function () {
+  //   if (getState("DOOR_MODEL") === "D" && getState("WIDTH") >= 96) {
+  //     $(".mixed-panel").show();
+  //   } else {
+  //     $(".mixed-panel").hide();
+  //   }
+  // }, ["DOOR_MODEL", "WIDTH"])
+
+  createNode(
+    "MIXED_PANEL_VISIBILITY",
+    function () {
+      const showMixed =
+        getState("DOOR_MODEL") === "D" &&
+        Number(getState("WIDTH")) >= 96;
+
+      const $mixed = $(".mixed-panel");
+      const $mixedInput = $("#MIXED");
+
+      if (showMixed) {
+        $mixed.show();
+      } else {
+
+        // If Mixed is selected, switch to Flush
+        if (getState("FACE") === "M") {
+
+          $("#MIXED")
+            .prop("checked", false)
+            .removeAttr("checked");
+
+          $(".mixed-panel")
+            .removeClass("btn-checked selected");
+
+          $("#FLUSH")
+            .prop("checked", true)
+            .attr("checked", "checked")
+            .trigger("change");
+
+          $("#FLUSH")
+            .closest(".rw-button")
+            .addClass("btn-checked selected");
+
+          setState("FACE", "F");
+        }
+
+        $mixedInput
+          .prop("checked", false)
+          .removeAttr("checked");
+
+        $mixed
+          .removeClass("btn-checked selected")
+          .hide();
+      }
+    },
+    "",
+    $("#MIXED_PANEL_VISIBILITY")[0],
+    ["DOOR_MODEL", "WIDTH", "FACE"]
+  );
 
 
   createNode(
@@ -243,8 +349,6 @@ function loadDrivenInputEvents() {
     $("#NUM_OF_SEC")[0],
     ["HEIGHT", "customSwitch"]
   );
-
-
 
   addLogic("STUCCO", function () {
     const panel_style = getState("FACE");
@@ -413,9 +517,11 @@ function loadDrivenInputEvents() {
     if (!spacing) {
       const value = getCenterHingeCodeEarly();
       this.value = value;
-
     }
 
+    if (getState("FACE") === 'M') {
+      this.value = getNode("DESIGN_CODE").getAttribute("center_hinge_code");
+    }
     else {
       const result = resolveLiteResult({
         width: getState("WIDTH"),
@@ -425,8 +531,7 @@ function loadDrivenInputEvents() {
       });
       this.value = result ? (result.center_hinge_code || "") : "";
     }
-
-  }, ["WIDTH", "FACE", "PANEL_SPACING", "GLASS_SHAPE"]);
+  }, ["WIDTH", "FACE", "PANEL_SPACING", "GLASS_SHAPE", "DESIGN_CODE"]);
 
 
   createNode(
@@ -469,9 +574,9 @@ function loadDrivenInputEvents() {
 
           state.sections.forEach(section => {
 
-            if (section.enabled?.length) {
-              section.enabled.fill(false);
-            }
+            // if (section.enabled?.length) {
+            //   section.enabled.fill(false);
+            // }
 
             section.selected = false;
           });
@@ -880,24 +985,7 @@ function loadDrivenInputEvents() {
     ["HARDWARE_SET"]
   );
 
-  // Design Code visibility
-  createNode(
-    "DESIGN_CODE_VISIBILITY",
-    function () {
-
-      const panel_style = getState("FACE");
-      if (panel_style === 'M') {
-        $("#MixPanelLayout").show();
-      } else {
-        $("#MixPanelLayout").hide();
-      }
-
-    },
-    "",
-    $("#DESIGN_CODE_VISIBILITY")[0],
-    ["FACE"]
-  );
-
+  //append design code dropdown values
   createNode(
     "DESIGN_CODE",
     function () {
@@ -913,75 +1001,75 @@ function loadDrivenInputEvents() {
           min: 96,
           max: 119,
           options: [
-            { value: "A", text: "CRC (MP-1)" }
+            { value: "A", text: "CRC (MP-1)", pattern: "CRC", center_hinge_code: "C" }
           ]
         },
         {
           min: 120,
           max: 143,
           options: [
-            { value: "B", text: "RCR (MP-2)" }
+            { value: "B", text: "RCR (MP-2)", pattern: "RCR", center_hinge_code: "C" }
           ]
         },
         {
           min: 144,
           max: 167,
           options: [
-            { value: "C", text: "CRRC (MP-3)" },
-            { value: "D", text: "RCCR (MP-4)" },
-            { value: "E", text: "CCRCC (MP-5)" }
+            { value: "C", text: "CRRC (MP-3)", pattern: "CRRC", center_hinge_code: "D" },
+            { value: "D", text: "RCCR (MP-4)", pattern: "RCCR", center_hinge_code: "C" },
+            { value: "E", text: "CCRCC (MP-5)", pattern: "CCRCC", center_hinge_code: "C" }
           ]
         },
         {
           min: 168,
           max: 191,
           options: [
-            { value: "J", text: "CRCRC (MP-10)" },
-            { value: "K", text: "RCCCR (MP-11)" }
+            { value: "J", text: "CRCRC (MP-10)", pattern: "CRCRC", center_hinge_code: "E" },
+            { value: "K", text: "RCCCR (MP-11)", pattern: "RCCCR", center_hinge_code: "E" }
           ]
         },
         {
           min: 192,
           max: 211,
           options: [
-            { value: "F", text: "CRRRC (MP-6)" },
-            { value: "G", text: "CRRCRC (MP-7)" },
-            { value: "H", text: "RCRCR (MP-8)" },
-            { value: "I", text: "CRRRCC (MP-9)" },
-            { value: "N", text: "CCRRCCC (MP-14)" },
-            { value: "O", text: "RCCCCR (MP-15)" }
+            { value: "F", text: "CRRRC (MP-6)", pattern: "CRRRC", center_hinge_code: "E" },
+            { value: "G", text: "CRCCRC (MP-7)", pattern: "CRCCRC", center_hinge_code: "E" },
+            { value: "H", text: "RCRCR (MP-8)", pattern: "RCRCR", center_hinge_code: "E" },
+            { value: "I", text: "CCRRCC (MP-9)", pattern: "CCRRCC", center_hinge_code: "D" },
+            { value: "N", text: "CCCRCCC (MP-14)", pattern: "CCCRCCC", center_hinge_code: "E" },
+            { value: "O", text: "RCCCCR (MP-15)", pattern: "RCCCCR", center_hinge_code: "D" }
           ]
         },
         {
           min: 212,
           max: 237,
           options: [
-            { value: "L", text: "CRCCCRC (MP-12)" },
-            { value: "M", text: "CCRCRCC (MP-13)" }
+            { value: "L", text: "CRCCCRC (MP-12)", pattern: "CRCCCRC", center_hinge_code: "E" },
+            { value: "M", text: "CCRCRCC (MP-13)", pattern: "CCRCRCC", center_hinge_code: "E" }
           ]
         },
         {
           min: 238,
           max: 255,
           options: [
-            { value: "P", text: "RCCRCCR (MP-16)" },
-            { value: "Q", text: "RCCCCCR (MP-17)" }
+            { value: "P", text: "RCCRCCR (MP-16)", pattern: "RCCRCCR", center_hinge_code: "E" },
+            { value: "Q", text: "RCCCCCR (MP-17)", pattern: "RCCCCCR", center_hinge_code: "E" }
           ]
         },
         {
           min: 256,
           max: 278,
           options: [
-            { value: "R", text: "CCCRCRCCC (MP-18)" },
-            { value: "S", text: "CCRCCRCC (MP-19)" }
+            { value: "R", text: "CCCRCRCCC (MP-18)", pattern: "CCCRCRCCC", center_hinge_code: "E" },
+            { value: "S", text: "CCRCCRCC (MP-19)", pattern: "CCRCCRCC", center_hinge_code: "E" }
           ]
         },
         {
           min: 279,
           max: Infinity,
           options: [
-            { value: "T", text: "RCCCCCCCCR (MP-20)" },
-            { value: "U", text: "CCRCCCCRCC (MP-21)" }
+            { value: "T", text: "RCCCCCCCCR (MP-20)", pattern: "RCCCCCCCCR", center_hinge_code: "F" },
+            { value: "U", text: "CCRCCCCRCC (MP-21)", pattern: "CCRCCCCRCC", center_hinge_code: "F" }
           ]
         }
       ];
@@ -1010,7 +1098,9 @@ function loadDrivenInputEvents() {
         $designCode.append(
           $("<option>", {
             value: item.value,
-            text: item.text
+            text: item.text,
+            pattern: item.pattern,
+            center_hinge_code: item.center_hinge_code
           })
         );
       });
@@ -1050,6 +1140,26 @@ function loadDrivenInputEvents() {
     $("#DESIGN_CODE")[0],
     ["FACE", "WIDTH"]
   );
+
+  // Design Code visibility
+  createNode(
+    "DESIGN_CODE_VISIBILITY",
+    function () {
+
+      const panel_style = getState("FACE");
+      if (panel_style === 'M') {
+        $("#MixPanelLayout").show();
+      } else {
+        $("#MixPanelLayout").hide();
+      }
+
+    },
+    "",
+    $("#DESIGN_CODE_VISIBILITY")[0],
+    ["FACE"]
+  );
+
+
 
   //Spring cycle visibility
   createNode(
@@ -1218,6 +1328,35 @@ function loadDrivenInputEvents() {
     ["DOOR_MODEL", "GLASS_SHAPE"]
   );
 
+
+  createNode(
+    "INSERT_COLOR_VISIBILITY",
+    function () {
+
+      const glassShape =
+        (getState("GLASS_SHAPE") || "").toLowerCase();
+
+      const isSlim =
+        glassShape.includes("slim");
+
+      if (isSlim) {
+
+        $("#INSERT_COLOR").hide();
+
+        // Optional: clear insert color when slim is selected
+        insertColorUserOverride = false;
+        setState("INSERT_COLOR", '');
+
+      } else {
+
+        $("#INSERT_COLOR").show();
+      }
+    },
+    "",
+    $("#INSERT_COLOR_VISIBILITY")[0],
+    ["GLASS_SHAPE"]
+  );
+
   let applyingMixedGlassTypeDefault = false;
 
   $(document)
@@ -1236,6 +1375,24 @@ function loadDrivenInputEvents() {
         $("input[name='GLASS_TYPE']:checked").val() || "";
 
       if (!selectedGlassType) {
+
+        const state = getState("WINDOW_STATE");
+
+        if (state?.sections?.length) {
+
+          state.sections.forEach(section => {
+
+            if (section.enabled?.length) {
+              section.enabled.fill(false);
+            }
+
+            section.selected = false;
+          });
+
+          setState("WINDOW_STATE", state);
+        }
+
+        forceRedraw();
         return;
       }
 
@@ -1303,6 +1460,12 @@ function loadDrivenInputEvents() {
         }, 0);
       }
     });
+
+  const designCodeNode = getNode("DESIGN_CODE");
+
+  if (designCodeNode && typeof designCodeNode.logic === "function") {
+    designCodeNode.logic.call(designCodeNode);
+  }
 
 }
 
@@ -1626,3 +1789,4 @@ function syncFrameColorUI(value) {
       .addClass("selected");
   }
 }
+

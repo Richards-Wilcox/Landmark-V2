@@ -19,8 +19,15 @@ const DIMENSION_DEPS = [
 
 const BUNDLE_DEPS = [
     ...SECTION_DEPS,
+    ...DIMENSION_DEPS,
+    "HEIGHT",
+    "WIDTH",
+    "FACE",
+    "DESIGN_CODE",
     "WINDOW_POSITION",
-    "GLASS_SHAPE"
+    "GLASS_SHAPE",
+    "CUSTOM_WINDOWS",
+    "WINDOW_STATE"
 ];
 
 
@@ -49,20 +56,13 @@ function addSectionBundleDrivers() {
     registerRawPanelBaseLogic();
     registerRawPanelTopSheetLogic();
     registerBottomRetainerLogic();
-    registerSectionCalculationLogic();
+
     registerEndCapsLogic();
     registerPackagingLogic();
 
 }
 
-function getBundles() {
-    return bundleByHeight();
-}
 
-function getBundle(bundleNo) {
-    const bundles = getBundles();
-    return bundles[bundleNo - 1];
-}
 
 function getBundleHeight(bundleNo) {
     const bundle = getBundle(bundleNo);
@@ -135,9 +135,13 @@ function registerHeaderLogic() {
         const doorModel = getDoorModelDesc();
         const panelStyle = getFaceDesc();
         const numOfSec = getState("NUM_OF_SEC");
+        //const design_code = getNode("DESIGN_CODE").getAttribute("pattern");
 
-        this.value = `${doorType} ${getState("DOOR_WIDTH_FEET")}-0x${getState("DOOR_HEIGHT_FEET")}-0(${numOfSec}) ${doorModel} ${color} ${panelStyle}`;
-    }, ["WIDTH", ...DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "customSwitch", "FACE"]);
+        let panel_desc = '';
+        panel_desc = panelStyle != "mixed" ? panelStyle : getNode("DESIGN_CODE").getAttribute("pattern");
+
+        this.value = `${doorType} ${getState("DOOR_WIDTH_FEET")}-${getState("DOOR_WIDTH_INCHES")}x${getState("DOOR_HEIGHT_FEET")}-0(${numOfSec}) ${doorModel} ${color} ${panel_desc}`;
+    }, ["WIDTH", ...DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "customSwitch", "FACE", "DESIGN_CODE"]);
 }
 
 
@@ -168,13 +172,11 @@ function registerBundleCoreLogic() {
             //this.value = getBundleHeight(bundleNo);
 
             const value = getBundleHeight(bundleNo);
-
             if (this.value === value) {
                 return;
             }
 
             this.value = value;
-
         }, BUNDLE_DEPS);
 
         // Section heights + qty
@@ -183,9 +185,8 @@ function registerBundleCoreLogic() {
             const scQtyField = bundleScField(bundleNo, s, "QTY");
 
             addLogic(scHeightField, function () {
+
                 // this.value = getBundleSectionHeight(bundleNo, s);
-
-
                 const value = getBundleSectionHeight(bundleNo, s);
 
                 if (this.value === value) {
@@ -236,7 +237,7 @@ function registerSectionBundleLogic() {
             const qty = getState(qtyField);
             const prefix = getSBPrefix(bundleNo === 1 ? "SB1" : "DEFAULT", height);
             this.value = buildSBDescription(prefix, height, qty);
-        }, [...DIMENSION_DEPS, heightField, "DOOR_MODEL", "COLOR", "FACE", "END_CAPS", qtyField]);
+        }, [...DIMENSION_DEPS, heightField, "DOOR_MODEL", "COLOR", "FACE", "END_CAPS", qtyField, "DESIGN_CODE"]);
     }
 }
 
@@ -261,7 +262,7 @@ function registerSectionComponentLogic() {
                 const height = getState(heightField);
                 const qty = getState(qtyField);
                 this.value = buildSCDescription(height, qty);
-            }, [...DIMENSION_DEPS, heightField, qtyField, "DOOR_MODEL", "COLOR", "FACE", "END_CAPS"]);
+            }, [...DIMENSION_DEPS, heightField, qtyField, "DOOR_MODEL", "COLOR", "FACE", "END_CAPS", "DESIGN_CODE"]);
         }
     });
 }
@@ -285,7 +286,7 @@ function registerRawPanelLogic() {
                 const height = getState(heightField);
                 const qty = getState(qtyField);
                 this.value = buildRPDescription(height, qty);
-            }, [...DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", heightField, qtyField]);
+            }, [...DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", heightField, qtyField, "DESIGN_CODE"]);
         }
     });
 }
@@ -361,37 +362,7 @@ function registerBottomRetainerLogic() {
     }, ["DOOR_WIDTH_FEET"]);
 }
 
-function registerSectionCalculationLogic() {
-    addLogic("SHORTEST_SECTION", function () {
-        const doorHeight = getState("HEIGHT");
-        const numOfSec = getState("NUM_OF_SEC");
 
-        this.value = Math.floor((doorHeight / numOfSec) / 3) * 3;
-    }, ["HEIGHT", "NUM_OF_SEC", "WIDTH"]);
-
-    addLogic("SHORTEST_SECTIONS_QTY", function () {
-        const numOfSec = getState("NUM_OF_SEC");
-        const doorHeight = getState("HEIGHT");
-        const shortestSection = getState("SHORTEST_SECTION");
-        const diff = (doorHeight / numOfSec) - shortestSection;
-
-        this.value = Math.round((1 - (diff / 3)) * numOfSec);
-    }, ["HEIGHT", "NUM_OF_SEC", "SHORTEST_SECTION"]);
-
-    addLogic("TALLEST_SECTION", function () {
-        const doorHeight = getState("HEIGHT");
-        const numOfSec = getState("NUM_OF_SEC");
-
-        this.value = Math.ceil((doorHeight / numOfSec) / 3) * 3;
-    }, ["HEIGHT", "NUM_OF_SEC"]);
-
-    addLogic("TALLEST_SECTION_QTY", function () {
-        const doorHeight = getState("HEIGHT");
-        const numOfSec = getState("NUM_OF_SEC");
-
-        this.value = Math.round((((doorHeight / numOfSec) - getState("SHORTEST_SECTION")) / 3) * numOfSec);
-    }, ["HEIGHT", "NUM_OF_SEC", "SHORTEST_SECTION"]);
-}
 
 function registerEndCapsLogic() {
     BUNDLE_CONFIG.forEach(({ bundleNo, sectionCount }) => {
@@ -448,8 +419,6 @@ function registerPackagingLogic() {
 }
 
 
-
-
 //==========================================================
 // END CAPS PART NUMBER
 // ==========================================================
@@ -493,234 +462,9 @@ function getEndCapsPartNum(section_height, door_model, end_caps) {
 }
 
 
-// ==========================================================
-// SECTION BUILDING
-// ==========================================================
-
-function getSectionBundle() {
-
-    const shortestQty =
-        Math.ceil(Number(getState("SHORTEST_SECTIONS_QTY"))) || 0;
-
-    const shortestSection =
-        Number(getState("SHORTEST_SECTION")) || 0;
-
-    const tallestQty =
-        Math.ceil(Number(getState("TALLEST_SECTION_QTY"))) || 0;
-
-    const tallestSection =
-        Number(getState("TALLEST_SECTION")) || 0;
-
-    // Create sorted DESC array
-    const sections = [
-        ...Array(shortestQty).fill(shortestSection),
-        ...Array(tallestQty).fill(tallestSection),
-    ].sort((a, b) => b - a);
-
-    const length = sections.length;
-    const result = new Array(length);
-
-    // Build placement order
-    const positions = [];
-
-    let bottom = 0;
-    let top = length - 1;
-
-    // 1st -> TOP
-    positions.push(top);
-    top--;
-
-    // 2nd -> BOTTOM
-    if (bottom <= top + 1) {
-        positions.push(bottom);
-        bottom++;
-    }
-
-    // Remaining:
-    // bottom+1
-    // top-1
-    // bottom+2
-    // top-2
-    while (bottom <= top) {
-
-        // bottom side
-        positions.push(bottom);
-        bottom++;
-
-        // top side
-        if (bottom <= top) {
-            positions.push(top);
-            top--;
-        }
-    }
-
-    // Assign values
-    sections.forEach((section, index) => {
-        result[positions[index]] = section;
-    });
-
-    return result;
-}
 
 
-// ==========================================================
-// BUNDLING
-// ======================================================
 
-function bundleByHeight() {
-    const width = Number(getState("WIDTH"));
-    const sections = getSectionBundle();
-
-    const window_position = getState("WINDOW_POSITION");
-    const glass_shape = getState("GLASS_SHAPE");
-
-    const isGlazed =
-        // window_position &&
-        // window_position !== "undefined" &&
-        glass_shape &&
-        glass_shape !== "undefined";
-
-    const result = [];
-
-    if (!sections.length) return result;
-
-    // =========================================
-    // WIDTH RULE
-    // =========================================
-    if (width >= 199) {
-        return sections.map((h, i) => ({
-            sections: [h],
-            indexes: [i + 1],
-            weight: calculateSectionShipWeight(h, false)
-        }));
-    }
-
-    const used = new Array(sections.length).fill(false);
-
-    // =========================================
-    // GLAZED RULE
-    // TOP + BOTTOM BUNDLE IF SAME HEIGHT
-    // =========================================
-    if (isGlazed) {
-
-        const bottomHeight = sections[0];
-        const topHeight = sections[sections.length - 1];
-
-        if (bottomHeight === topHeight) {
-
-            result.push({
-                sections: [bottomHeight, topHeight],
-                indexes: [1, sections.length],
-                weight:
-                    calculateSectionShipWeight(bottomHeight, true) +
-                    calculateSectionShipWeight(topHeight, false)
-            });
-
-            used[0] = true;
-            used[sections.length - 1] = true;
-
-        }
-    }
-
-    // =========================================
-    // NORMAL RULE
-    // bottom single only if not already used
-    // =========================================
-    if (!used[0]) {
-
-        result.push({
-            sections: [sections[0]],
-            indexes: [1],
-            weight: calculateSectionShipWeight(sections[0], true)
-        });
-
-        used[0] = true;
-    }
-
-    // =========================================
-    // FORWARD NEAREST MATCH BUNDLING
-    // =========================================
-    for (let i = 1; i < sections.length; i++) {
-
-        if (used[i]) continue;
-
-        const height = sections[i];
-        const bundleIndexes = [i + 1];
-
-        used[i] = true;
-
-        // nearest forward same height
-        for (let j = i + 1; j < sections.length; j++) {
-
-            if (!used[j] && sections[j] === height) {
-
-                bundleIndexes.push(j + 1);
-                used[j] = true;
-                break;
-            }
-        }
-
-        const weight = bundleIndexes.reduce((sum) => {
-            return sum + calculateSectionShipWeight(height, false);
-        }, 0);
-
-        result.push({
-            sections: bundleIndexes.map(() => height),
-            indexes: bundleIndexes,
-            weight
-        });
-    }
-
-
-    return result;
-}
-
-
-function calculateRawPanelWeight(sectionHeightInInches) {
-    let RPWeight = getState("DOOR_MODEL") === "A" ? 1.775 : 1.74;
-
-    let width = Number(getState("DOOR_WIDTH_FEET")) || 0;
-    const sectionHeightInFeet = sectionHeightInInches / 12;
-    let areaSqFt = (width * sectionHeightInFeet);
-    const totalWeight = Number((RPWeight * areaSqFt).toFixed(2));
-    // console.log("raw panel weight", totalWeight);
-
-    return totalWeight;
-}
-
-function calculateEndCaps(sectionHeightInInches) {
-    let getEndCaps = getState("END_CAPS");
-    let sectionHeightInFeet = sectionHeightInInches / 12;
-    let weightPerFoot;
-
-    if (getEndCaps === "N") { //case single
-        weightPerFoot = getState("DOOR_MODEL") === "A" ? 1.02 : 1.14;
-    } else {
-        weightPerFoot = getState("DOOR_MODEL") === "A" ? 3.07 : 3.3;
-    }
-
-    // console.log("totalEndCapsWeight", Number((sectionHeightInFeet * weightPerFoot).toFixed(2)));
-    return Number((sectionHeightInFeet * weightPerFoot).toFixed(2));
-}
-
-function calculateBTMRetainer(isBottomSection = true) { //only for bottom section
-    if (!isBottomSection) return 0;
-    const width = Number(getState("DOOR_WIDTH_FEET")) || 0;
-    //console.log("btmRetainerWeight", btmRetainerWeight);
-    return Number((width * 0.4).toFixed(2));
-
-}
-
-//function to calculate shipping weight
-function calculateSectionShipWeight(sectionHeightInInches, isBottomSection = true) {
-    let RPWeight = calculateRawPanelWeight(sectionHeightInInches);
-    let EndCapsWeight = calculateEndCaps(sectionHeightInInches);
-    let btmWeight = isBottomSection ? calculateBTMRetainer(Number(getState("DOOR_WIDTH_FEET")) || 0) : 0;
-    let lites = 0;
-    let pck_weight = 0.15;
-
-    return Number((RPWeight + EndCapsWeight + btmWeight + lites + pck_weight).toFixed(2));
-}
 
 //function to get the section component desc
 function buildSCDescription(height, qty) {
@@ -736,8 +480,11 @@ function buildSCDescription(height, qty) {
     const endCaps = getState("END_CAPS");
     const doubleEndCaps = endCaps === "Y" ? "DE" : "";
 
+    let panel_desc = '';
+    panel_desc = panelStyle != "mixed" ? panelStyle : getNode("DESIGN_CODE").getAttribute("pattern");
+
     return qty > 0
-        ? `SC ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${color} ${panelStyle} ${doubleEndCaps}`
+        ? `SC ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${color} ${panel_desc} ${doubleEndCaps}`
         : "";
 }
 
@@ -752,15 +499,18 @@ function buildRPDescription(height, qty) {
     const color = getState("COLOR").desc;
     const panelStyle = getNode("FACE").getAttribute("desc");
 
+    let panel_desc = '';
+    panel_desc = panelStyle != "mixed" ? panelStyle : getNode("DESIGN_CODE").getAttribute("pattern");
+
     return qty > 0
-        ? `SR ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${color} ${panelStyle}`
+        ? `SR ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${color} ${panel_desc}`
         : "";
 }
 
 //function to get the raw panel base part#
 function buildRPBaseSpNum(height) {
     const doorModelId = getNode("DOOR_MODEL").getAttribute("id");
-    return `${doorModelId}-${height}`;
+    return `RB-${doorModelId}-${height}S`;
 }
 
 
@@ -795,8 +545,10 @@ function buildSBDescription(prefix, height, qty) {
     const endCaps = getState("END_CAPS");
     const doubleEndCaps = endCaps === "Y" ? "DE" : "";
 
+    let panel_desc = '';
+    panel_desc = panelStyle != "mixed" ? panelStyle : getNode("DESIGN_CODE").getAttribute("pattern");
 
-    return `${prefix} ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${color} ${panelStyle} ${doubleEndCaps}`;
+    return `${prefix} ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${color} ${panel_desc} ${doubleEndCaps}`;
 }
 
 function getSBPrefix(type, height) {

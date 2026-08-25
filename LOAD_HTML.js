@@ -81,8 +81,9 @@ function setInputJsonValue(value) {
 
 function loadForm() {
 
-    calculatePrice();
+    //calculateTotalPrice();
     toggleAccordion();
+
     const form = createForm();
     //Here is where we append the HTML
     $('.concept-ui-form.scrollable').append(form)
@@ -143,7 +144,6 @@ function loadForm() {
 
 function createForm() {
 
-    const totalPrice = $("#TOTAL_PRICE").val();
 
     const form = `
 	<script src="/HTML/products/162059085/jscripts/panelConfigurations.js"></script>
@@ -216,7 +216,7 @@ function createForm() {
 		  font-size: 24px;
 		  font-weight: 700;
 		  font-style: italic;
-	   ">${totalPrice}
+	   ">
                     </span>
                 </div>
             </div>
@@ -384,13 +384,13 @@ function createForm() {
                             </div>
                             <div class="rw-button panel-button mixed-panel" tabindex="0" style="display:none">
                                 <label for="MIXED">Mixed</label>
-                                <input type="radio" id="MIXED" name="FACE" value="M">
+                                <input type="radio" id="MIXED" name="FACE" value="M" desc="mixed">
                             </div>
                         </div>
                     </div>
 
                     <!-- Mix Panel Design code-->
-                    <div class="dropdown-item" class="mix-panel-layout" style="width:50%" id="MixPanelLayout" style="display:none">
+                    <div class="dropdown-item mix-panel-layout" style="width:50%" id="MixPanelLayout" style="display:none">
                         <h3>Design Code</h3>
                         <div>
                             <select id="DESIGN_CODE" name="DESIGN_CODE">
@@ -1401,7 +1401,7 @@ function createForm() {
 
                     </button>
 
-                    <button type="button" name="nextPageBtn" class="button-configure" onclick="Configure()"
+                    <button type="button" name="nextPageBtn" class="button-configure" onclick="return Configure(event);"
                         data-qa-selector="continue" id="CONFIGURE_BTN">Configure</button>
 
                     <button class="button-nextpage" onclick="formForward()">
@@ -1653,8 +1653,6 @@ function populateCarousel() {
 
         if (!container || container.dataset.loaded) return;
 
-        console.log("✅ init operator carousel");
-
         operatorCarouselLoad(currentOperatorIndex);
         updateSelectedOperator(currentOperatorIndex);
         createOperatorPagination();
@@ -1820,7 +1818,6 @@ function syncOperatorState(operator) {
 }
 
 function updateActiveOperator(index) {
-    console.log("Carousel index:", index);
     const items = document.querySelectorAll('.carousel-operator-item');
 
 
@@ -1929,7 +1926,6 @@ function saveDefaults() {
         });
     });
 
-    console.log(JSON.stringify(defaults, null, 2));
 
     $.ajax({
         url: "/spr/custom/jpoc/json/849871261?162059085",
@@ -2134,7 +2130,6 @@ function applyDefaults() {
             }
 
             const defaultValues = JSON.parse(res.INPUT_SETTINGS);
-            console.log("defaultValues", defaultValues);
 
             if (!Array.isArray(defaultValues)) {
                 console.error("INPUT_SETTINGS is not an array:", defaultValues);
@@ -2246,12 +2241,6 @@ function applyDefaults() {
                     setState("DOOR_HEIGHT_FEET", heightFeet.value);
                 }
 
-                console.log("FINAL VALUES:");
-                console.log("WIDTH_FEET", nodeset.DOOR_WIDTH_FEET.value);
-                console.log("WIDTH_INCHES", nodeset.DOOR_WIDTH_INCHES.value);
-                console.log("HEIGHT_FEET", nodeset.DOOR_HEIGHT_FEET.value);
-                console.log("HEIGHT_INCHES", nodeset.DOOR_HEIGHT_INCHES.value);
-
                 // Restore COLOR, FRAME_COLOR, INSERT_COLOR
                 ["COLOR", "FRAME_COLOR", "INSERT_COLOR"].forEach(id => {
 
@@ -2293,12 +2282,6 @@ function applyDefaults() {
                 $('input[type="radio"]:checked').trigger("click");
 
             }, 50);
-
-            console.log({
-                dom: $("#DOOR_WIDTH_FEET").val(),
-                node: nodeset.DOOR_WIDTH_FEET.value,
-                state: getState("DOOR_WIDTH_FEET")
-            });
 
         })
         .fail((res) => {
@@ -2342,7 +2325,6 @@ function clickHandler() {
 
     appendDrpData();
     toggleHandler();
-
 
     $("input[type='radio']")
         .not("input[name='AVAILABLE_COLOR'], input[name='OPTIONAL_COLOR']")
@@ -2978,13 +2960,6 @@ function updateDoorWidthInches(feet) {
 
 function appendDrpData() {
 
-    console.log("appendDrpData START",
-        $("#DOOR_WIDTH_FEET").val(),
-        $("#DOOR_WIDTH_INCHES").val(),
-        $("#DOOR_HEIGHT_FEET").val(),
-        $("#DOOR_HEIGHT_INCHES").val()
-    );
-
     // Populate Door Width Feet (4–20)
     $("#DOOR_WIDTH_FEET").html(generateOptions(4, 20));
     $("#DOOR_WIDTH_FEET").val("16");
@@ -3012,13 +2987,6 @@ function appendDrpData() {
             const feet = parseInt($(this).val(), 10);
             refreshHeightInches(feet);
         });
-
-    console.log("appendDrpData END",
-        $("#DOOR_WIDTH_FEET").val(),
-        $("#DOOR_WIDTH_INCHES").val(),
-        $("#DOOR_HEIGHT_FEET").val(),
-        $("#DOOR_HEIGHT_INCHES").val()
-    );
 }
 
 
@@ -3051,13 +3019,6 @@ function refreshHeightInches(feet) {
             select.options[0].selected = true;
             select.value = select.options[0].value;
         }
-
-        // console.log("refreshHeightInches =>", {
-        //     feet,
-        //     previousValue,
-        //     value: select.value,
-        //     selectedIndex: select.selectedIndex
-        // });
     }, 0);
 }
 
@@ -3219,7 +3180,13 @@ function additionalSaves(json) {
         text: $("#JAMB_SEAL_SCREW_PACKAGES").text().trim()
     });
 
-    console.log("additionalSaves", json);
+    json.push({
+        id: "WEIGHT",
+        value: getState("WEIGHT"),
+        desc: getState("WEIGHT"),
+        text: getState("WEIGHT")
+    });
+
 }
 
 
@@ -3236,7 +3203,6 @@ function loadGlazingUI() {
     $('input[name="GLASS_TYPE"]').prop('checked', false).data('checked', false);
 
     $('#more_glass_types').change(function () {
-        console.log("more_glass_types_container", $(this).is(':checked'));
         if ($(this).is(':checked')) {
             $("#more_glass_types_container").slideDown();
         } else {
@@ -3345,8 +3311,6 @@ function loadGlazingUI() {
 
     $("#NAVIGATION_SPC").off("click.windowHints").on("click.windowHints", function (event) {
 
-        console.log("NAVIGATION_SPC", currentSection);
-
         const state = getState("WINDOW_STATE");
 
         if (!state) {
@@ -3388,28 +3352,9 @@ function loadGlazingUI() {
         });
 
         forceRedraw();
-
-        console.log("WINDOW_STATE hints after nav", {
-            currentSection,
-            hints: getState("WINDOW_STATE")?.hints,
-            face: getState("FACE_desc")
-        });
     });
 }
 
 
-function calculatePrice() {
-    let DOOR_FACE_PRICE = $("#DOOR_FACE_PRICE").val();
-    let GLAZING_PRICE = $("#GLAZING_PRICE").val();
-    let OPERATORS_PRICE = $("#OPERATORS_PRICE").val();
-    let HARDWARE_PRICE = $("#HARDWARE_PRICE").val();
 
 
-    let totalPrice = DOOR_FACE_PRICE + GLAZING_PRICE + OPERATORS_PRICE + HARDWARE_PRICE;
-
-    $("#TOTAL_PRICE").val(totalPrice)
-    //setState("TOTAL_PRICE", totalPrice);
-
-
-
-}
