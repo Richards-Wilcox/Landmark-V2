@@ -5,86 +5,112 @@ var sections = {};
 
 function loadInputJson(inputJson) {
 
-    if (!inputJson || inputJson.trim() === "") {
+    if (!inputJson) {
         return;
     }
 
-    inputJson = inputJson.trim().replace(/(\r\n|\n|\r|\t)/gm, "");
-    inputJson = inputJson.replace(/^\[|\]$/g, "");
-    inputJson = inputJson.replace(/&quot;/g, '"');
+    inputJson = String(inputJson).trim();
 
-    var objects = inputJson.split('},{');
-
-    if (objects.length > 0) {
-        objects[0] = objects[0].replace('{', '');
-        objects[objects.length - 1] =
-            objects[objects.length - 1].replace('}', '');
+    if (inputJson === "") {
+        return;
     }
 
-    for (var i = 0; i < objects.length; i++) {
+    inputJson = inputJson.replace(/&quot;/g, '"');
 
-        var obj = objects[i];
+    inputJson = inputJson
+        .replace(/"\s*i\s*d\s*"/g, '"id"')
+        .replace(/"\s*v\s*a\s*l\s*u\s*e\s*"/g, '"value"')
+        .replace(/"\s*d\s*e\s*s\s*c\s*"/g, '"desc"')
+        .replace(/"\s*t\s*e\s*x\s*t\s*"/g, '"text"');
 
-        if (obj.indexOf('glazingobj') !== -1) {
+    inputJson = inputJson
+        .replace(/\bn\s*u\s*l\s*l\b/gi, 'null')
+        .replace(/\bf\s*a\s*l\s*s\s*e\b/gi, 'false')
+        .replace(/\bt\s*r\s*u\s*e\b/gi, 'true');
+
+    var data;
+
+    try {
+        data = JSON.parse(inputJson);
+    }
+    catch (e) {
+
+        out.println("JSON.parse failed:");
+        out.println(inputJson);
+        out.println("Error: " + e);
+
+        return;
+    }
+
+    if (!Array.isArray(data)) {
+        data = [data];
+    }
+
+    for (var i = 0; i < data.length; i++) {
+
+        var item = data[i];
+
+        if (!item) {
             continue;
         }
 
-        var keyValuePairs = obj.split(',');
-
-        var id = '';
-        var value = '';
-        var desc = '';
-        var text = '';
-
-        for (var j = 0; j < keyValuePairs.length; j++) {
-
-            var pair = keyValuePairs[j].split(':');
-
-            var key = pair[0].trim();
-
-            if (key.charAt(0) == '&') {
-                key = key.substring(6, key.length - 6);
-            }
-
-            var val = pair.slice(1).join(':').trim();
-
-            if (val.charAt(0) == '&') {
-                val = val.substring(6, val.length - 6);
-            }
-
-            if (key === 'id') {
-                id = val;
-            }
-
-            if (key === 'value') {
-                value = val;
-
-                if (
-                    value === 'null' ||
-                    value === 'undefined' ||
-                    value === 'NONE'
-                ) {
-                    value = '';
-                }
-            }
-
-            if (key === 'desc') {
-                desc = val;
-            }
-
-            if (key === 'text') {
-                text = val;
-            }
+        if (item.glazingobj !== undefined) {
+            continue;
         }
 
-        sections[id] =
-            text !== ''
-                ? text
-                : (desc !== '' ? desc : value);
+        var id = item.id;
 
-        if (sections[id]) {
-            sections[id] = sections[id].replace(/\\/g, '');
+        if (!id) {
+            continue;
         }
+
+        var value = item.value;
+        var desc = item.desc;
+        var text = item.text;
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === 'null' ||
+            value === 'undefined' ||
+            value === 'NONE'
+        ) {
+            value = '';
+        }
+
+        if (
+            desc === null ||
+            desc === undefined
+        ) {
+            desc = '';
+        }
+
+        if (
+            text === null ||
+            text === undefined
+        ) {
+            text = '';
+        }
+
+        value = String(value);
+        desc = String(desc);
+        text = String(text);
+
+        var finalValue = '';
+
+        if (text !== '') {
+            finalValue = text;
+        }
+        else if (desc !== '') {
+            finalValue = desc;
+        }
+        else {
+            finalValue = value;
+        }
+
+        finalValue = finalValue.replace(/\\/g, '');
+
+        sections[id] = finalValue;
     }
 }
 

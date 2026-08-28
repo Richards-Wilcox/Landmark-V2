@@ -1,30 +1,60 @@
 let sectionBundleDriversAdded = false;
 let configureInProgress = false;
 
-function initializeDriversOnDemand() {
+function runNodeLogic(id) {
+    const node = getNode(id);
 
+    if (node && typeof node.logic === "function") {
+        console.log("Running node logic:", id);
+        node.logic.call(node);
+    } else {
+        console.warn("Node logic not found:", id);
+    }
+}
+function initializeDriversOnDemand() {
     if (sectionBundleDriversAdded) {
         return Promise.resolve();
     }
 
     console.log("Initializing drivers...");
 
-    addSectionBundleDrivers();
-    addGlazingCodeLogic();
-    addSchedulingCodeLogic();
-    addHardwareDrivers();
-    addTrackDrivers();
-    addOperatorEvents();
+    try {
+        addSectionBundleDrivers();
+        addGlazingCodeLogic();
+        addSchedulingCodeLogic();
+        addHardwareDrivers();
+        addTrackDrivers();
+        addOperatorEvents();
 
-    sectionBundleDriversAdded = true;
+        sectionBundleDriversAdded = true;
 
-    return Promise.resolve();
+        // Force logic to run once after registration
+        // [
+        //     "FACE",
+        //     "FACE_desc",
+        //     "PANEL_SPACING",
+        //     "DESIGN_CODE",
+        //     "DESIGN_CODE_VISIBILITY",
+        //     "GLASS_SHAPE",            
+        //     "GLASS_TYPE_VISIBILITY",
+        //     "GLASS_INSERT",
+        //     "GLASS_INSERT_VISIBILITY",
+        //     "WINDOW_STATE",
+        //     "WINDOW_POSITION",
+        //     "RENDER"
+        // ].forEach(runNodeLogic);
+
+        return Promise.resolve();
+    } catch (e) {
+        sectionBundleDriversAdded = false;
+        console.error("Driver initialization failed:", e);
+        return Promise.reject(e);
+    }
 }
 
 function finalvalidation(options) {
-
-
-    console.log("finalvalidation start",
+    console.log(
+        "finalvalidation start",
         $("#DOOR_WIDTH_FEET").val(),
         $("#DOOR_WIDTH_INCHES").val(),
         $("#DOOR_HEIGHT_FEET").val(),
@@ -38,22 +68,11 @@ function finalvalidation(options) {
 
     renderSuspended = true;
 
-    // return Promise.race([    
-    //     forceInitialValidationLM(),
-    //     new Promise((_, reject) =>
-    //         setTimeout(
-    //             () => reject(new Error("Validation timeout")),
-    //             30000
-    //         )
-    //     )
-    // ])
     return forceInitialValidationLM()
         .then(function (res) {
-
-            console.log(
-                "finalvalidation resolved",
-                res
-            );
+            console.log("finalvalidation completed", {
+                result: res
+            });
 
             renderSuspended = false;
 
@@ -70,29 +89,32 @@ function finalvalidation(options) {
             return res;
         })
         .catch(function (e) {
-
             renderSuspended = false;
 
-            console.error(
-                "finalvalidation failed:",
-                e
-            );
+            console.error("finalvalidation failed:", e);
 
             throw e;
         });
 }
 
-function loadTestResults(json) {
-    $("#INPUT_JSON").val(json);
-    loadInputValues();
+// function loadTestResults(json) {
+//     return initializeDriversOnDemand()
+//         .then(function () {
+//             $("#INPUT_JSON").val(json);
 
-    // ✅ No configure loader/render behavior during load/test restore
-    return finalvalidation({
-        isConfigureClick: false
-    });
-}
+//             loadInputValues();
 
-function Configure() {
+//             return finalvalidation({
+//                 isConfigureClick: false
+//             });
+//         });
+// }
+
+function Configure(event) {
+    if (event && typeof event.preventDefault === "function") {
+        event.preventDefault();
+        event.stopPropagation();
+    }
 
     if (configureInProgress) {
         return false;
@@ -102,36 +124,23 @@ function Configure() {
     showConfigureLoader();
 
     initializeDriversOnDemand()
-
         .then(function () {
-
             console.log("Drivers ready");
 
             return finalvalidation({
                 isConfigureClick: true
             });
-
         })
-
         .then(function () {
-
             console.log("Validation complete");
-
-            nextPage();
-
+            // nextPage();
         })
-
         .catch(function (e) {
-
             console.error("Configure error:", e);
-
         })
-
         .finally(function () {
-
             configureInProgress = false;
             hideConfigureLoader();
-
         });
 
     return false;

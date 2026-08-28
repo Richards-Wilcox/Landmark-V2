@@ -95,12 +95,6 @@ function addRenderNode() {
 					.closest(".rw-button")
 					.addClass("selected btn-checked");
 
-				console.log("GLASS_SHAPE setting WINDOW_POSITION top", {
-					face: getState("FACE_desc"),
-					glass_shape,
-					prevGlassShape
-				});
-
 				setTimeout(() => {
 					setState("WINDOW_POSITION", "top");
 					forceRedraw();
@@ -191,8 +185,6 @@ function addRenderNode() {
 				state.hints = false;
 			}
 
-			// console.log("state value", this.value);
-
 			const sections = state.sections;
 
 			while (sections.length != num_sections) {
@@ -243,6 +235,7 @@ function addRenderNode() {
 					positions = mixedLayout.map(panel => panel.x);
 
 					mixedDesignChanged =
+						!!section._mixedPatternKey &&
 						section._mixedPatternKey !== mixedPatternKey;
 
 				} else {
@@ -446,13 +439,6 @@ function addRenderNode() {
 		// Apply defaults ONLY when no glass exists yet
 		if (!position && !has_glass) {
 
-			console.log("WINDOW_POSITION defaulting", {
-				face,
-				glass_shape,
-				position,
-				has_glass
-			});
-
 			if (face === "mixed") {
 				this.value = "";
 				forceRedraw();
@@ -502,7 +488,7 @@ function addRenderNode() {
 		logic: renderDoor,
 		value: null,
 	}, ["WIDTH", "HEIGHT", "COLOR", "NUM_OF_SEC", "FACE_desc", "FINISH", "WINDOW_STATE", "WINDOW_POSITION",
-		"GLASS_INSERT", "FRAME_COLOR", "INSERT_COLOR", "DESIGN_CODE"]);
+		"GLASS_INSERT", "FRAME_COLOR", "INSERT_COLOR", "DESIGN_CODE", "GLASS_TEMPERED"]);
 
 	addNode({
 		id: "CANVAS_CURSOR",
@@ -525,7 +511,6 @@ function addRenderNode() {
 	addLogic("JSON_OBJ", function () {
 		this.value = JSON.stringify(getState("RENDER"))
 	}, ["RENDER"]);
-
 
 	$(document).off('click.canvasFix');
 
@@ -930,6 +915,7 @@ function addSlimUi() {
 
 							recalcWindowState();
 
+							setState("CUSTOM_WINDOWS", !getState("CUSTOM_WINDOWS"));
 							$("#STEP_LITES").fadeIn();
 
 							forceRedraw();
@@ -1619,6 +1605,8 @@ function getMixedPanelPattern() {
 	return (codePatterns[option.value] || "").split("");
 }
 
+
+
 function getMixedPanelLayout(door_width) {
 	const pattern = getMixedPanelPattern();
 	if (!pattern.length) return [];
@@ -1712,12 +1700,18 @@ function getDoorInfo() {
 
 	let sum = 0;
 	const sections = [];
+	const tempGlass = getState("GLASS_TEMPERED") || "";
+	const totalSections = window_info.sections.length;
 
 	for (const [i, section_info] of window_info.sections.entries()) {
 		const info = { ...section_info };
 
 		info.height = section_heights[i];
 		info.ypos = sum;
+
+		const enabledArr = Array.isArray(section_info.enabled)
+			? section_info.enabled
+			: [];
 
 		info.mixed_panels =
 			face === "mixed"
@@ -1732,8 +1726,49 @@ function getDoorInfo() {
 				})
 				: [];
 
-		// calculation to count the glass qty for each section
-		info.glass_qty = section_info.enabled.filter(v => v === true).length;
+		if (face === "mixed") {
+			const mixedCounts = getMixedPanelStyleCountsForSection(
+				info.mixed_panels,
+				enabledArr
+			);
+
+			info.mixed_colonial_qty = mixedCounts.colonial;
+			info.mixed_ranch_qty = mixedCounts.ranch;
+
+			// Keep temp qty explicit for mixed, unless later you want separate mixed temp logic.
+			info.temp_glass_qty = 0;
+		} else {
+			const selectedGlassQty =
+				enabledArr.filter(v => v === true).length;
+
+			info.slim_single_glass_qty = 0;
+			info.slim_double_glass_qty = 0;
+
+			if (info.shape === "slim_single") {
+				info.slim_single_glass_qty = selectedGlassQty;
+			}
+
+			if (info.shape === "slim_double") {
+				info.slim_double_glass_qty = selectedGlassQty;
+			}
+
+			const tempAppliesToThisSection = isTempGlassSection(
+				tempGlass,
+				i,
+				totalSections
+			);
+
+			if (tempAppliesToThisSection) {
+				info.glass_qty = 0;
+				info.temp_glass_qty = selectedGlassQty;
+			} else {
+				info.glass_qty = selectedGlassQty;
+				info.temp_glass_qty = 0;
+			}
+
+			info.mixed_colonial_qty = 0;
+			info.mixed_ranch_qty = 0;
+		}
 
 		info.max_window_qty = getMaxSlimWindowQty(
 			info.shape,
@@ -1745,6 +1780,27 @@ function getDoorInfo() {
 		sections.push(info);
 		sum += section_heights[i];
 	}
+
+	let total_glass_qty = 0;
+	let total_colonial_glass_qty = 0;
+	let total_ranch_glass_qty = 0;
+	let total_temp_glass_qty = 0;
+	let total_slim_single_glass_qty = 0;
+	let total_slim_double_glass_qty = 0;
+
+
+	sections.forEach(section => {
+
+		total_glass_qty += Number(section.glass_qty || 0);
+		total_temp_glass_qty += Number(section.temp_glass_qty || 0);
+
+		total_slim_single_glass_qty +=
+			Number(section.slim_single_glass_qty || 0);
+
+		total_slim_double_glass_qty +=
+			Number(section.slim_double_glass_qty || 0);
+
+	});
 
 	const color = getState("COLOR");
 	const frame_color = getState("FRAME_COLOR");
@@ -1786,6 +1842,19 @@ function getDoorInfo() {
 
 		insert: insert,
 		sections: sections,
+
+		...(face === "mixed"
+			? {
+				total_colonial_glass_qty,
+				total_ranch_glass_qty
+			}
+			: {
+				total_glass_qty,
+				total_temp_glass_qty,
+				total_slim_single_glass_qty,
+				total_slim_double_glass_qty
+			}),
+
 		scale: getScale(width, height),
 
 		face: face,
@@ -1794,8 +1863,7 @@ function getDoorInfo() {
 		},
 		draw_hints: hints,
 		custom_windows: getState("CUSTOM_WINDOWS"),
-
-	}
+	};
 }
 
 function addChangeEvents() {
@@ -2036,4 +2104,55 @@ function resetSlimCustomState() {
 	});
 
 	forceRedraw();
+}
+
+function getMixedPanelStyleCountsForSection(mixedPanels, enabled) {
+	const counts = {
+		colonial: 0,
+		ranch: 0
+	};
+
+	if (!Array.isArray(mixedPanels) || !Array.isArray(enabled)) {
+		return counts;
+	}
+
+	mixedPanels.forEach(function (panel, index) {
+		if (enabled[index] !== true) {
+			return;
+		}
+
+		if (panel.style === "C") {
+			counts.colonial++;
+		} else if (panel.style === "R") {
+			counts.ranch++;
+		}
+	});
+
+	return counts;
+}
+
+function isTempGlassSection(tempGlass, sectionIndex, totalSections) {
+	if (!tempGlass) {
+		return false;
+	}
+
+	if (tempGlass === "all") {
+		return true;
+	}
+
+	// getDoorInfo sections are TOP to BOTTOM.
+	// Bottom 1 is the last section in the array.
+	if (tempGlass === "bottom_1") {
+		return sectionIndex === totalSections - 1;
+	}
+
+	// Bottom 2 are the last two sections in the array.
+	if (tempGlass === "bottom_2") {
+		return (
+			sectionIndex === totalSections - 1 ||
+			sectionIndex === totalSections - 2
+		);
+	}
+
+	return false;
 }
