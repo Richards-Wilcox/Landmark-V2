@@ -258,7 +258,7 @@ function saveInputValues(configuratorID = "configurator") {
 
   const inputJson = JSON.stringify(json);
 
-  console.log("INPUT_JSON Length:", inputJson.length);
+  // console.log("INPUT_JSON Length:", inputJson.length);
 
   const inputFields = [
     "INPUT_JSON_1",
@@ -297,14 +297,14 @@ function saveInputValues(configuratorID = "configurator") {
 
   });
 
-  console.log("saveInputValues completed");
+  // console.log("saveInputValues completed");
 
   return true;
 }
 
 
 function additionalSaves(json) {
-  console.log("additionalSaves", json);
+  // console.log("additionalSaves", json);
 }
 
 
@@ -328,7 +328,7 @@ function saveOutputValues() {
     suffix = suffix + "_1"
   }
 
-  console.log("saveOutputValues", json)
+  // console.log("saveOutputValues", json)
 
 }
 function loadOutputValues() {
@@ -370,10 +370,10 @@ function loadInputValues() {
   if (inputJson === "")
     return;
 
-  console.log(
-    "loadInputValues Length:",
-    inputJson.length
-  );
+  // console.log(
+  //   "loadInputValues Length:",
+  //   inputJson.length
+  // );
 
   const arr = JSON.parse(inputJson);
 

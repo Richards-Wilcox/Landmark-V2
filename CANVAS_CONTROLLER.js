@@ -3,6 +3,7 @@ const canvas_mouse = {
 	is_down: false,
 };
 
+
 let initialCanvasRendered = false;
 let renderRequestId = 0;
 
@@ -180,7 +181,6 @@ function addRenderNode() {
 
 			const state = this.value;
 
-			// Force stale hints off outside Glazing
 			if (typeof currentSection !== "undefined" && currentSection != 1) {
 				state.hints = false;
 			}
@@ -213,15 +213,16 @@ function addRenderNode() {
 
 				const wasSpecial = section._wasSpecial || false;
 
-				// ✅ RESET when exiting special
 				if (wasSpecial && !special) {
 					section.enabled = Array(section.positions?.length || 0).fill(false);
 				}
 
 				let shape = face;
+
 				if (flush) {
 					shape = glass_shape;
 				}
+
 				if (glass_shape.includes('grand')) {
 					shape = "window_gv";
 				}
@@ -230,6 +231,7 @@ function addRenderNode() {
 				let mixedDesignChanged = false;
 
 				if (face === "mixed") {
+
 					const mixedLayout = getMixedPanelLayout(width);
 
 					positions = mixedLayout.map(panel => panel.x);
@@ -239,12 +241,15 @@ function addRenderNode() {
 						section._mixedPatternKey !== mixedPatternKey;
 
 				} else {
+
 					positions = getPanelPositions(shape, width);
+
 				}
-				// ✅ Reset enabled if glass_shape is deselected
+
 				if (!glass_shape && face !== "mixed") {
 					section.enabled = Array(positions.length).fill(false);
 				}
+
 				const section_enabled = section.enabled;
 				const section_glass = section_enabled.some(x => x == true);
 
@@ -261,38 +266,61 @@ function addRenderNode() {
 				const slim_spacing = section.slim_spacing;
 
 				if (glass_shape.includes("slim")) {
-					// if (section.shape.includes("slim")) {
-					// 	shape = section.shape;						
-					// }
 
 					shape = section.shape?.includes("slim")
 						? section.shape
 						: glass_shape;
 
-
 					if (slim_one || slim_position_mode) {
+
 						const slim_s = 34.344;
 						const slim_l = 68.344;
+
 						const endcap_single = 4.8125;
 						const endcap_double = 7.8125;
 
-						const window_width = shape == "slim_single" ? slim_s : slim_l;
-						const endcap_offset = single_endcap ? endcap_single : endcap_double;
-						positions = slim_window_locationsx_in(width, window_width, 3, endcap_offset);
+						const window_width =
+							shape == "slim_single"
+								? slim_s
+								: slim_l;
+
+						const endcap_offset =
+							single_endcap
+								? endcap_single
+								: endcap_double;
+
+						positions = slim_window_locationsx_in(
+							width,
+							window_width,
+							3,
+							endcap_offset
+						);
+
 					} else {
-						positions = slim_getWindowPositions(shape, width, slim_spacing == 'fixed', single_endcap);
+
+						positions = slim_getWindowPositions(
+							shape,
+							width,
+							slim_spacing == 'fixed',
+							single_endcap
+						);
+
 					}
 				}
 
-				// const enabled = (section_enabled.length != positions.length) ?
-				// Array(positions.length).fill(false) : Array.from(section_enabled);
-
 				let enabled;
 
-				if (section_enabled.length === positions.length && !mixedDesignChanged) {
-					enabled = section_enabled; // ✅ preserve existing clicks
+				if (
+					section_enabled.length === positions.length &&
+					!mixedDesignChanged
+				) {
+
+					enabled = section_enabled;
+
 				} else {
+
 					enabled = Array(positions.length).fill(false);
+
 				}
 
 				if (special && section_glass) {
@@ -300,24 +328,30 @@ function addRenderNode() {
 				}
 
 				if (getPanelConfigurationKey(face) == "windemere") {
-					shape = (face == "colonial_grooved") ? 'colonial' : 'ranch';
+					shape =
+						(face == "colonial_grooved")
+							? "colonial"
+							: "ranch";
 				}
 
 				section.positions = positions;
 				section.shape = shape;
 				section.enabled = enabled;
-				section.glass_qty = enabled.filter(v => v === true).length;
+
+				section.glass_qty =
+					enabled.filter(v => v === true).length;
+
 				section.slim_one = slim_one;
 				section.slim_spacing = slim_spacing;
-				//section.panel_width = panelConfigurations[shape]?.panelWidth;
-				//section.panel_height = panelConfigurations[shape]?.panelHeight;
 
 				if (face === "mixed") {
+
 					section.panel_width =
 						panelConfigurations.mixed?.panelWidthCol;
 
 					section.panel_height =
 						panelConfigurations.mixed?.panelHeightCol;
+
 				} else {
 
 					section.panel_width =
@@ -325,14 +359,25 @@ function addRenderNode() {
 
 					section.panel_height =
 						panelConfigurations[shape]?.panelHeight;
+
 				}
+
 				section._wasSpecial = special;
 				section._mixedPatternKey = mixedPatternKey;
 			}
 		}
 	},
-		["WIDTH", "NUM_OF_SEC", "GLASS_SHAPE", "END_CAPS", "FACE_desc", "SPECIAL_FACE",
-			"SLIM_WINDOW_SPACING", "SLIM_WINDOW_LITES", "DESIGN_CODE"]);
+		[
+			"WIDTH",
+			"NUM_OF_SEC",
+			"GLASS_SHAPE",
+			"END_CAPS",
+			"FACE_desc",
+			"SPECIAL_FACE",
+			"SLIM_WINDOW_SPACING",
+			"SLIM_WINDOW_LITES",
+			"DESIGN_CODE"
+		]);
 
 	addLogic("WINDOW_POSITION", function () {
 		const face = getState("FACE_desc");
@@ -708,7 +753,6 @@ function selectCenterOneLite(section) {
 
 function recalcWindowState() {
 	const node = getNode("WINDOW_STATE");
-
 	if (node && typeof node.logic === "function") {
 		node.logic.call(node);
 	}
@@ -1014,7 +1058,6 @@ function isMouseIntersect(x, y, width, height) {
 }
 
 function forceRedraw() {
-
 	if (configureInProgress) {
 		return;
 	}
@@ -1023,9 +1066,41 @@ function forceRedraw() {
 
 }
 
+
 async function renderDoor() {
 
-	// Show loader only before first draw
+	const state = getState("WINDOW_STATE");
+
+	const renderKey = JSON.stringify({
+		width: getState("WIDTH"),
+		height: getState("HEIGHT"),
+		color: getState("COLOR")?.value,
+		finish: getState("FINISH"),
+		face: getState("FACE_desc"),
+		designCode: getState("DESIGN_CODE"),
+		glassShape: getState("GLASS_SHAPE"),
+		frameColor: getState("FRAME_COLOR")?.value,
+		insertColor: getState("INSERT_COLOR")?.value,
+		glassTempered: getState("GLASS_TEMPERED"),
+
+		sections: (state?.sections || []).map(section => ({
+			shape: section.shape,
+			enabled: [...section.enabled],
+			slim_one: section.slim_one,
+			slim_spacing: section.slim_spacing,
+			slim_position_mode: section.slim_position_mode
+		}))
+	});
+
+	if (this._renderKey === renderKey) {
+		return;
+	}
+
+	this._renderKey = renderKey;
+
+	const requestId = ++renderRequestId;
+
+	// Initial page load loader
 	if (!initialCanvasRendered) {
 		showConfigureLoader();
 	}
@@ -1038,18 +1113,33 @@ async function renderDoor() {
 
 		await new Promise(requestAnimationFrame);
 
+		if (requestId !== renderRequestId) {
+			return;
+		}
+
 		await CANVAS_PLUGIN.draw(layer_obj);
+
+		if (requestId !== renderRequestId) {
+			return;
+		}
 
 		initialCanvasRendered = true;
 
+	} catch (err) {
+
+		console.error("renderDoor failed", err);
+
 	} finally {
 
-		if (initialCanvasRendered && !configureInProgress) {
+		if (
+			requestId === renderRequestId &&
+			!configureInProgress
+		) {
 			hideConfigureLoader();
 		}
+
 	}
 }
-
 
 // function setWindowPositions(position) {
 // 	const state = getState("WINDOW_STATE");
@@ -1663,6 +1753,8 @@ function getDoorInfo() {
 	const url_woodgrain = `/HTML/products/162059085/images/woodgrain_dark.png`;
 	const url_stucco = `/HTML/products/162059085/images/stucco4.png`;
 
+
+
 	let scale = 0.03;
 
 	let url = url_woodtexture;
@@ -1998,15 +2090,18 @@ function getMaxSlimWindowQty(shape, doorWidth, spacing, singleEndcap) {
 // }
 
 function showConfigureLoader() {
-	$("#canvas-loader-backdrop").css("display", "flex");
-	$("#canvas-loader").show();
+   // console.log("SHOW LOADER", performance.now());
+
+    $("#canvas-loader-backdrop").css("display", "flex");
+    $("#canvas-loader").show();
 }
 
 function hideConfigureLoader() {
-	$("#canvas-loader-backdrop").hide();
-	$("#canvas-loader").hide();
-}
+    //console.log("HIDE LOADER", performance.now());
 
+    $("#canvas-loader-backdrop").hide();
+    $("#canvas-loader").hide();
+}
 function prepareSlimPositionMode(section) {
 	if (!section.shape?.includes("slim")) return;
 

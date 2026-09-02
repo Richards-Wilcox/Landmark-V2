@@ -12,7 +12,8 @@ function loadStyles() {
   const radius = {
     radius15: "15px",
     radius20: "20px",
-    radius10: "10px"
+    radius10: "10px",
+    radius05: "5px"
   };
 
 
@@ -36,6 +37,134 @@ function loadStyles() {
   display: none;
 }
 
+#PRODUCT_SELECTION_SCREEN{
+    width:100%;
+    min-height:700px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    gap:40px;
+
+    border-radius:20px;
+
+    background: radial-gradient(
+        circle,
+        rgba(255,255,255,1) 0%,
+        rgba(180,180,180,1) 100%
+    );
+
+    padding:40px;
+}
+
+.product-selection-header{
+    text-align:center;
+}
+
+.product-selection-header h1{
+    margin:0 0 10px;
+    color:#333;
+    font-size:32px;
+    font-weight:700;
+}
+
+.product-selection-header p{
+    margin:0;
+    color:#666;
+    font-size:16px;
+}
+
+.product-selection-grid{
+    display:flex;
+    gap:24px;
+    justify-content:center;
+    align-items:center;
+}
+
+.product-tile{
+    width:320px;
+    height:280px;
+
+    background:#ffffff;
+
+    border:1px solid #E4E4E4;
+    border-radius:20px;
+
+    display:flex;
+    flex-direction:column;
+
+    overflow:hidden;
+
+    cursor:pointer;
+
+    box-shadow:0 4px 18px rgba(0,0,0,.09);
+
+    transition:all .25s ease;
+}
+
+.product-tile:hover{
+    transform:translateY(-6px);
+
+    box-shadow:0 14px 32px rgba(0,0,0,.18);
+
+    border-color:#000;
+}
+
+.product-tile-image{
+    height:160px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:#f5f5f5;
+
+    border-bottom:1px solid #e4e4e4;
+}
+
+.product-tile-image i{
+    font-size:60px;
+    color:#333;
+}
+
+.product-tile-content{
+    flex:1;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    padding:20px;
+
+    text-align:center;
+}
+
+.product-tile-content h2{
+    margin:0 0 10px;
+
+    font-size:24px;
+    font-weight:700;
+
+    color:#333;
+}
+
+.product-tile-content p{
+    margin:0;
+
+    color:#666;
+
+    font-size:14px;
+    line-height:1.4;
+}
+
+.product-tile.selected{
+    border:2px solid #000;
+    transform:translateY(-4px);
+}
+    
 #DEFAULTS_PLUGIN {
     			width: 100%;
     			display: block;
@@ -170,8 +299,7 @@ function loadStyles() {
 }
 
 .dropdown-item h3{
-  margin-bottom: 5px
-  font-size:12px;
+
 }
 
 .cobalt.autodesk360 .custom-dimension-item{
@@ -389,7 +517,7 @@ function loadStyles() {
 
 .slider:before {
   position: absolute;
-  content: "X";
+ content: "✕";
 
   height: 20px;
   width: 20px;
@@ -707,7 +835,7 @@ input:focus + .slider {
 .rw-button{
 	height: var(--height--button);
 	min-width: var(--min-width--button);
-  border:1px solid black;
+  border:1px solid ${COLORS.gray500};
 	border-radius: 10px;
   box-shadow: var(--box-shadow--primary-button);
 
@@ -743,6 +871,7 @@ input:focus + .slider {
 .btn-checked{
 	// background:#000;
  background:${COLORS.gray300};
+ border-color: ${COLORS.gray900};
 }
 
 .btn-checked label{
@@ -773,7 +902,8 @@ input:focus + .slider {
 }
 
 .finish-layout-btn{
-  min-width: 100px;
+  //min-width: 100px;
+  	min-width: var(--min-width--button);
 }
 
 
@@ -1154,8 +1284,8 @@ div.radio-layout{
 	   min-width: 185px;
 	   padding: 5px;
 	   background-color: #fff;
-	   border-radius:${radius.radius15};
-     border: 1px solid black;
+	   border-radius:${radius.radius10};
+     border: 1px solid ${COLORS.gray500};
 
 
 		.rw-sliding-button {
@@ -1170,7 +1300,7 @@ div.radio-layout{
 		    font-size: 12px;
 		    font-family: Helvetica;
 		    color: ${COLORS.gray900};
-		    border-radius:${radius.radius15};
+		    border-radius:${radius.radius05};
 		    box-sizing: border-box;
 		    width: 100px;
 		    transition: background color 0.2s ease;
@@ -1286,6 +1416,7 @@ div.radio-layout{
 
 
 #configurator .dimension-layout .rw-button.btn-checked::after, 
+#configurator .finish-layout .rw-button.btn-checked::after, 
 #configurator .panel-layout .rw-button.btn-checked::after,
 .window-position-container .rw-button.btn-checked::after,
 .slim-option.active::after
@@ -1349,14 +1480,14 @@ height: 75px;
   background-color: #008CBA;
 }
 
-  .image-input-cell{
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    height: 100%;
-    justify-content: center;
-    padding: 8px;
-  }
+.image-input-cell{
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+    height:100%;
+    justify-content:center;
+    padding:8px;
+}
 
 }
 
@@ -1395,8 +1526,9 @@ height: 75px;
 .config-option-label-style {
 	font-size: 1.1rem;
 	line-height: 1.5rem;
-	font-style: italic;
+	//font-style: italic;
 	font-weight: normal;
+  font-size: 0.85rem;
 }
 
 .window-position-title {
@@ -1508,16 +1640,18 @@ width:210px;
 
 }
 .horizontal-inputs--quantity{
-justify-content:flex-start;
-column-gap:0px;
+    justify-content:flex-start;
+    column-gap:0px;
+}
 
-div:nth-child(1){
-flex-grow:3;
+.horizontal-inputs--quantity > .image-input-cell:first-child{
+    flex: 3 1 0;
 }
-	div:nth-child(2){
-		flex-grow:1;
-	}
+
+.horizontal-inputs--quantity > .image-input-cell:last-child{
+    flex: 1 1 0;
 }
+
 .horizontal-inputs select.spc__select, .horizontal-inputs input.spc__select{
 width:auto;
 }
@@ -1693,7 +1827,6 @@ option--disabled {
     box-shadow:0 4px 14px rgba(0,0,0,.05);
 
     display:flex;
-    align-items:center;
     gap:20px;
 }
 
@@ -1705,6 +1838,68 @@ option--disabled {
     transform-origin: center;
 }
 
+.decorative-hardware .rw-image-input-img {
+    transform: scale(1.4);
+}
+
+.decorative-hardware .rw-image-input-img[src] {
+    transform: scale(0.9);
+}
+
+
+
+#MAGNETIC_SETS_CARD {
+    display: flex;
+    align-items: flex-start;
+}
+
+#MAGNETIC_SETS_CARD .horizontal-inputs--quantity {
+    width: 100%;
+    column-gap: 16px;
+}
+
+#MAGNETIC_SETS_CARD .image-input-cell:first-child {
+    flex: 1;
+}
+
+#MAGNETIC_SETS_CARD .image-input-cell:last-child {
+    flex: 0 0 170px;
+}
+
+
+/* =====================================
+   Multi accessory card
+===================================== */
+
+.operator-accessory-card--multi{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+/* each accessory row */
+
+.operator-accessory-row{
+    display:flex;
+    gap:24px;
+   // align-items:center;
+    margin-top:16px;
+}
+
+
+/* divider between rows */
+
+.operator-accessory-row:not(:last-child){
+    padding-bottom:16px;
+    border-bottom:1px solid #e4e4e4;
+}
+
+/* allow select area to grow */
+
+.operator-accessory-card--multi
+.horizontal-inputs{
+    flex:1;
+}
 
 .operator-carousel-outer {
 	display: flex;
@@ -1941,8 +2136,6 @@ option--disabled {
 }
 
 #configurator div.rw-button{
-	height: var(--height--button);
-
 	& label{
 	    display: flex;
 	    justify-content: center;
@@ -1978,10 +2171,6 @@ option--disabled {
 .chevron-icon-prev {
 	width: 20px
 	height: 20px;
-}
-
-.config-option-label-style {
-	font-size: 0.85rem;
 }
 
 
@@ -2034,25 +2223,53 @@ option--disabled {
   border-radius: 0 8px 8px 0;
 }
 
-.cobalt.autodesk360 .quantity-field .number{
-  display: inline-block;
-  text-align: center;
-  border: none;
-  border-top: 1px solid #000;
-  border-bottom: 1px solid #000;
-  margin: 0px;
-  width: 40px;
-  height: 100%;
-  line-height: 35px;
-  font-size: 11pt;
-  box-sizing: border-box;
-  background: white;
-  font-family: calibri;
-}
+// .cobalt.autodesk360 .quantity-field .number{
+//   display: inline-block;
+//   text-align: center;
+//   border: none;
+//   border-top: 1px solid #000;
+//   border-bottom: 1px solid #000;
+//   margin: 0px;
+//   width: 40px;
+//   height: 100%;
+//   line-height: 35px;
+//   font-size: 11pt;
+//   box-sizing: border-box;
+//   background: white;
+//   font-family: calibri;
+// }
 
 .cobalt.autodesk360 .quantity-field .number::selection{
   background: none;
 }
+
+.cobalt.autodesk360 .quantity-field .number{
+    text-align:center;
+    border:none;
+    border-top:1px solid #000;
+    border-bottom:1px solid #000;
+    margin:0;
+    width:40px;
+    height:100%;
+    font-size:11pt;
+    box-sizing:border-box;
+    background:white;
+    font-family:calibri;
+    padding:0;
+      border-radius: 0;
+}
+
+.cobalt.autodesk360 .quantity-field input.number{
+    appearance:textfield;
+    -moz-appearance:textfield;
+}
+
+.cobalt.autodesk360 .quantity-field input.number::-webkit-outer-spin-button,
+.cobalt.autodesk360 .quantity-field input.number::-webkit-inner-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+}
+
 
 
 

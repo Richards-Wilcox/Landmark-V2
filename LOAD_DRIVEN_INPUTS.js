@@ -61,9 +61,6 @@ function loadDrivenInputEvents() {
     ["LIFT_TYPE", "HARDWARE_SET"]
   );
 
-
-
-
   addLogic("HIGHLIFT_VALUE", function () {
     this.value = getState("HIGHLIFT")
   }, ["HIGHLIFT"])
@@ -91,21 +88,6 @@ function loadDrivenInputEvents() {
     }
   }, [""])
 
-  // addNode({
-  //   id: "FRAME_COLOR",
-  //   value: null,
-  //   logic: function () {
-  //     // Only fall back to door color if user hasn't made an explicit pick
-  //     if (!frameColorUserOverride) {
-  //       const doorColor = getNode("COLOR")?.value;
-  //       if (doorColor?.value) {
-  //         const match = [...AvailableColorImages, ...OptionalColorImages]
-  //           .find(c => c.value === doorColor.value);
-  //         this.value = match ?? null;
-  //       }
-  //     }
-  //   }
-  // }, ["COLOR"]);
 
   addNode({
     id: "FRAME_COLOR",
@@ -196,7 +178,6 @@ function loadDrivenInputEvents() {
   }, ["COLOR", "DOOR_MODEL", "GLASS_SHAPE"]);
 
 
-
   addNode({
     id: "INSERT_COLOR",
     value: null,
@@ -211,6 +192,31 @@ function loadDrivenInputEvents() {
       }
     }
   }, ["COLOR"]);
+
+  addNode({
+    id: "JAMB_SEAL_COLOR",
+    value: null,
+    logic: function () {
+      if (!jambSealColorUserOverride) {
+        const doorColor = getNode("COLOR")?.value;
+        if (doorColor?.value) {
+          const match = [...AvailableColorImages, ...OptionalColorImages]
+            .find(c => c.value === doorColor.value);
+          this.value = match ?? null;
+        }
+      }
+    }
+  }, ["COLOR"]);
+
+  addNode({
+    id: "JAMB_SEAL_SCREW_PACKAGES",
+    value: null,
+    logic: function () {
+      this.value = Number(
+        $("#JAMB_SEAL_SCREW_PACKAGES").text().trim()
+      ) || 0;
+    }
+  }, [""])
 
   // addLogic("MIXED", function () {
   //   if (getState("DOOR_MODEL") === "D" && getState("WIDTH") >= 96) {
@@ -382,17 +388,16 @@ function loadDrivenInputEvents() {
   addLogic("LIFT_TYPE", function () {
     let selectedHardware = getState("HARDWARE_SET");
     let SelectedSpring = getState("SPRING_TYPE");
-    let SelectedInclinedTrack = getState("INCLINEDTRACK");
+    let SelectedInclinedTrack = getState("INCLINED_TRACK");
     $(".lift-option").hide();
 
-
     // Hide entire Lift Type section when hardware set is not selected
-    if (!selectedHardware) {
-      $("#liftTypeSection").hide();
-      return;
-    } else {
-      $("#liftTypeSection").show();
-    }
+    // if (!selectedHardware) {
+    //   $("#liftTypeSection").hide();
+    //   return;
+    // } else {
+    //   $("#liftTypeSection").show();
+    // }
 
 
     // Mapping hardware → allowed lift types
@@ -467,7 +472,7 @@ function loadDrivenInputEvents() {
       .attr("hwdesc", selectedConfig.hwdesc || "")
       .attr("trackCode", selectedConfig.trackCode || "");
 
-  }, ["HARDWARE_SET", "SPRING_TYPE", "INCLINEDTRACK"])
+  }, ["HARDWARE_SET", "SPRING_TYPE", "INCLINED_TRACK"])
 
   addLogic("PANEL_SPACING", function () {
     const panel_style = getState("FACE") || "";
@@ -551,7 +556,7 @@ function loadDrivenInputEvents() {
       //Hide the glass shape when mix panel is selected
 
       if (face === "M") {
-
+        clearRadio("GLASS_SHAPE");
         $("#GLASS_SHAPE_LAYOUT").hide();
 
         $("#more_glass_types")
@@ -644,11 +649,15 @@ function loadDrivenInputEvents() {
       });
 
       // If the currently-selected shape is now hidden, deselect it and clear glass type too
-      // const $checked = $("input[name='GLASS_SHAPE']:checked");
-      // if ($checked.length && !$checked.closest(".rw-button").is(":visible")) {
-      //   clearRadio("GLASS_SHAPE");
-      //   clearRadio("GLASS_TYPE");
-      // }
+      const $checked = $("input[name='GLASS_SHAPE']:checked");
+      if ($checked.length && !$checked.closest(".rw-button").is(":visible")) {
+        clearRadio("GLASS_SHAPE");
+        clearRadio("GLASS_TYPE");
+
+        clearRadio("GLASS_INSERT");
+        setState("WINDOW_POSITION", "");
+        forceRedraw();
+      }
 
     },
     "",
@@ -1159,6 +1168,22 @@ function loadDrivenInputEvents() {
     ["FACE"]
   );
 
+  // Inclined Track visibility
+  createNode(
+    "INCLINED_TRACK_VISIBILITY",
+    function () {
+
+      const hardware = getState("HARDWARE_SET");
+      if (hardware === 'C') {
+        $(".inclined-track").show();
+      } else {
+        $(".inclined-track").hide();
+      }
+    },
+    "",
+    $("#INCLINED_TRACK_VISIBILITY")[0],
+    ["HARDWARE_SET"]
+  );
 
 
   //Spring cycle visibility
@@ -1325,36 +1350,151 @@ function loadDrivenInputEvents() {
     },
     "",
     $("#FRAME_COLOR_VISIBILITY")[0],
-    ["DOOR_MODEL", "GLASS_SHAPE"]
+    ["DOOR_MODEL", "GLASS_SHAPE", "COLOR"]
   );
 
 
+createNode(
+  "INSERT_COLOR_VISIBILITY",
+  function () {
+
+    const glassShape =
+      (getState("GLASS_SHAPE") || "").toLowerCase();
+
+    const isSlim =
+      glassShape.includes("slim");
+
+    const doorColor =
+      getNode("COLOR")?.value?.value;
+
+    const isWoodTone =
+      doorColor === "X" ||
+      doorColor === "Y";
+
+    if (isSlim) {
+
+      $("#INSERT_COLOR").hide();
+
+      insertColorUserOverride = false;
+      setState("INSERT_COLOR", "");
+
+    } else {
+
+      $("#INSERT_COLOR").show();
+
+      $("#OptionalInsertColorsSection .color-button-container").each(function () {
+
+        const value = $(this)
+          .find("input[type='radio']")
+          .val();
+
+        // X and Y only visible for woodtone doors
+        if (
+          value === "X" ||
+          value === "Y"
+        ) {
+
+          $(this).toggle(isWoodTone);
+
+        } else {
+
+          $(this).show();
+
+        }
+
+      });
+
+    }
+
+  },
+  "",
+  $("#INSERT_COLOR_VISIBILITY")[0],
+  ["GLASS_SHAPE", "COLOR"]
+);
+  //Full set Visibility - Decorative hardware
   createNode(
-    "INSERT_COLOR_VISIBILITY",
+    "FULL_SETS_VISIBILITY",
     function () {
+      let dec_hardware = getState("DEC_HARDWARE");
 
-      const glassShape =
-        (getState("GLASS_SHAPE") || "").toLowerCase();
+      if (dec_hardware === "FS") {
+        $("#FULL_SETS_CARD").show();
+      } else {
+        $("#FULL_SETS").val("NONE");
+        operatorImageOnChangeLM(document.getElementById("FULL_SETS"));
+        setState("FULL_SETS", '');
+        $("#FULL_SETS_CARD").hide();
+      }
 
-      const isSlim =
-        glassShape.includes("slim");
+    }, "",
+    $("#FULL_SETS_VISIBILITY")[0],
+    ["DEC_HARDWARE"]
+  );
 
-      if (isSlim) {
 
-        $("#INSERT_COLOR").hide();
+  //Individial components for dec hardware - visibility
+  createNode(
+    "INDVIDIUAL_COMPO_VISIBILITY",
+    function () {
+      let dec_hardware = getState("DEC_HARDWARE");
 
-        // Optional: clear insert color when slim is selected
-        insertColorUserOverride = false;
-        setState("INSERT_COLOR", '');
-
+      if (dec_hardware === "IC") {
+        $("#INDIVIDIUAL_CARD").show();
       } else {
 
-        $("#INSERT_COLOR").show();
+        // L Handle
+        $("#L_HANDLE").val("NONE");
+        $("#L_HANDLE_QTY").val("0");
+        setState("L_HANDLE", "NONE");
+        setState("L_HANDLE_QTY", 0);
+        operatorImageOnChangeLM(document.getElementById("L_HANDLE"));
+
+        // Handle
+        $("#HANDLE").val("NONE");
+        $("#HANDLE_QTY").val("0");
+        setState("HANDLE", "NONE");
+        setState("HANDLE_QTY", 0);
+        operatorImageOnChangeLM(document.getElementById("HANDLE"));
+
+        // Door Knocker
+        $("#DOOR_KNOCKER").val("NONE");
+        $("#DOOR_KNOCKER_QTY").val("0");
+        setState("DOOR_KNOCKER", "NONE");
+        setState("DOOR_KNOCKER_QTY", 0);
+        operatorImageOnChangeLM(document.getElementById("DOOR_KNOCKER"));
+
+        // Straps
+        $("#STRAPS").val("NONE");
+        $("#STRAPS_QTY").val("0");
+        setState("STRAPS", "NONE");
+        setState("STRAPS_QTY", 0);
+        operatorImageOnChangeLM(document.getElementById("STRAPS"));
+
+        $("#INDIVIDIUAL_CARD").hide();
       }
+
     },
     "",
-    $("#INSERT_COLOR_VISIBILITY")[0],
-    ["GLASS_SHAPE"]
+    $("#INDVIDIUAL_COMPO_VISIBILITY")[0],
+    ["DEC_HARDWARE"]
+  );
+
+  createNode(
+    "MAGNETIC_SETS_VISIBILITY",
+    function () {
+      let dec_hardware = getState("DEC_HARDWARE");
+
+      if (dec_hardware === "MS") {
+        $("#MAGNETIC_SETS_CARD").show();
+      } else {
+        $("#MAGNETIC_SET").val("NONE");
+        setState("MAGNETIC_SET", '');
+        $("#MAGNETIC_SETS_CARD").hide();
+      }
+
+    }, "",
+    $("#MAGNETIC_SETS_VISIBILITY")[0],
+    ["DEC_HARDWARE"]
   );
 
   let applyingMixedGlassTypeDefault = false;
@@ -1691,11 +1831,42 @@ function updateFrameColorRestriction() {
     }
   });
 
-  // Hide optional colors during slim
+  // ==================================================
+  // OPTIONAL FRAME COLORS
+  // ==================================================
+
+  const doorColor = getNode("COLOR")?.value?.value;
+  const isWoodTone =
+    doorColor === "X" ||
+    doorColor === "Y";
+
   if (isSlimA) {
+
+    // Existing slim behavior
     $("#OptionalFrameColorsSection .color-button-container").hide();
+
   } else {
-    $("#OptionalFrameColorsSection .color-button-container").show();
+
+    $("#OptionalFrameColorsSection .color-button-container").each(function () {
+
+      const value = $(this)
+        .find("input[type='radio']")
+        .val();
+
+      // X and Y only visible for woodtone doors
+      if (
+        value === "X" ||
+        value === "Y"
+      ) {
+
+        $(this).toggle(isWoodTone);
+
+      } else {
+
+        $(this).show();
+
+      }
+    });
   }
 
   $("#optionalStackFrameColors")

@@ -348,7 +348,7 @@ async function getSpringSolutionsRW() {
         TRACK_RADIUS: selectedLiftType ? (selectedLiftType.getAttribute("radius") || "") : "",
         TRACK_ANGLE: "0.0",
     };
-    console.log(doorData);
+   // console.log(doorData);
     //Need to check for validation
     // Need to check for validation
 	if (JSON.stringify(doorData).includes("NaN")) {

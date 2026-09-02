@@ -4,63 +4,44 @@ let configureInProgress = false;
 function runNodeLogic(id) {
     const node = getNode(id);
 
-    if (node && typeof node.logic === "function") {
-        console.log("Running node logic:", id);
+    if (node && typeof node.logic === "function") {        
         node.logic.call(node);
-    } else {
-        console.warn("Node logic not found:", id);
+    } else {        
     }
 }
+
 function initializeDriversOnDemand() {
+
     if (sectionBundleDriversAdded) {
         return Promise.resolve();
     }
-
-    console.log("Initializing drivers...");
-
-    try {
-        addSectionBundleDrivers();
-        addGlazingCodeLogic();
+    try {        
+        addSectionBundleDrivers();        
+        addGlazingCodeLogic();        
         addSchedulingCodeLogic();
-        addHardwareDrivers();
-        addTrackDrivers();
+        addHardwareDrivers();        
+        addTrackDrivers();    
         addOperatorEvents();
-
+        
         sectionBundleDriversAdded = true;
 
-        // Force logic to run once after registration
-        // [
-        //     "FACE",
-        //     "FACE_desc",
-        //     "PANEL_SPACING",
-        //     "DESIGN_CODE",
-        //     "DESIGN_CODE_VISIBILITY",
-        //     "GLASS_SHAPE",            
-        //     "GLASS_TYPE_VISIBILITY",
-        //     "GLASS_INSERT",
-        //     "GLASS_INSERT_VISIBILITY",
-        //     "WINDOW_STATE",
-        //     "WINDOW_POSITION",
-        //     "RENDER"
-        // ].forEach(runNodeLogic);
-
         return Promise.resolve();
+
     } catch (e) {
+
         sectionBundleDriversAdded = false;
-        console.error("Driver initialization failed:", e);
+
+        console.error(
+            "Driver initialization failed:",
+            e
+        );
+
         return Promise.reject(e);
     }
 }
 
-function finalvalidation(options) {
-    console.log(
-        "finalvalidation start",
-        $("#DOOR_WIDTH_FEET").val(),
-        $("#DOOR_WIDTH_INCHES").val(),
-        $("#DOOR_HEIGHT_FEET").val(),
-        $("#DOOR_HEIGHT_INCHES").val()
-    );
 
+function finalvalidation(options) {
     options = options || {};
 
     const isConfigureClick = options.isConfigureClick === true;
@@ -69,10 +50,8 @@ function finalvalidation(options) {
     renderSuspended = true;
 
     return forceInitialValidationLM()
+    // return forceInitialValidation()
         .then(function (res) {
-            console.log("finalvalidation completed", {
-                result: res
-            });
 
             renderSuspended = false;
 
@@ -80,20 +59,17 @@ function finalvalidation(options) {
                 isConfigureClick &&
                 renderNode &&
                 typeof renderNode.logic === "function"
-            ) {
+            ) {                
+
                 return Promise.resolve(
                     renderNode.logic.call(renderNode)
-                ).then(() => res);
+                )
+                .then(() => {
+                    return res;
+
+                });
             }
-
             return res;
-        })
-        .catch(function (e) {
-            renderSuspended = false;
-
-            console.error("finalvalidation failed:", e);
-
-            throw e;
         });
 }
 
@@ -110,7 +86,8 @@ function finalvalidation(options) {
 //         });
 // }
 
-function Configure(event) {
+async function Configure(event) {
+
     if (event && typeof event.preventDefault === "function") {
         event.preventDefault();
         event.stopPropagation();
@@ -121,27 +98,39 @@ function Configure(event) {
     }
 
     configureInProgress = true;
+
     showConfigureLoader();
 
-    initializeDriversOnDemand()
-        .then(function () {
-            console.log("Drivers ready");
-
-            return finalvalidation({
-                isConfigureClick: true
-            });
-        })
-        .then(function () {
-            console.log("Validation complete");
-            // nextPage();
-        })
-        .catch(function (e) {
-            console.error("Configure error:", e);
-        })
-        .finally(function () {
-            configureInProgress = false;
-            hideConfigureLoader();
+    // Give browser a chance to paint loader
+    await new Promise(resolve => {
+        requestAnimationFrame(() => {
+            setTimeout(resolve, 0);
         });
+    });
+
+    try {
+
+        await initializeDriversOnDemand();
+
+        await finalvalidation({
+            isConfigureClick: true
+        });
+
+        nextPage();
+
+    }
+    catch (e) {
+
+        console.error("Configure error:", e);
+
+    }
+    finally {
+
+        configureInProgress = false;
+
+        hideConfigureLoader();
+
+    }
 
     return false;
 }

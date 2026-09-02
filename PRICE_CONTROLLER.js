@@ -1,3 +1,16 @@
+
+let _bundleCache = null;
+let _bundleCacheKey = null;
+
+let _doorInfoCache = null;
+let _doorInfoCacheKey = null;
+
+let _sectionFlagsCache = null;
+let _sectionFlagsCacheKey = null;
+
+let _reversedSectionsCache = null;
+let _reversedSectionsKey = null;
+
 const glassTypeColonialMap = {
     "CLEAR": "004",
     "CLEAR_SINGLE": "005",
@@ -117,66 +130,85 @@ function getPrice() {
     registerSectionCalculationLogic();
     registerGlazingCalculationLogic();
 
-    addNode({
-        id: "PRICEBOOK",
-        value: "",
-        logic: function () {
-            let solutions;
-            try {
-                solutions = $.ajax({
-                    method: "POST",
-                    url: "/spr/custom/jpoc/json/1728612690"
-                });
-            } catch (err) {
-                console.log("Spring API failed to load price", err);
-                // Return a valid default object       
-            }
-            this.value = solutions;
-            //console.log("data pricebook", solutions);
-        }
-    }, [""])
+    // addNode({
+    //     id: "PRICEBOOK",
+    //     value: "",
+    //     logic: function () {
+    //         let solutions;
+    //         try {
+    //             solutions = $.ajax({
+    //                 method: "POST",
+    //                 url: "/spr/custom/jpoc/json/1728612690"
+    //             });
+    //         } catch (err) {
+    //             console.log("Spring API failed to load price", err);
+    //             // Return a valid default object       
+    //         }
+    //         this.value = solutions;
+    //         //console.log("data pricebook", solutions);
+    //     }
+    // }, [""])
 
 
     //door face price - dummy
     addLogic("DOOR_FACE_PRICE", function () {
-        const door_model = getState("DOOR_MODEL");
-        if (door_model === 'A') {
-            this.value = 66.66;
-            $("#DOOR_FACE_PRICE").val(66.66);
-        } else if (door_model === 'D') {
-            this.value = 77.77;
-            $("#DOOR_FACE_PRICE").val(66.66);
-        }
-    }, ["DOOR_MODEL"])
+        const width = getState("WIDTH") / 12;
+        const height = getState("HEIGHT") / 12;
+        const doorModel = getState("DOOR_MODEL");
 
-    addLogic("GLAZING_PRICE", function () {
+        const sqft = width * height;
 
-        const pricebookJson = getState("PRICEBOOK")?.responseJSON?.[0] || {};
+        const rate =
+            doorModel === "A"
+                ? 66.66
+                : 77.77;
 
-        const doorInfo = getDoorInfo();
+        this.value = +(sqft * rate).toFixed(2);
+        $("#DOOR_FACE_PRICE").val(this.value);
 
-        const totalGlassQty = Number(doorInfo.total_glass_qty) || 0;
+    }, ["DOOR_MODEL", "WIDTH", "HEIGHT"])
 
-        const totalTempGlassQty = Number(doorInfo.total_temp_glass_qty) || 0;
+    addLogic("GLAZING_PRICE", function () {        
+        // const pricebookJson = getState("PRICEBOOK")?.responseJSON?.[0] || {};
+        const pricebookJson = window.PRICEBOOK_CACHE || {};
+        const face = getState("FACE");
 
-        const totalMixedColQty = Number(doorInfo.total_colonial_glass_qty) || 0;
+        const {
+            total_glass_qty = 0,
+            total_temp_glass_qty = 0,
+            total_colonial_glass_qty = 0,
+            total_ranch_glass_qty = 0
+        } = getGlassTotals();
 
-        const totalMixedRncQty = Number(doorInfo.total_ranch_glass_qty) || 0;
+        const totalGlassQty = Number(total_glass_qty);
+        const totalTempGlassQty = Number(total_temp_glass_qty);
+        const totalMixedColQty = Number(total_colonial_glass_qty);
+        const totalMixedRncQty = Number(total_ranch_glass_qty);
 
-        if (getState("WINDOW_1") === "None") {
+        const window1 = getState("WINDOW_1");
+        const window2 = getState("WINDOW_2");
+        const insert1 = getState("INSERT_1");
+        const insert2 = getState("INSERT_2");
+        const exteriorFrame1 = getState("EXTERIOR_FRAME_1");
+        const exteriorFrame2 = getState("EXTERIOR_FRAME_2");
+        const interiorFrame1 = getState("INTERIOR_FRAME_1");
+        const interiorFrame2 = getState("INTERIOR_FRAME_2");
+        const frameKit = getState("FRAME_KIT");
+
+        if (window1 === "None") {
             this.value = 0;
             return;
         }
 
-        const window_1_price = Number(pricebookJson[getState("WINDOW_1")]) || 0;
-        const window_2_price = Number(pricebookJson[getState("WINDOW_2")]) || 0;
-        const insert_1_price = Number(pricebookJson[getState("INSERT_1")]) || 0;
-        const insert_2_price = Number(pricebookJson[getState("INSERT_2")]) || 0;
-        const ext_frame_1_price = Number(pricebookJson[getState("EXTERIOR_FRAME_1")]) || 0;
-        const ext_frame_2_price = Number(pricebookJson[getState("EXTERIOR_FRAME_2")]) || 0;
-        const int_frame_1_price = Number(pricebookJson[getState("INTERIOR_FRAME_1")]) || 0;
-        const int_frame_2_price = Number(pricebookJson[getState("INTERIOR_FRAME_2")]) || 0;
-        const frame_kit = Number(pricebookJson[getState("FRAME_KIT")]) || 0;
+        const window_1_price = Number(pricebookJson[window1]) || 0;
+        const window_2_price = Number(pricebookJson[window2]) || 0;
+        const insert_1_price = Number(pricebookJson[insert1]) || 0;
+        const insert_2_price = Number(pricebookJson[insert2]) || 0;
+        const ext_frame_1_price = Number(pricebookJson[exteriorFrame1]) || 0;
+        const ext_frame_2_price = Number(pricebookJson[exteriorFrame2]) || 0;
+        const int_frame_1_price = Number(pricebookJson[interiorFrame1]) || 0;
+        const int_frame_2_price = Number(pricebookJson[interiorFrame2]) || 0;
+        const frame_kit = Number(pricebookJson[frameKit]) || 0;
 
 
         let total_glass_price = 0;
@@ -187,7 +219,7 @@ function getPrice() {
 
 
         // Mixed panel
-        if (getState("FACE") === "M") {
+        if (face === "M") {
 
             // glass price
             const mixed_col_price = window_1_price * totalMixedColQty;
@@ -236,12 +268,12 @@ function getPrice() {
             const totalWindowQty = totalGlassQty + totalTempGlassQty;
             total_insert_price = insert_1_price * totalWindowQty;
 
-            if (getState("SLIM_YES_NO_FOR_FRAMES") === 'Y') {
+            const useFrameKit = getState("SLIM_YES_NO_FOR_FRAMES") === "Y";
 
+            if (useFrameKit) {
                 total_frame_kit = frame_kit * totalWindowQty
 
             } else {
-
                 // Exterior Frame            
                 total_ext_frame_price = ext_frame_1_price * totalWindowQty;
 
@@ -266,7 +298,8 @@ function getPrice() {
 
         // console.log("GLAZING PRICE", this.value);
 
-    }, ["WINDOW_1", "WINDOW_2", "RENDER", "INSERT_1", "INSERT_2", "CUSTOM_WINDOWS", "SLIM_YES_NO_FOR_FRAMES"]);
+        // /"RENDER"
+    }, ["WINDOW_1", "WINDOW_2", "INSERT_1", "INSERT_2", "CUSTOM_WINDOWS", "SLIM_YES_NO_FOR_FRAMES"]);
 
     addLogic("HARDWARE_PRICE", function () {
 
@@ -280,12 +313,13 @@ function getPrice() {
     addNode(
         {
             id: "PRICE",
-            logic: async function () {
-                this.value = await calculateTotalPrice();
+            logic: function () {
+                this.value = calculateTotalPrice();
             },
             value: 0,
         },
-        ["DOOR_FACE_PRICE", "HARDWARE_PRICE", "OPERATORS_PRICE", "GLAZING_PRICE"])
+        ["DOOR_FACE_PRICE", "HARDWARE_PRICE", "OPERATORS_PRICE", "GLAZING_PRICE"]
+    );
 
     addLogic(
         "PRICE_DISPLAY",
@@ -382,9 +416,28 @@ function registerSectionCalculationLogic() {
 }
 
 
+// function getBundles() {
+//     return bundleByHeight();
+// }
+
 function getBundles() {
-    return bundleByHeight();
+
+    const key = [
+        getState("WIDTH"),
+        getState("HEIGHT"),
+        getState("NUM_OF_SEC"),
+        getState("GLASS_SHAPE")
+    ].join("|");
+
+    if (key === _bundleCacheKey) {        
+        return _bundleCache;
+    }
+    _bundleCacheKey = key;
+    _bundleCache = bundleByHeight();
+
+    return _bundleCache;
 }
+``
 
 function getBundle(bundleNo) {
     const bundles = getBundles();
@@ -465,11 +518,10 @@ function getSectionBundle() {
 // BUNDLING
 // ======================================================
 
-function bundleByHeight() {
+function bundleByHeight() {    
     const width = Number(getState("WIDTH"));
     const sections = getSectionBundle();
 
-    const window_position = getState("WINDOW_POSITION");
     const glass_shape = getState("GLASS_SHAPE");
 
     const isGlazed =
@@ -574,23 +626,27 @@ function bundleByHeight() {
 
 
 function calculateRawPanelWeight(sectionHeightInInches) {
-    let RPWeight = getState("DOOR_MODEL") === "A" ? 1.775 : 1.74;
+    const RPWeight =
+        getState("DOOR_MODEL") === "A"
+            ? 1.775
+            : 1.74;
 
-    let width = Number(getState("DOOR_WIDTH_FEET")) || 0;
+    const width = Number(getState("DOOR_WIDTH_FEET")) || 0;
     const sectionHeightInFeet = sectionHeightInInches / 12;
-    let areaSqFt = (width * sectionHeightInFeet);
+
+    const areaSqFt = width * sectionHeightInFeet;
+
     const totalWeight = Number((RPWeight * areaSqFt).toFixed(2));
-    // console.log("raw panel weight", totalWeight);
 
     return totalWeight;
 }
 
 function calculateEndCaps(sectionHeightInInches) {
-    let getEndCaps = getState("END_CAPS");
-    let sectionHeightInFeet = sectionHeightInInches / 12;
+    const endCaps = getState("END_CAPS");
+    const sectionHeightInFeet = sectionHeightInInches / 12;
     let weightPerFoot;
 
-    if (getEndCaps === "N") { //case single
+    if (endCaps === "N") { //case single
         weightPerFoot = getState("DOOR_MODEL") === "A" ? 1.02 : 1.14;
     } else {
         weightPerFoot = getState("DOOR_MODEL") === "A" ? 3.07 : 3.3;
@@ -610,19 +666,23 @@ function calculateBTMRetainer(isBottomSection = true) { //only for bottom sectio
 
 //function to calculate shipping weight
 function calculateSectionShipWeight(sectionHeightInInches, isBottomSection = true) {
-    let RPWeight = calculateRawPanelWeight(sectionHeightInInches);
-    let EndCapsWeight = calculateEndCaps(sectionHeightInInches);
-    let btmWeight = isBottomSection ? calculateBTMRetainer(Number(getState("DOOR_WIDTH_FEET")) || 0) : 0;
-    let lites = 0;
-    let pck_weight = 0.15;
+    const RPWeight = calculateRawPanelWeight(sectionHeightInInches);
+    const EndCapsWeight = calculateEndCaps(sectionHeightInInches);
+    // let btmWeight = isBottomSection ? calculateBTMRetainer(Number(getState("DOOR_WIDTH_FEET")) || 0) : 0;
+    const btmWeight = isBottomSection
+        ? calculateBTMRetainer()
+        : 0;
+    const lites = 0;
+    const pck_weight = 0.15;
 
     return Number((RPWeight + EndCapsWeight + btmWeight + lites + pck_weight).toFixed(2));
 }
 
 
-function getGlassQtyByBundleSection(bundleIndex, sectionIndexInBundle, qtyFieldName) {
+function getGlassQtyByBundleSection(bundleIndex, sectionIndexInBundle, qtyFieldName) {    
     const bundle = getBundles()[bundleIndex];
-    const sections = getDoorInfo().sections.slice().reverse();
+    // const sections = getDoorInfo().sections.slice().reverse();
+    const sections = getReversedSectionsCached();
 
     const sectionIndex =
         bundle?.indexes?.[sectionIndexInBundle];
@@ -634,6 +694,13 @@ function getGlassQtyByBundleSection(bundleIndex, sectionIndexInBundle, qtyFieldN
     return Number(sections[sectionIndex - 1]?.[qtyFieldName]) || 0;
 }
 
+
+function getReversedSections() {
+    return getDoorInfoCached()
+        .sections
+        .slice()
+        .reverse();
+}
 
 function registerGlazingCalculationLogic() {
 
@@ -783,14 +850,13 @@ function registerGlazingCalculationLogic() {
     // }, ["GLASS_SHAPE", "FRAME_COLOR", "DOOR_MODEL", "GLASS_TYPE", "GLASS_TEMPERED", "FACE", "DESIGN_CODE"]);
 
 
-    addLogic("WINDOW_1", function () {
-
+    addLogic("WINDOW_1", function () {        
         const door_model = getState("DOOR_MODEL");
         const glass_shape = getState("GLASS_SHAPE") || "";
         const glass_type = getState("GLASS_TYPE") || "";
 
-        const doorInfo = getDoorInfo();
-        const sections = getDoorInfo().sections.slice().reverse();
+        // const sections = getDoorInfo().sections.slice().reverse();
+        //const sections = getReversedSectionsCached();
 
         let window_code = "";
 
@@ -798,13 +864,11 @@ function registerGlazingCalculationLogic() {
         // CUSTOM SLIM
         // ======================      
 
-        const hasSlimSingle = sections.some(section =>
-            section.shape === "slim_single"
-        );
+        const { hasSlimSingle } = getSectionFlags();
 
         if (
             getState("WINDOW_POSITION") === "custom" &&
-            getState("GLASS_SHAPE")?.includes("slim") &&
+            glass_shape.includes("slim") &&
             hasSlimSingle
         ) {
 
@@ -899,19 +963,18 @@ function registerGlazingCalculationLogic() {
         "FACE",
         "WINDOW_STATE",
         "WINDOW_POSITION",
-        "CUSTOM_WINDOW"
+        "CUSTOM_WINDOWS"
     ]);
 
 
-    addLogic("WINDOW_2", function () {
-
+    addLogic("WINDOW_2", function () {        
         const door_model = getState("DOOR_MODEL");
         const glass_shape = getState("GLASS_SHAPE") || "";
         const glass_type = getState("GLASS_TYPE") || "";
         const temp_glass = getState("GLASS_TEMPERED") || "";
 
-        const doorInfo = getDoorInfo();
-        const sections = getDoorInfo().sections.slice().reverse();
+        // const sections = getDoorInfo().sections.slice().reverse();
+        //const sections = getReversedSectionsCached();
 
         // const sections = [...(getState("WINDOW_STATE")?.sections || [])].reverse();
 
@@ -920,13 +983,11 @@ function registerGlazingCalculationLogic() {
         // ======================
         // CUSTOM SLIM
         // ======================
-        const hasSlimDouble = sections.some(section =>
-            section.shape === "slim_double"
-        );
+        const { hasSlimDouble } = getSectionFlags();
 
         if (
             getState("WINDOW_POSITION") === "custom" &&
-            getState("GLASS_SHAPE")?.includes("slim") &&
+            glass_shape.includes("slim") &&
             hasSlimDouble
         ) {
 
@@ -1166,7 +1227,7 @@ function registerGlazingCalculationLogic() {
     addLogic("INTERIOR_FRAME_2", function () {
 
         const glazingtype = getNode("GLASS_TYPE").getAttribute('glazingType');
-        const glass_shape = getState("GLASS_SHAPE") || "";
+
         let face = getState("FACE");
         let glass_type = getState("GLASS_TYPE");
 
@@ -1192,7 +1253,7 @@ function registerGlazingCalculationLogic() {
 
         const doorModel = getState("DOOR_MODEL");
         const glassShape = getState("GLASS_SHAPE");
-        const frameColor = getState("FRAME_COLOR").value;
+        const frameColor = getState("FRAME_COLOR")?.value || "";
 
         const frameKitMap = {
             slim_single: {
@@ -1214,14 +1275,14 @@ function registerGlazingCalculationLogic() {
 
         this.value =
             frameKitMap[glassShape]?.[frameColor] || "None";
-        
+
     }, ["DOOR_MODEL", "GLASS_SHAPE", "FRAME_COLOR"]);
 
 
     addLogic("SCREWS", function () {
         const door_model = getState("DOOR_MODEL");
         const glass_shape = getState("GLASS_SHAPE") || "";
-        let glass_type = getState("GLASS_TYPE") || "";
+        const glass_type = getState("GLASS_TYPE") || "";
 
         //Mixed
         if (getState("FACE") === 'M') {
@@ -1254,8 +1315,7 @@ function registerGlazingCalculationLogic() {
 
 
     GLASS_QTY_FIELDS.forEach(function (item) {
-        addLogic(item.field, function () {
-
+        addLogic(item.field, function () {            
             const isCustomSlim =
                 getState("WINDOW_POSITION") === "custom" &&
                 (getState("GLASS_SHAPE") || "").includes("slim");
@@ -1277,8 +1337,7 @@ function registerGlazingCalculationLogic() {
 
         }, GLASS_QTY_DEPS);
 
-        addLogic(item.field + "_TEMP_OR_MIXED", function () {
-
+        addLogic(item.field + "_TEMP_OR_MIXED", function () {            
             const isCustomSlim =
                 getState("WINDOW_POSITION") === "custom" &&
                 (getState("GLASS_SHAPE") || "").includes("slim");
@@ -1302,23 +1361,30 @@ function registerGlazingCalculationLogic() {
     });
 
     addLogic("INSERT_YES_NO", function () {
-        let insert = getState("GLASS_INSERT");
-        if (!insert) this.value = 'N'
-        else this.value = 'Y'
-
+        this.value =
+            getState("GLASS_INSERT")
+                ? "Y"
+                : "N";
     }, ["GLASS_INSERT"])
 
     addLogic("SLIM_YES_NO_FOR_FRAMES", function () {
-        let slim_glass = getState("GLASS_TYPE");
-        let door_model = getState("DOOR_MODEL");
 
-        if (slim_glass.includes['slim_single', 'slim_double'] && door_model === 'A') {
-            this.value = 'Y'
-        } else this.value = 'N';
-    }, ["GLASS_TYPE", "DOOR_MODEL"])
+        const glass_shape = getState("GLASS_SHAPE");
+        const door_model = getState("DOOR_MODEL");
+
+        if (
+            ["slim_single", "slim_double"].includes(glass_shape) &&
+            door_model === "A"
+        ) {
+            this.value = "Y";
+        } else {
+            this.value = "N";
+        }
+
+    }, ["GLASS_SHAPE", "DOOR_MODEL"]);
 
     SCREW_QTY_FIELDS.forEach(function (item) {
-        addLogic(item.field, function () {
+        addLogic(item.field, function () {            
             const face = getState("FACE");
             const glass_shape = getState("GLASS_SHAPE") || "";
 
@@ -1341,9 +1407,9 @@ function registerGlazingCalculationLogic() {
     });
 }
 
-async function calculateTotalPrice() {
-    const DOOR_FACE_PRICE = parseFloat(getState("DOOR_FACE_PRICE"));
-    const GLAZING_PRICE = parseFloat(getState("GLAZING_PRICE"))
+function calculateTotalPrice() {
+    const DOOR_FACE_PRICE = parseFloat(getState("DOOR_FACE_PRICE")) || 0;
+    const GLAZING_PRICE = parseFloat(getState("GLAZING_PRICE")) || 0;
 
     // const OPERATORS_PRICE = parseFloat($("#OPERATORS_PRICE").val()) || 0;
     // const HARDWARE_PRICE = parseFloat($("#HARDWARE_PRICE").val()) || 0;
@@ -1358,9 +1424,174 @@ async function calculateTotalPrice() {
 
     // console.log("total price", totalPrice);
     return totalPrice;
-
-
-
-    // $("#TOTAL_PRICE").val(totalPrice);
-    // setState("TOTAL_PRICE", totalPrice);
 }
+
+
+function getDoorInfoCached() {
+    const windowState = getState("WINDOW_STATE");
+
+    const key = JSON.stringify({
+        width: getState("WIDTH"),
+        height: getState("HEIGHT"),
+        numSections: getState("NUM_OF_SEC"),
+        position: getState("WINDOW_POSITION"),
+        glassShape: getState("GLASS_SHAPE"),
+        face: getState("FACE"),
+        custom: getState("CUSTOM_WINDOWS"),
+        tempered: getState("GLASS_TEMPERED"),
+
+        sections: (windowState?.sections || []).map(s => ({
+            shape: s.shape,
+            enabled: s.enabled,
+            slim_one: s.slim_one,
+            slim_spacing: s.slim_spacing
+        }))
+    });
+
+    if (key === _doorInfoCacheKey) {        
+        return _doorInfoCache;
+    }
+    
+    _doorInfoCacheKey = key;
+    _doorInfoCache = getDoorInfo();
+
+    return _doorInfoCache;
+}
+
+function getGlassTotals() {
+    const sections =
+        getState("WINDOW_STATE")?.sections || [];
+
+    const face = getState("FACE");
+    const tempGlass =
+        getState("GLASS_TEMPERED") || "";
+
+    const totalSections = sections.length;
+
+    let total_glass_qty = 0;
+    let total_temp_glass_qty = 0;
+    let total_colonial_glass_qty = 0;
+    let total_ranch_glass_qty = 0;
+    let total_slim_single_glass_qty = 0;
+    let total_slim_double_glass_qty = 0;
+
+    sections.forEach((section, index) => {
+
+        const selectedGlassQty =
+            (section.enabled || [])
+                .filter(v => v === true)
+                .length;
+
+        // Mixed panel
+        if (face === "M") {
+
+            const mixedPanels =
+                getMixedPanelLayout(
+                    getState("WIDTH")
+                );
+
+            const counts =
+                getMixedPanelStyleCountsForSection(
+                    mixedPanels,
+                    section.enabled || []
+                );
+
+            total_colonial_glass_qty +=
+                counts.colonial;
+
+            total_ranch_glass_qty +=
+                counts.ranch;
+
+            return;
+        }
+
+        // Slim totals
+        if (section.shape === "slim_single") {
+            total_slim_single_glass_qty +=
+                selectedGlassQty;
+        }
+
+        if (section.shape === "slim_double") {
+            total_slim_double_glass_qty +=
+                selectedGlassQty;
+        }
+
+        // Standard / tempered totals
+        const tempApplies =
+            isTempGlassSection(
+                tempGlass,
+                index,
+                totalSections
+            );
+
+        if (tempApplies) {
+            total_temp_glass_qty +=
+                selectedGlassQty;
+        } else {
+            total_glass_qty +=
+                selectedGlassQty;
+        }
+    });
+
+    return {
+        total_glass_qty,
+        total_temp_glass_qty,
+        total_colonial_glass_qty,
+        total_ranch_glass_qty,
+        total_slim_single_glass_qty,
+        total_slim_double_glass_qty
+    };
+}
+
+
+
+function getSectionFlags() {
+
+    const key = JSON.stringify({
+        sections: getState("WINDOW_STATE")?.sections,
+        custom: getState("CUSTOM_WINDOWS"),
+        position: getState("WINDOW_POSITION")
+    });
+
+    if (key === _sectionFlagsCacheKey) {
+        return _sectionFlagsCache;
+    }
+
+    const sections =
+        getDoorInfoCached().sections;
+
+    _sectionFlagsCacheKey = key;
+
+    _sectionFlagsCache = {
+        hasSlimSingle: sections.some(
+            s => s.shape === "slim_single"
+        ),
+        hasSlimDouble: sections.some(
+            s => s.shape === "slim_double"
+        )
+    };
+
+    return _sectionFlagsCache;
+}
+
+function getReversedSectionsCached() {
+
+    const windowState = getState("WINDOW_STATE");
+
+    const key = JSON.stringify(windowState?.sections);
+
+    if (key === _reversedSectionsKey) {
+        return _reversedSectionsCache;
+    }
+
+    _reversedSectionsKey = key;
+
+    _reversedSectionsCache =
+        getDoorInfoCached()
+            .sections
+            .slice()
+            .reverse();
+
+    return _reversedSectionsCache;
+}
+

@@ -180,7 +180,7 @@ html += '<tr><th><b>Input Field</b></th><th><b>Value</b></th></tr>';
 
 html += '<tr><td>Hardware Set</td><td>' + (sections['HARDWARE_SET'] || '') + '</td></tr>';
 html += '<tr><td>Spring Type</td><td>' + (sections['SPRING_TYPE'] || '') + '</td></tr>';
-html += '<tr><td>Inclined Track</td><td>' + (sections['INCLINEDTRACK'] || '') + '</td></tr>';
+html += '<tr><td>Inclined Track</td><td>' + (sections['INCLINED_TRACK'] || '') + '</td></tr>';
 html += '<tr><td>Lift Type</td><td>' + (sections['LIFT_TYPE'] || '') + '</td></tr>';
 
 if (sections['LIFT_TYPE'] == 'HL') {
