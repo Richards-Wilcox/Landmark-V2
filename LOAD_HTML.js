@@ -2,21 +2,22 @@
 const src_path = "/HTML/products/162059085/";
 
 const AvailableColorImages = [
-    { url: "images/White_2.jpg", value: "W", colorName: "White", hex: "#fdf6ee", desc: "Wht" },
-    { url: "images/Black_2.jpg", value: "K", colorName: "Black", hex: "#211f1e", desc: "Blk" },
-    { url: "images/Iron Ore_2.jpg", value: "V", colorName: "Iron Ore", hex: "#313532", desc: "Ore" },
-    { url: "images/Cafe_2.jpg", value: "F", colorName: "Cafe", hex: "#3b3831", desc: "Cafe" }
+    { url: "images/White_2.jpg", value: "W", colorName: "White", hex: "#fef5ee", desc: "Wht", jambscrews: "215-302W-050" },
+    { url: "images/Black_2.jpg", value: "K", colorName: "Black", hex: "#211f1e", desc: "Blk", jambscrews: "215-302K-050" },
+    { url: "images/Iron Ore_2.jpg", value: "V", colorName: "Iron Ore", hex: "#313532", desc: "Ore", jambscrews: "215-302C-050" },
+    { url: "images/Cafe_2.jpg", value: "F", colorName: "Cafe", hex: "#3b3831", desc: "Cafe", jambscrews: "215-302F-050" }
 ];
 
 const OptionalColorImages = [
-    { url: "images/Sandstone_2.jpg", value: "T", colorName: "Sandstone", hex: "#938b7d", desc: "Snd" },
-    { url: "images/Brown_2.jpg", value: "B", colorName: "Brown", hex: "#453a2d", desc: "Brn" },
-    { url: "images/Slate Grey_2.jpg", value: "C", colorName: "Slate Grey", hex: "#626260", desc: "SGr" },
-    { url: "images/Bronze_2.jpg", value: "Z", colorName: "Bronze", hex: "#463a2e", desc: "Brz" },
-    { url: "images/Desert Tan_2.jpg", value: "E", colorName: "Desert Tan", hex: "#bfb6a4", desc: "DTan" },
-    { url: "images/Almond_2.jpg", value: "A", colorName: "Almond", hex: "#d1cbb3", desc: "Alm" },
-    { url: "images/Honey Cedar.png", value: "X", colorName: "Honey Cedar", restricted: true, hex: "#914e27" },
-    { url: "images/Cocoa Hickory.png", value: "Y", colorName: "Cocoa Hickory", restricted: true, hex: "#45261c" }
+    { url: "images/Sandstone_2.jpg", value: "T", colorName: "Sandstone", hex: "#938b7d", desc: "Snd", jambscrews: "215-302T-050" },
+    { url: "images/Brown_2.jpg", value: "B", colorName: "Brown", hex: "#453a2d", desc: "Brn", jambscrews: "215-302B-050" },
+    { url: "images/Slate Grey_2.jpg", value: "C", colorName: "Slate Grey", hex: "#626260", desc: "SGr", jambscrews: "215-302C-050" },
+    { url: "images/Bronze_2.jpg", value: "Z", colorName: "Bronze", hex: "#463a2e", desc: "Brz", jambscrews: "215-302Z-050" },
+    { url: "images/Desert Tan_2.jpg", value: "E", colorName: "Desert Tan", hex: "#bfb6a4", desc: "DTan", jambscrews: "215-302E-050" },
+    { url: "images/Almond_2.jpg", value: "A", colorName: "Almond", hex: "#d1cbb3", desc: "Alm", jambscrews: "215-302A-050" },
+    { url: "images/Honey Cedar.png", value: "X", colorName: "Honey Cedar", restricted: true, desc: "Hon", hex: "#914e27", jambscrews: "215-302X-050" },
+    { url: "images/Cocoa Hickory.png", value: "Y", colorName: "Cocoa Hickory", restricted: true, desc: "Coc", hex: "#45261c", jambscrews: "215-302Y-050" },
+    { url: "", value: "R", colorName: "Polar White", restricted: true, desc: "PWht", hex: "#F4F5F3 ", jambscrews: "215-302R-050" }
 ];
 
 const SilverColor = {
@@ -33,8 +34,11 @@ const woodTones = ["X", "Y"];
 let toggle_Switch = 0;
 let frameColorUserOverride = false;
 let insertColorUserOverride = false;
+let jambSealColorUserOverride = false;
 let currentOperatorIndex = 1;
 let operatorDataArray = [];
+window.PRICEBOOK_CACHE = {};
+
 
 function getInputJsonValue() {
 
@@ -79,74 +83,187 @@ function setInputJsonValue(value) {
     }
 }
 
+// function loadForm() {
+
+//     loadPricebook();
+//     toggleAccordion();
+
+//     const form = createForm();
+//     //Here is where we append the HTML
+//     $('.concept-ui-form.scrollable').append(form);
+
+//     // Hide configurator initially
+
+//     const inputJsonValue = getInputJsonValue();
+//     if (inputJsonValue === '') {
+//         $("#configurator").hide();
+
+//         createProductSelectionScreen();
+//     } else {
+//         $("#configurator").show();
+//     }
+
+//     $('.concept-ui-form.scrollable').removeClass('concept-ui-form scrollable')
+
+//     loadUI();
+
+
+//     createNode("NEXT_PAGE_BTN_0", function () {
+//         if (!isFormValid())
+//             this.setAttribute("disabled", 'true')
+//         else
+//             this.removeAttribute("disabled")
+//     }, "container", $("button[name=nextPageBtn]")[0], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
+
+//     createNode("NEXT_PAGE_BTN_1", function () {
+//         if (!isFormValid())
+//             this.setAttribute("disabled", 'true')
+//         else
+//             this.removeAttribute("disabled")
+//     }, "container", $("button[name=nextPageBtn]")[1], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
+
+//     //The save button isn't compatible with a single page configurator
+//     $("div.button-set.button-2.location-border button")[0].remove()
+//     $("button[onclick='nextPage()']").text("Configure")
+
+
+//     //Adding indicies to sections
+//     $('#configurator section').each((index, e) => { e.setAttribute('index', index) })
+
+//     $(`#collapse1159850199`).remove();
+//     $(`#section_select`).on('change', (evt) => {
+//         showSection(Number(evt.target.value))
+//     })
+
+//     //Load the caching system.
+//     rw_init("configurator");
+
+//     $('.rw-warning').hide()
+//     // $("#DEFAULTS_PLUGIN").html(DEFAULTS_PLUGIN.load("162059085"))
+//     $('#configurator button').on("click", evt => evt.preventDefault())
+//     $('#LOAD_DEFAULTS').on('click', applyDefaults)
+//     $("#LIFT_TYPE").change((e) => $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display")))
+
+//     populateCarousel()
+
+
+//     if (inputJsonValue === '')
+//         applyDefaults()
+//     else {
+//         loadInputValues("configurator");
+//         $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display"))
+//     }
+
+
+
+// }
+
+
 function loadForm() {
 
-    //calculateTotalPrice();
+    console.time("loadForm");
+
+    loadPricebook();
     toggleAccordion();
 
     const form = createForm();
-    //Here is where we append the HTML
-    $('.concept-ui-form.scrollable').append(form)
-    $('.concept-ui-form.scrollable').removeClass('concept-ui-form scrollable')
 
-    loadUI();
-    //All warnings default to hidden
-
-    //loadWeightNodes()
-
-    createNode("NEXT_PAGE_BTN_0", function () {
-        if (!isFormValid())
-            this.setAttribute("disabled", 'true')
-        else
-            this.removeAttribute("disabled")
-    }, "container", $("button[name=nextPageBtn]")[0], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
-
-    createNode("NEXT_PAGE_BTN_1", function () {
-        if (!isFormValid())
-            this.setAttribute("disabled", 'true')
-        else
-            this.removeAttribute("disabled")
-    }, "container", $("button[name=nextPageBtn]")[1], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
-
-    //The save button isn't compatible with a single page configurator
-    $("div.button-set.button-2.location-border button")[0].remove()
-    $("button[onclick='nextPage()']").text("Configure")
-
-
-    //Adding indicies to sections
-    $('#configurator section').each((index, e) => { e.setAttribute('index', index) })
-
-    $(`#collapse1159850199`).remove();
-    $(`#section_select`).on('change', (evt) => {
-        showSection(Number(evt.target.value))
-    })
-
-    //Load the caching system.
-    rw_init("configurator");
-
-    $('.rw-warning').hide()
-    // $("#DEFAULTS_PLUGIN").html(DEFAULTS_PLUGIN.load("162059085"))
-    $('#configurator button').on("click", evt => evt.preventDefault())
-    $('#LOAD_DEFAULTS').on('click', applyDefaults)
-    $("#LIFT_TYPE").change((e) => $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display")))
+    $('.concept-ui-form.scrollable').append(form);
 
     const inputJsonValue = getInputJsonValue();
 
-    if (inputJsonValue === '')
-        applyDefaults()
-    else {
-        loadInputValues("configurator");
-        $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display"))
+    if (inputJsonValue === '') {
+
+        $("#configurator").hide();
+        createProductSelectionScreen();
+
+    } else {
+
+        $("#configurator").show();
+
     }
-    populateCarousel()
+    $('.concept-ui-form.scrollable')
+        .removeClass('concept-ui-form scrollable');
+
+    loadUI();
+
+    createNode(
+        "NEXT_PAGE_BTN_0",
+        function () {
+            if (!isFormValid())
+                this.setAttribute("disabled", "true");
+            else
+                this.removeAttribute("disabled");
+        },
+        "container",
+        $("button[name=nextPageBtn]")[0],
+        ["SPRING_SOLUTION", "WEIGHT", "PRICE"]
+    );
+
+    createNode(
+        "NEXT_PAGE_BTN_1",
+        function () {
+            if (!isFormValid())
+                this.setAttribute("disabled", "true");
+            else
+                this.removeAttribute("disabled");
+        },
+        "container",
+        $("button[name=nextPageBtn]")[1],
+        ["SPRING_SOLUTION", "WEIGHT", "PRICE"]
+    );
+
+    $("div.button-set.button-2.location-border button")[0].remove();
+
+    $("button[onclick='nextPage()']").text("Configure");
+
+    $('#configurator section').each((index, e) => {
+        e.setAttribute('index', index);
+    });
+
+    $('#collapse1159850199').remove();
+
+    $('#section_select').on('change', evt => {
+        showSection(Number(evt.target.value));
+    });
+
+    rw_init("configurator");
+
+    $('.rw-warning').hide();
+
+    $('#configurator button').on(
+        "click",
+        evt => evt.preventDefault()
+    );
+
+    $('#LOAD_DEFAULTS').on(
+        'click',
+        applyDefaults
+    );
+
+    $("#LIFT_TYPE").change((e) =>
+        $("#LIFT_TYPE_DISPLAY")
+            .html($("#LIFT_TYPE > option:selected").attr("display"))
+    );
+
+
+
+    populateCarousel();
+
+    if (inputJsonValue !== '') {
+
+        loadInputValues("configurator");
+
+        $("#LIFT_TYPE_DISPLAY")
+            .html($("#LIFT_TYPE > option:selected").attr("display"));
+    }
 
 }
 
 function createForm() {
 
-
     const form = `
-	<script src="/HTML/products/162059085/jscripts/panelConfigurations.js"></script>
+<script src="/HTML/products/162059085/jscripts/panelConfigurations.js"></script>
 
 <div id="configurator">
     <div class="rw-configurator__layout">
@@ -185,7 +302,7 @@ function createForm() {
                         <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_BOTH"
                             name="WINDOW_POSITION" desc="Both" code="both" value="both">
                     </div>
-                    <div class="rw-button" tabindex="0"  id="POSITION_CUSTOM" style="display:none;">
+                    <div class="rw-button" tabindex="0" id="POSITION_CUSTOM">
                         <label for="WINDOW_POSITION_CUSTOM">Custom</label>
                         <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_CUSTOM"
                             name="WINDOW_POSITION" desc="Custom" code="custom" value="custom">
@@ -196,13 +313,13 @@ function createForm() {
             <div id="CANVAS_PLUGIN">
             </div>
             <!-- Loader -->
-           <div id="canvas-loader-backdrop" class="canvas-loader-backdrop" style="display:none;">
+            <div id="canvas-loader-backdrop" class="canvas-loader-backdrop" style="display:none;">
                 <div class="canvas-loader" id="canvas-loader" style="position:absolute; top:50%; left:50%;
                                                             transform:translate(-50%, -50%);
                                                             padding:10px 20px; border-radius:8px; z-index:10;">
                 </div>
             </div>
-            
+
 
         </div>
         <div class="rw-configurator__layout--right">
@@ -290,50 +407,61 @@ function createForm() {
 
                     <div class="custom-dimension-container">
                         <div class="custom-dimension-section">
+
+                            <!-- Door Width -->
                             <div class="dropdown-item">
                                 <h3>Door Width</h3>
+
                                 <div class="dropdown-pair">
                                     <div class="dropdown-subitem">
-                                        <label for="DOOR_WIDTH_FEET">Feet</label>
+                                        <label for="DOOR_WIDTH_FEET">Ft</label>
                                         <select id="DOOR_WIDTH_FEET" name="DOOR_WIDTH_FEET">
                                         </select>
                                     </div>
 
                                     <div class="dropdown-subitem">
-                                        <label for="DOOR_WIDTH_INCHES">Inches</label>
+                                        <label for="DOOR_WIDTH_INCHES">In</label>
                                         <select id="DOOR_WIDTH_INCHES" name="DOOR_WIDTH_INCHES">
                                         </select>
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- Door Height -->
                             <div class="dropdown-item">
                                 <h3>Door Height</h3>
+
                                 <div class="dropdown-pair">
                                     <div class="dropdown-subitem">
-                                        <label for="DOOR_HEIGHT_FEET">Feet</label>
+                                        <label for="DOOR_HEIGHT_FEET">Ft</label>
                                         <select id="DOOR_HEIGHT_FEET" name="DOOR_HEIGHT_FEET">
                                         </select>
                                     </div>
 
                                     <div class="dropdown-subitem">
-                                        <label for="DOOR_HEIGHT_INCHES">Inches</label>
+                                        <label for="DOOR_HEIGHT_INCHES">In</label>
                                         <select id="DOOR_HEIGHT_INCHES" name="DOOR_HEIGHT_INCHES">
                                         </select>
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- Number Of Sections -->
                             <div class="dropdown-item">
                                 <h3>Number Of Sections</h3>
-                                <div class="dimension-layout">
-                                    <select id="NUM_OF_SEC" name="NUM_OF_SEC">
-                                    </select>
-                                </div>
 
+                                <select id="NUM_OF_SEC" name="NUM_OF_SEC">
+                                </select>
                             </div>
-                        </div>
 
+                            <!-- Number Of Panels -->
+                            <div class="dropdown-item" id="CustomPanelLayout">
+                                <h3>Number Of Panels</h3>
+                                <select id="NUM_OF_PANELS" name="NUM_OF_PANELS">
+                                </select>
+                            </div>
+
+                        </div>
                     </div>
 
                     <div class="dropdown-item">
@@ -390,7 +518,8 @@ function createForm() {
                     </div>
 
                     <!-- Mix Panel Design code-->
-                    <div class="dropdown-item mix-panel-layout" style="width:50%" id="MixPanelLayout" style="display:none">
+                    <div class="dropdown-item mix-panel-layout" style="width:50%" id="MixPanelLayout"
+                        style="display:none">
                         <h3>Design Code</h3>
                         <div>
                             <select id="DESIGN_CODE" name="DESIGN_CODE">
@@ -422,7 +551,7 @@ function createForm() {
                                         <div aria-labelledby="colors" tabindex="0" id="optionalStackColors"
                                             class="colorsFieldset"></div>
                                         <div class="tooltip">
-                                            <p>View Other Colors</p>
+                                            <p>View More Colors</p>
                                         </div>
                                     </div>
 
@@ -653,26 +782,26 @@ function createForm() {
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_25">Cascade</label>
-                            <input type="radio" id="GLASS_INSERT_MORE_25" name="GLASS_INSERT" value="cascade_ranch" 
-                            insertCode='550-321'>
+                            <input type="radio" id="GLASS_INSERT_MORE_25" name="GLASS_INSERT" value="cascade_ranch"
+                                insertCode='550-321'>
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_2">Arched Stockton</label>
-                            <input type="radio" id="GLASS_INSERT_MORE_2" name="GLASS_INSERT" value="arched_stockton" 
-                            insertCode ='550-341'>
+                            <input type="radio" id="GLASS_INSERT_MORE_2" name="GLASS_INSERT" value="arched_stockton"
+                                insertCode='550-341'>
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_3">Stockbridge</label>
                             <input type="radio" id="GLASS_INSERT_MORE_3" name="GLASS_INSERT" value="stockbridge"
-                            insertCode = '550-456'>
+                                insertCode='550-456'>
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_4">Arched Stockbridge</label>
-                            <input type="radio" id="GLASS_INSERT_MORE_4" name="GLASS_INSERT" value="arched_stockbridge" 
-                            insertCode = '550-396'>
+                            <input type="radio" id="GLASS_INSERT_MORE_4" name="GLASS_INSERT" value="arched_stockbridge"
+                                insertCode='550-396'>
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
@@ -745,19 +874,19 @@ function createForm() {
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_17">Arched Stockton 3pc Set</label>
                             <input type="radio" id="GLASS_INSERT_MORE_17" name="GLASS_INSERT" value="arched_stockton_3"
-                            insertCode = '550-341'>
+                                insertCode='550-341'>
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_18">Arched Stockbridge 3pc Set</label>
                             <input type="radio" id="GLASS_INSERT_MORE_18" name="GLASS_INSERT"
-                                value="arched_stockbridge_3" insertCode='550-396' >
+                                value="arched_stockbridge_3" insertCode='550-396'>
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
                             <label for="GLASS_INSERT_MORE_19">Berkshire</label>
                             <input type="radio" id="GLASS_INSERT_MORE_19" name="GLASS_INSERT" value="arched_stockton_4"
-                            insertCode='550-341'>
+                                insertCode='550-341'>
                         </div>
 
                         <div class="rw-button panel-button" tabindex="0">
@@ -859,6 +988,55 @@ function createForm() {
                     </div>
                 </div>
                 <!-- tempered glass end -->
+
+                <!-- Number Of Windows -->              
+              <div
+    class="dropdown-item"
+    id="WINDOW_COUNT_LAYOUT"
+    style="display:none;">
+
+    <h3>Number Of Windows</h3>
+
+    <div class="combined-button-container">
+        <div class="combined-button-container-inner">
+
+            <div class="rw-sliding-button selected">
+
+                <label
+                    for="WINDOWS_DEFAULT"
+                    id="WINDOWS_DEFAULT_LABEL">
+                    Default
+                </label>
+
+                <input
+                    type="radio"
+                    id="WINDOWS_DEFAULT"
+                    name="NUM_OF_WINDOWS"
+                    value="DEFAULT"
+                    checked
+                    style="display:none;">
+            </div>
+
+            <div class="rw-sliding-button">
+
+                <label
+                    for="WINDOWS_SPECIAL"
+                    id="WINDOWS_SPECIAL_LABEL">
+                    Special
+                </label>
+
+                <input
+                    type="radio"
+                    id="WINDOWS_SPECIAL"
+                    name="NUM_OF_WINDOWS"
+                    value="SPECIAL"
+                    style="display:none;">
+            </div>
+
+        </div>
+    </div>
+
+</div>
             </section>
 
             <!-- HARDWARE SECTION -->
@@ -912,12 +1090,12 @@ function createForm() {
                                             <div class="rw-sliding-button">
                                                 <label for="INCLINED_YES">YES</label>
                                                 <input type="radio" style="display:none;" id="INCLINED_YES"
-                                                    name="INCLINEDTRACK" value="Y">
+                                                    name="INCLINED_TRACK" value="Y">
                                             </div>
                                             <div class="rw-sliding-button selected">
                                                 <label for="INCLINED_NO">NO</label>
                                                 <input type="radio" style="display:none;" id="INCLINED_NO"
-                                                    name="INCLINEDTRACK" value="N" checked>
+                                                    name="INCLINED_TRACK" value="N" checked>
                                             </div>
                                         </div>
                                     </div>
@@ -1042,7 +1220,9 @@ function createForm() {
                                     <div class="quantity-field">
                                         <button class="value-button decrease-button"
                                             onclick="decreaseValue(this)">-</button>
-                                        <div class="number" id="HANGER_ANGLE_QTY">0</div>
+
+                                        <input type="number" class="number" id="HANGER_ANGLE_QTY" value="0" min="0"
+                                            max="10" oninput="syncQuantityNode($(this), this.value)">
                                         <button class="value-button increase-button" onclick="increaseValue(this, 10)">+
                                         </button>
                                     </div>
@@ -1055,7 +1235,9 @@ function createForm() {
                                     <div class="quantity-field">
                                         <button class="value-button decrease-button"
                                             onclick="decreaseValue(this)">-</button>
-                                        <div class="number" id="JAMB_SEAL_SCREW_PACKAGES">0</div>
+
+                                        <input type="number" class="number" id="JAMB_SEAL_SCREW_PACKAGES" value="0"
+                                            min="0" max="50" oninput="syncQuantityNode($(this), this.value)">
                                         <button class="value-button increase-button" onclick="increaseValue(this, 10)">+
                                         </button>
                                     </div>
@@ -1129,7 +1311,43 @@ function createForm() {
 
                 <div class="operator-accessories">
                     <div class="operator-accessory-card">
-                        <a href="" target="_blank">
+
+                        <div class="horizontal-inputs" style="width:100%;">
+                            <div class="image-input-cell" style="width:100%;">
+
+                                <h3 class="config-option-label-style">
+                                    Operator Bracket Mount
+                                </h3>
+
+                                <div class="dimension-layout">
+
+                                    <div class="rw-button" tabindex="0">
+                                        <label for="ADJUSTABLE_BRACKET">
+                                            Adjustable Bracket
+                                        </label>
+
+                                        <input type="radio" id="ADJUSTABLE_BRACKET" name="OPERATOR_BRACKET"
+                                            value="ADJUSTABLE_BRACKET">
+                                    </div>
+
+                                    <div class="rw-button" tabindex="0">
+                                        <label for="CLAW_BRACKET">
+                                            Claw Bracket
+                                        </label>
+
+                                        <input type="radio" id="CLAW_BRACKET" name="OPERATOR_BRACKET"
+                                            value="CLAW_BRACKET">
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="operator-accessory-card">
+                        <a href="" target="_blank" style="pointer-events:none;">
                             <div class="image-placeholder-container">
                                 <img class="rw-image-input-img" id="ADDITIONAL_TRANSMITTER_IMAGE" />
 
@@ -1177,7 +1395,7 @@ function createForm() {
                     </div>
 
                     <div class="operator-accessory-card">
-                        <a href="" target="_blank">
+                        <a href="" target="_blank" style="pointer-events:none;">
                             <div class="image-placeholder-container">
                                 <img class="rw-image-input-img" id="ADDITIONAL_CONTROL_PANEL_IMAGE" />
 
@@ -1219,7 +1437,7 @@ function createForm() {
                         </div>
                     </div>
                     <div class="operator-accessory-card">
-                        <a href="" target="_blank">
+                        <a href="" target="_blank" style="pointer-events:none;">
                             <div class="image-placeholder-container">
                                 <img class="rw-image-input-img" id="ADDITIONAL_KEYLESS_ENTRY_IMAGE" />
                                 <div class="no-image-message">
@@ -1285,19 +1503,19 @@ function createForm() {
                         </div>
                     </div>
 
-                    <!-- Drill for Hinges  & End caps-->
+                    <!-- Drill for Hinges & End Caps -->
                     <div class="dropdown-item" style="flex-direction:row;">
                         <div class="drill-container">
                             <h3>Drill for Hinges?</h3>
                             <div style="display:flex;justify-content: flex-start;">
                                 <div class="combined-button-container">
                                     <div class="combined-button-container-inner">
-                                        <div class="rw-sliding-button">
+                                        <div class="rw-sliding-button selected">
                                             <label for="DrillYes">YES</label>
                                             <input type="radio" style="display:none;" id="DrillYes" name="DRILL"
                                                 value="Y" checked>
                                         </div>
-                                        <div class="rw-sliding-button selected">
+                                        <div class="rw-sliding-button">
                                             <label for="DrillNo">NO</label>
                                             <input type="radio" style="display:none;" id="DrillNo" name="DRILL"
                                                 value="N">
@@ -1327,6 +1545,7 @@ function createForm() {
                         </div>
                     </div>
 
+                    <!-- Extra Truss and Shaft-->
                     <div class="dropdown-item" style="flex-direction:row">
                         <div class="drill-container">
                             <h3 for="EXTRA_TRUSS"> Extra Truss</h3>
@@ -1367,7 +1586,610 @@ function createForm() {
                             </div>
                         </div>
                     </div>
-                </div>
+
+
+                    <!-- window cut outs -->
+                    <div class="dropdown-item" style="flex-direction:row">
+                        <div class="end-cap-container">
+                            <h3 for="WINDOW_CUTOUTS">Window Cut Outs</h3>
+                            <div style="display:flex;justify-content: flex-start;">
+                                <div class="combined-button-container">
+                                    <div class="combined-button-container-inner">
+                                        <div class="rw-sliding-button selected">
+                                            <label for="CUTOUT_NO">NO</label>
+                                            <input type="radio" style="display:none;" id="CUTOUT_NO"
+                                                name="WINDOW_CUTOUTS" value="N" checked>
+                                        </div>
+                                        <div class="rw-sliding-button">
+                                            <label for="CUTOUT_YES">YES</label>
+                                            <input type="radio" style="display:none;" id="CUTOUT_YES"
+                                                name="WINDOW_CUTOUTS" value="Y">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Jamb color-->
+                    <div class="dropdown-item" id="JAMB_SEAL_COLOR">
+                        <h3>Jamb Seal Colour</h3>
+                        <div class="colorChooser">
+                            <div class="available">
+                                <div class="colorsSection" id="AvailableJambSealColorsSection">
+                                    <div class="stack-wrapper colorContainerInactive bottom">
+                                        <div aria-labelledby="colors" tabindex="0" id="availableStackJambSealColors"
+                                            class="colorsFieldset"></div>
+                                        <div class="tooltip">
+                                            <p>View Most Popular Colors</p>
+                                        </div>
+                                    </div>
+                                    <div class='colorContainer'></div>
+                                </div>
+                            </div>
+                            <div class="optional">
+                                <div class="colorsSection" id="OptionalJambSealColorsSection">
+                                    <div class="divider"></div>
+                                    <div class="stack-wrapper right">
+                                        <div aria-labelledby="colors" tabindex="0" id="optionalStackJambSealColors"
+                                            class="colorsFieldset"></div>
+                                        <div class="tooltip">
+                                            <p>View Other Colors</p>
+                                        </div>
+                                    </div>
+
+                                    <div class='colorContainer colorContainerInactive'></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Top and Bottom Seal-->
+                    <div class="dropdown-item" style="flex-direction:row;">
+                        <div class="drill-container">
+                            <h3>Top Seal</h3>
+                            <div style="display:flex;justify-content: flex-start;">
+                                <div class="combined-button-container">
+                                    <div class="combined-button-container-inner">
+                                        <div class="rw-sliding-button selected">
+                                            <label for="TopSealNo">No</label>
+                                            <input type="radio" style="display:none;" id="TopSealNo" name="TOP_SEAL"
+                                                value="N" checked>
+                                        </div>
+                                        <div class="rw-sliding-button">
+                                            <label for="TopSealYes">YES</label>
+                                            <input type="radio" style="display:none;" id="TopSealYes" name="TOP_SEAL"
+                                                value="Y">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="end-cap-container">
+                            <h3>Bottom Seal</h3>
+                            <div style="display:flex;justify-content: flex-start;">
+                                <div class="combined-button-container">
+                                    <div class="combined-button-container-inner">
+                                        <div class="rw-sliding-button selected">
+                                            <label for="BottomSealNo">NO</label>
+                                            <input type="radio" style="display:none;" id="BottomSealNo"
+                                                name="BOTTOM_SEAL" value="N" checked>
+                                        </div>
+                                        <div class="rw-sliding-button">
+                                            <label for="BottomSealYes">YES</label>
+                                            <input type="radio" style="display:none;" id="BottomSealYes"
+                                                name="BOTTOM_SEAL" value="Y">
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- snap latch-->
+                    <div class="dropdown-item">
+                        <h3>Snap Latch</h3>
+                        <div class="dimension-layout">
+                            <div class="rw-button" tabindex="0">
+                                <input type="radio" id="SNAP_LATCH" name="SNAP_LATCH_OPTION" value="SnapLatch">
+                                <label for="SNAP_LATCH">Snap Latch</label>
+                            </div>
+
+                            <div class="rw-button" tabindex="0">
+                                <input type="radio" id="ONE_POINT_SNAP" name="SNAP_LATCH_OPTION" value="OnePointLatch">
+                                <label for="ONE_POINT_SNAP">One Point Latch</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Decorative Hardware-->
+                    <div class="dropdown-item">
+                        <h3>Decorative Hardware</h3>
+                        <div class="dimension-layout decorative-hardware-layout">
+                            <div class="rw-button" tabindex="0">
+                                <input type="radio" id="FS" name="DEC_HARDWARE" value="FS">
+                                <label for="FS">Full Sets</label>
+                            </div>
+
+                            <div class="rw-button " tabindex="0">
+                                <input type="radio" id="IC" name="DEC_HARDWARE" value="IC">
+                                <label for="IC">Individual Components</label>
+                            </div>
+
+                            <div class="rw-button" tabindex="0">
+                                <input type="radio" id="MS" name="DEC_HARDWARE" value="MS">
+                                <label for="MS">Magnetic Sets</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="operator-accessories">
+
+                        <!-- Full sets-->
+                        <div class="operator-accessory-card decorative-hardware" id="FULL_SETS_CARD"
+                            style="display:none">
+                            <a href="" target="_blank" style="pointer-events:none;">
+                                <div class="image-placeholder-container">
+                                    <img class="rw-image-input-img" id="FULL_SETS_IMAGE" />
+
+                                    <div class="no-image-message">
+                                        <span>No</span>
+                                        <span>Accessory</span>
+                                        <span>Selected</span>
+                                    </div>
+                                    <div class="overlay"></div>
+                                </div>
+                            </a>
+                            <div class="horizontal-inputs horizontal-inputs--quantity" style="width:75%;">
+                                <div class="image-input-cell">
+                                    <h3 for="FULL_SETS" class="config-option-label-style">Decorative Full Sets
+                                    </h3>
+                                    <select id="FULL_SETS" style="width:75%" name="FULL_SETS"
+                                        onchange="operatorImageOnChangeLM(this)">
+                                        <option value=NONE selected img="" smartpartnum=>NONE</option>
+                                        <option value=5-6501 img="5-6501 FullSet.jpg" smartpartnum=5-6501>Colonial 16" /
+                                            406mm and Lift - Cast (5-6501)
+                                        </option>
+                                        <option value=5-6502 img="5-6502 FullSet.jpg" smartpartnum=5-6502>Colonial 16" /
+                                            406mm and Pull - Cast (5-6502)
+                                        </option>
+                                        <option value=5-6503 img="5-6503 FullSet.jpg" smartpartnum=5-6503>Spade 16" /
+                                            406mm and Lift - Stamp (5-6503)
+                                        </option>
+                                        <option value=5-6504 img="5-6504 FullSet.jpg" smartpartnum=5-6504>Spade 16" /
+                                            406mm and Pull - Stamp (5-6504)
+                                        </option>
+                                        <option value=5-6505 img="5-6505 FullSet.jpg" smartpartnum=5-6505>Spade Narrow
+                                            16" / 406mm and Lift - Stamp (5-6505)
+                                        </option>
+                                        <option value=5-6506 img="5-6506 FullSet.jpg" smartpartnum=5-6506>Spade Narrow
+                                            16" / 406mm and Pull - Stamp (5-6506)
+                                        </option>
+                                        <option value=5-6507 img="5-6508 FullSet.jpg" smartpartnum=5-6507>Spade 24" /
+                                            610mm and Lift - Stamp (5-6507)
+                                        </option>
+                                        <option value=5-6508 img="5-6507 FullSet.jpg" smartpartnum=5-6508>Spade 24" /
+                                            610mm and Pull - Stamp (5-6508)
+                                        </option>
+                                        <option value=5-6509 img="5-6509 FullSet.jpg" smartpartnum=5-6509>Spade 30" /
+                                            762mm and Lift - Stamp (5-6509)
+                                        </option>
+                                        <option value=5-6510 img="5-6510 FullSet.jpg" smartpartnum=5-6510>Spade 30" /
+                                            762mm and Pull - Stamp (5-6510)
+                                        </option>
+                                        <option value=5-6511 img="5-6511 FullSet.jpg" smartpartnum=5-6511>Spear 16" /
+                                            406mm and Lift - Cast (5-6511)
+                                        </option>
+                                        <option value=5-6512 img="5-6512 FullSet.jpg" smartpartnum=5-6512>Spear 16" /
+                                            406mm and Pull - Cast (5-6512)
+                                        </option>
+                                        <option value=5-6513 img="5-6513 FullSet.jpg" smartpartnum=5-6513>Spear 16" /
+                                            406mm Assembly and Lift - Cast (5-6513)
+                                        </option>
+                                        <option value=5-6514 img="5-6514 FullSet.jpg" smartpartnum=5-6514>Spear 16" /
+                                            406mm Assembly and Pull - Cast (5-6514)
+                                        </option>
+                                        <option value=5-6515 img="5-6515 FullSet.jpg" smartpartnum=5-6515>Fleur-De-Lys
+                                            16" / 406mm and Lift - Cast (5-6515)
+                                        </option>
+                                        <option value=5-6516 img="5-6516 FullSet.jpg" smartpartnum=5-6516>Fleur-De-Lys
+                                            16" / 406mm and Pull - Cast (5-6516)
+                                        </option>
+
+                                    </select>
+                                </div>
+                                <div class="image-input-cell">
+                                    <h3 for="FULL_SETS_QTY" class="config-option-label-style">Qty</h3>
+                                    <select id="FULL_SETS_QTY" name="FULL_SETS_QTY" style="min-width: 50px;" disabled>
+                                        <option value="0" selected>0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Individual components card -->
+                        <div class="operator-accessory-card operator-accessory-card--multi decorative-hardware"
+                            id="INDIVIDIUAL_CARD" style="display:none">
+                            <!-- L Handle -->
+
+                            <div class="operator-accessory-row">
+
+                                <a href="" target="_blank" style="pointer-events:none;">
+
+                                    <div class="image-placeholder-container">
+
+                                        <img class="rw-image-input-img" id="L_HANDLE_IMAGE" />
+
+                                        <div class="no-image-message">
+                                            <span>No</span>
+                                            <span>Accessory</span>
+                                            <span>Selected</span>
+                                        </div>
+
+                                        <div class="overlay"></div>
+
+                                    </div>
+
+                                </a>
+
+                                <div class="horizontal-inputs horizontal-inputs--quantity">
+
+                                    <div class="image-input-cell">
+
+                                        <h3 class="config-option-label-style">
+                                            L Handle
+                                        </h3>
+
+                                        <select id="L_HANDLE" name="L_HANDLE" style="width:75%"
+                                            onchange="operatorImageOnChangeLM(this)">
+
+                                            <option value="NONE" selected>NONE</option>
+                                            <option value="324-425" img="324-425.jpg" smartpartnum="324-425">L-Handles
+                                                (K/D)</option>
+                                            <option value="324-423" img="324-423.jpg" smartpartnum="324-423">Spade
+                                                L-Handle (K/D)</option>
+                                            <option value="324-413" smartpartnum="324-413" img="324-413.jpg">
+                                                Fleur-De-Lys (D)</option>
+                                            <option value="324-416" smartpartnum="324-416" img="324-416.jpg">Long
+                                                L-Handle (D)</option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="image-input-cell">
+
+                                        <h3 class="config-option-label-style">
+                                            Qty
+                                        </h3>
+
+                                        <select id="L_HANDLE_QTY" name="L_HANDLE_QTY" disabled>
+
+                                            <option value="0" selected>0</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Handle -->
+                            <div class="operator-accessory-row">
+
+                                <a href="" target="_blank" style="pointer-events:none;">
+                                    <div class="image-placeholder-container">
+
+                                        <img class="rw-image-input-img" id="HANDLE_IMAGE" />
+
+                                        <div class="no-image-message">
+                                            <span>No</span>
+                                            <span>Accessory</span>
+                                            <span>Selected</span>
+                                        </div>
+
+                                        <div class="overlay"></div>
+
+                                    </div>
+                                </a>
+
+                                <div class="horizontal-inputs horizontal-inputs--quantity">
+
+                                    <div class="image-input-cell">
+
+                                        <h3 class="config-option-label-style">
+                                            Handle
+                                        </h3>
+
+                                        <select id="HANDLE" name="HANDLE" style="width:75%"
+                                            onchange="operatorImageOnChangeLM(this)">
+
+                                            <option value="NONE" selected>NONE</option>
+                                            <option value="324-417" smartpartnum="324-417"
+                                                img="324-417 Colonial-lift.jpg">Colonial Lift - Cast</option>
+                                            <option value="324-401" smartpartnum="324-401" img="324-401 FDL-Lift.jpg">
+                                                Fleur-De-Lys Lift - Cast</option>
+                                            <option value="324-402" smartpartnum="324-402" img="324-402 Spade-Lift.jpg">
+                                                Spade Lift - Stamp</option>
+                                            <option value="324-420" smartpartnum="324-420" img="324-420 Spear-Lift.jpg">
+                                                Spear Lift - Cast</option>
+                                            <option value="324-418" smartpartnum="324-418"
+                                                img="324-418 Colonial-Pull.jpg">Colonial Pull - Cast</option>
+                                            <option value="324-422" smartpartnum="324-422" img="324-422 FDL-Pull.jpg">
+                                                Fleur-De-Lys Pull - Cast</option>
+                                            <option value="324-403" smartpartnum="324-403" img="324-403 Spade-Pull.jpg">
+                                                Spade Pull - Stamp</option>
+                                            <option value="324-421" smartpartnum="324-421" img="324-421 Spear-Pull.jpg">
+                                                Spear Pull - Cast</option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="image-input-cell">
+
+                                        <h3 class="config-option-label-style">
+                                            Qty
+                                        </h3>
+
+                                        <select id="HANDLE_QTY" name="HANDLE_QTY" disabled>
+
+                                            <option value="0" selected>0</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Door Knockers -->
+                            <div class="operator-accessory-row">
+
+                                <a href="" target="_blank" style="pointer-events:none;">
+                                    <div class="image-placeholder-container">
+
+                                        <img class="rw-image-input-img" id="DOOR_KNOCKER_IMAGE" />
+
+                                        <div class="no-image-message">
+                                            <span>No</span>
+                                            <span>Accessory</span>
+                                            <span>Selected</span>
+                                        </div>
+
+                                        <div class="overlay"></div>
+
+                                    </div>
+                                </a>
+
+                                <div class="horizontal-inputs horizontal-inputs--quantity">
+
+                                    <div class="image-input-cell">
+
+                                        <h3 class="config-option-label-style">
+                                            Door Knowckers
+                                        </h3>
+
+                                        <select id="DOOR_KNOCKER" name="DOOR_KNOCKER"
+                                            onchange="operatorImageOnChangeLM(this)" style="width:75%">
+
+                                            <option value="NONE" selected>NONE</option>
+                                            <option value="324-404" img="324-404 Lion-Knocker.jpg"
+                                                smartpartnum="324-404">Lion Kit</option>
+                                            <option value="324-405" img="324-405 FDL-Knocker.jpg"
+                                                smartpartnum="324-405">Fleur-De-Lys Kit</option>
+                                        </select>
+
+                                    </div>
+
+                                    <div class="image-input-cell">
+
+                                        <h3 class="config-option-label-style">
+                                            Qty
+                                        </h3>
+
+                                        <select id="DOOR_KNOCKER_QTY" name="DOOR_KNOCKER_QTY" disabled>
+
+                                            <option value="0" selected>0</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- straps-->
+                            <div class="operator-accessory-row">
+
+                                <a href="" target="_blank" style="pointer-events:none;">
+                                    <div class="image-placeholder-container">
+
+                                        <img class="rw-image-input-img" id="STRAPS_IMAGE" />
+
+                                        <div class="no-image-message">
+                                            <span>No</span>
+                                            <span>Accessory</span>
+                                            <span>Selected</span>
+                                        </div>
+
+                                        <div class="overlay"></div>
+
+                                    </div>
+                                </a>
+
+                                <div class="horizontal-inputs horizontal-inputs--quantity">
+
+                                    <div class="image-input-cell">
+
+                                        <h3 class="config-option-label-style">
+                                            Straps
+                                        </h3>
+
+                                        <select id="STRAPS" name="STRAPS" style="width:75%"
+                                            onchange="operatorImageOnChangeLM(this)">
+
+                                            <option value="NONE" selected>NONE</option>
+                                            <option value="324-419" smartpartnum="324-419"
+                                                img="324-419 Colonial-Strap.jpg">Colonial 16" / 406mm</option>
+                                            <option value="324-408" smartpartnum="324-408"
+                                                img="324-408 Spade-Strap.jpg">Spade 16" / 406mm</option>
+                                            <option value="324-415" smartpartnum="324-415" img="324-415.jpg">Spade
+                                                Narrow 16" / 406mm</option>
+                                            <option value="324-410" smartpartnum="324-410" img="324-410.jpg">Spade 24" /
+                                                610mm</option>
+                                            <option value="324-409" smartpartnum="324-409" img="324-409.jpg">Spade 30" /
+                                                762mm</option>
+                                            <option value="324-407" smartpartnum="324-407"
+                                                img="324-407 Spear-Strap.jpg">Spear 16" / 406mm</option>
+                                            <option value="324-406" smartpartnum="324-406"
+                                                img="324-406 Spear-Hinge-Strap.jpg">Spear 16" / 406mm Assembly</option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="image-input-cell">
+
+                                        <h3 class="config-option-label-style">
+                                            Qty
+                                        </h3>
+
+                                        <select id="STRAPS_QTY" name="STRAPS_QTY" disabled>
+                                            <option value="0" selected>0</option>
+                                            <option value="2">2</option>
+                                            <option value="4">4</option>
+                                            <option value="6">6</option>
+                                            <option value="8">8</option>
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Door Studs and Gripper Screws -->
+                            <div class="operator-accessory-row">
+
+                                <div class="image-input-cell">
+                                    <h3 class="config-option-label-style">
+                                        Door Studs
+                                    </h3>
+
+                                    <div class="combined-button-container">
+                                        <div class="combined-button-container-inner">
+
+                                            <div class="rw-sliding-button selected">
+                                                <label for="DOOR_STUDS_NO">NO</label>
+                                                <input type="radio" id="DOOR_STUDS_NO" name="DOOR_STUDS" value="N"
+                                                    checked style="display:none;">
+                                            </div>
+
+                                            <div class="rw-sliding-button">
+                                                <label for="DOOR_STUDS_YES">YES</label>
+                                                <input type="radio" id="DOOR_STUDS_YES" name="DOOR_STUDS" value="Y"
+                                                    style="display:none;">
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="image-input-cell">
+                                    <h3 class="config-option-label-style">
+                                        Door Studs Qty
+                                    </h3>
+
+                                    <div class="quantity-field">
+                                        <button class="value-button decrease-button"
+                                            onclick="decreaseValue(this)">-</button>
+
+                                        <input type="number" class="number" id="DOOR_STUDS_QTY" value="0" min="0"
+                                            max="100" oninput="syncQuantityNode($(this), this.value)">
+
+                                        <button class="value-button increase-button"
+                                            onclick="increaseValue(this,100)">+</button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="operator-accessory-row">
+
+                                <div class="image-input-cell">
+                                    <h3 class="config-option-label-style">
+                                        Gripper Screws
+                                    </h3>
+
+                                    <div class="combined-button-container">
+                                        <div class="combined-button-container-inner">
+
+                                            <div class="rw-sliding-button selected">
+                                                <label for="GRIPPER_SCREWS_NO">NO</label>
+                                                <input type="radio" id="GRIPPER_SCREWS_NO" name="GRIPPER_SCREWS"
+                                                    value="N" checked style="display:none;">
+                                            </div>
+
+                                            <div class="rw-sliding-button">
+                                                <label for="GRIPPER_SCREWS_YES">YES</label>
+                                                <input type="radio" id="GRIPPER_SCREWS_YES" name="GRIPPER_SCREWS"
+                                                    value="Y" style="display:none;">
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Magnetic Sets-->
+                        <div class="operator-accessory-card decorative-hardware" id="MAGNETIC_SETS_CARD">
+                            <div class="horizontal-inputs horizontal-inputs--quantity">
+
+                                <div class="image-input-cell">
+                                    <h3 class="config-option-label-style">
+                                        Decorative Magnetic Set
+                                    </h3>
+
+                                    <select id="MAGNETIC_SET" name="MAGNETIC_SET" onchange="magneticSetOnChange(this)">
+                                        <option value="NONE" selected>NONE</option>
+                                        <option value="5-6517" smartpartnum="5-6517">Manor</option>
+                                        <option value="5-6518" smartpartnum="5-6518">Mission</option>
+                                    </select>
+                                </div>
+
+                                <div class="image-input-cell">
+                                    <h3 class="config-option-label-style">
+                                        Magnetic Set Qty
+                                    </h3>
+
+                                    <div class="quantity-field">
+                                        <button class="value-button decrease-button"
+                                            onclick="decreaseValue(this)">-</button>
+                                        <input type="number" class="number" id="MAGNETIC_SET_QTY" value="0" min="0"
+                                            max="10" oninput="syncQuantityNode($(this), this.value)">
+
+                                        <button class="value-button increase-button"
+                                            onclick="increaseValue(this, 10)">+</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
             </section>
 
 
@@ -1414,19 +2236,19 @@ function createForm() {
                         </div>
                     </button>
                 </div>
-                <div id="DEFAULTS_PLUGIN">                                
-                 <div class="defaults-plugin-container">
-                    <div onclick="saveDefaults()" class="defaults-button">
-                        <i class="far fa-bookmark"></i>
-                        <span>Save as Default</span>
-                    </div>
-                    
-                    <div id="LOAD_DEFAULTS" class="defaults-button" onclick = "applyDefaults()">
-                        <i class="fas fa-undo"></i>
-                        <span>Restore Default</span>
+                <div id="DEFAULTS_PLUGIN">
+                    <div class="defaults-plugin-container">
+                        <div onclick="saveDefaults()" class="defaults-button">
+                            <i class="far fa-bookmark"></i>
+                            <span>Save as Default</span>
+                        </div>
+
+                        <div id="LOAD_DEFAULTS" class="defaults-button" onclick="applyDefaults()">
+                            <i class="fas fa-undo"></i>
+                            <span>Restore Default</span>
+                        </div>
                     </div>
                 </div>
-            </div>
             </div>
         </div>
     </div>
@@ -1435,18 +2257,137 @@ function createForm() {
     return form;
 }
 
+function createProductSelectionScreen() {
+    const inputJsonValue = getInputJsonValue();
+
+    const html = `
+   <div id="PRODUCT_SELECTION_SCREEN">
+    
+    <div id="PRODUCT_SCREEN_LOADER" class="canvas-loader-backdrop">
+        <div class="canvas-loader"></div>
+    </div>
+
+    <div class="product-selection-header">
+        <h1>Select Product Type</h1>
+        <p>Choose how you would like to configure your product.</p>
+    </div>
+
+    <div class="product-selection-grid">
+
+        <div class="product-tile" data-value="COMPLETE_DOOR">
+
+            <div class="product-tile-image">
+                <i class="fas fa-garage"></i>
+            </div>
+
+            <div class="product-tile-content">
+                <h2>Complete Door</h2>
+                <p>Door, hardware and operator configuration.</p>
+            </div>
+
+        </div>
+
+        <div class="product-tile" data-value="ASSEMBLED_PANEL">
+
+            <div class="product-tile-image">
+                <i class="fas fa-layer-group"></i>
+            </div>
+
+            <div class="product-tile-content">
+                <h2>Assembled Panel</h2>
+                <p>Ready-to-assemble door sections.</p>
+            </div>
+
+        </div>
+
+        <div class="product-tile" data-value="RAW_PANEL">
+
+            <div class="product-tile-image">
+                <i class="fas fa-th-large"></i>
+            </div>
+
+            <div class="product-tile-content">
+                <h2>Raw Panel</h2>
+                <p>Panel components only.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>`
+
+    $("#configurator").before(html);
+
+    if (
+        !getInputJsonValue() ||
+        String(getInputJsonValue()).trim() === ""
+    ) {
+
+        $(".product-tile").css({
+            pointerEvents: "none"
+        });
+
+        setTimeout(function () {
+
+            $("#PRODUCT_SCREEN_LOADER").fadeOut(300);
+
+            $(".product-tile").css({
+                pointerEvents: "auto"
+            });
+
+        }, 3000);
+    }
+}
+
+// $(document)
+//     .off("click.productTile")
+//     .on("click.productTile", ".product-tile", function () {
+
+//         const productType = $(this).data("value");
+
+//         const productText = $(this)
+//             .find(".product-tile-content h2")
+//             .text()
+//             .trim();
+
+//         setState("PRODUCT_TYPE", {
+//             value: productType,
+//             text: productText
+//         });
+
+//         $("#PRODUCT_SELECTION_SCREEN")
+//             .addClass("screen-exit");
+
+//         setTimeout(() => {
+
+//             $("#PRODUCT_SELECTION_SCREEN").remove();
+
+//             $("#configurator")
+//                 .show()
+//                 .addClass("screen-enter");
+
+//             applyDefaults();
+
+//         }, 250);
+
+//     });
+
+
+
+
 function toggleAccordion() {
     //At least one input needs to be loaded in initially to get the title.
     $('#ROOT_0').hide()
     $("#accordion661524662").hide();//Hides TEST_UTIL
     $('#accordion935516314').hide(); // hide load_html page
-    $('#accordion991246024').hide(); //weight controller
-    //Hides the outputs
+    $('#accordion991246024').hide(); //weight controller    
     $('#accordion1406547076').hide()  //Hides the outputs
     $("#accordion1094153584").hide()//Hides the global data for JDE
-    $("#accordion9757245").hide() //section bundle
+    //  $("#accordion9757245").hide() //section bundle
     $("#accordion321627220").hide() //Glazing code
     $("#accordion1892755284").hide() //Scheduling code
+    $("#accordion51537489").hide(); //price_controller
 }
 
 // Update data list selection and update positioning
@@ -1498,17 +2439,25 @@ function populateCarousel() {
             setupRadioSelectionTwoButtons("EXTRA_TRUSS");
             setupRadioSelectionTwoButtons("SHAFT_TYPE");
             setupRadioSelectionTwoButtons("SPRING_CYCLE");
-            setupRadioSelectionTwoButtons("INCLINEDTRACK");
+            setupRadioSelectionTwoButtons("INCLINED_TRACK");
+            setupRadioSelectionTwoButtons("WINDOW_CUTOUTS");
+            setupRadioSelectionTwoButtons("NUM_OF_WINDOWS");
 
 
 
             function updatedColorSelection() {
-                $(".color-button-container").removeClass("selected");
-                $(".door-color-text").removeClass("selected");
-                const $selected = $("input[name='COLOR']:checked");
+                // FIXED LINE: Confine the clearing selectors context exclusively to the Door Colour parent section wrapper container.
+                // This stops the layout engine from accidentally wiping out classes on your Insert, Frame, or Jamb Seal choices.
+                const $doorColorSection = $(`div[data-id="COLOR"]`);
+
+                $doorColorSection.find(".color-button-container").removeClass("selected");
+                $doorColorSection.find(".door-color-text").removeClass("selected");
+
+                const $selected = $doorColorSection.find("input[name='COLOR']:checked");
                 $selected.closest(".color-button-container").addClass("selected");
                 $selected.siblings(".door-color-text").addClass("selected");
             }
+
 
             updatedColorSelection();
 
@@ -1845,29 +2794,6 @@ function updateCarouselPosition(index) {
     carousel.style.transform = `translateX(-${index * 100}%)`;
 }
 
-//162059085
-
-// function saveDefaults() {
-//     const defaults = {};
-//     Object.values(nodeset).forEach((node) => {
-//         if (node.id !== "SPC_BOM" && node.id !== "INPUT_JSON_1" && node.id !== "SPRING_SOLUTION" && !node.id.startsWith("GL_") && node.id !== "RENDER")
-//             defaults[node.id] = node.value;        
-//     });
-
-//     console.log("data", JSON.stringify(defaults))
-//     $.ajax({
-//         url: `/spr/custom/jpoc/json/849871261?162059085`,
-//         type: "POST",
-//         data: JSON.stringify(defaults),
-//         contentType: "application/json; charset=utf-8",
-//         error: function (err, textStatus, errorThrown) {
-//             console.log(err, textStatus, errorThrown);
-//             simpleConfirm("Error, new defaults not saved.");
-//         },
-//     }).done((res) => {
-//         simpleConfirm("New Defaults Saved");
-//     });
-// }
 
 function saveDefaults() {
 
@@ -1894,7 +2820,7 @@ function saveDefaults() {
         "GLASS_TEMPERED",
         "HARDWARE_SET",
         "SPRING_TYPE",
-        "INCLINEDTRACK",
+        "INCLINED_TRACK",
         "LIFT_TYPE",
         "SPRING_CYCLE",
         "HANGER_ANGLE",
@@ -1909,7 +2835,8 @@ function saveDefaults() {
         "DRILL",
         "END_CAPS",
         "EXTRA_TRUSS",
-        "SHAFT_TYPE"
+        "SHAFT_TYPE",
+        "JAMB_SEAL_COLOR"
     ]);
 
     const defaults = [];
@@ -1941,182 +2868,6 @@ function saveDefaults() {
             simpleConfirm("Error, new defaults not saved.");
         });
 }
-
-// function applyDefaults() {
-
-//     $.ajax({
-//         url: "/spr/custom/jpoc/json/849871261?162059085"
-//     })
-//         .done((res) => {
-
-//             console.log("RES:", res);
-
-//             let defaultValues = null;
-
-//             try {
-//                 if (typeof res === "string") {
-//                     res = JSON.parse(res);
-//                 }
-
-//                 if (res && typeof res === "object" && res.INPUT_SETTINGS) {
-//                     defaultValues = typeof res.INPUT_SETTINGS === "string"
-//                         ? JSON.parse(res.INPUT_SETTINGS)
-//                         : res.INPUT_SETTINGS;
-//                 } else if (res && typeof res === "object") {
-//                     defaultValues = res;
-//                 }
-//             } catch (e) {
-//                 console.error("Failed to parse INPUT_SETTINGS");
-//                 console.error(res && res.INPUT_SETTINGS ? res.INPUT_SETTINGS : res);
-//                 console.error(e);
-//                 return;
-//             }
-
-//             if (!defaultValues || typeof defaultValues !== "object") {
-//                 console.warn("No defaults found.");
-//                 return;
-//             }
-
-//             Object.keys(defaultValues).forEach((key) => {
-
-//                 if (!nodeset[key]) {
-//                     return;
-//                 }
-
-//                 const value = defaultValues[key];
-
-//                 if (nodeset[key].type === "RADIO_PARENT") {
-
-//                     $(`input[type=radio][name="${key}"]`)
-//                         .removeAttr("checked");
-
-//                     $(`input[type=radio][name="${key}"][value="${value}"]`)
-//                         .attr("checked", "");
-//                 }
-
-//                 nodeset[key].value = value;
-
-//                 const input = $("#" + key);
-
-//                 if (input.attr("type") !== "radio") {
-//                     input.val(value);
-//                 }
-//             });
-
-//             finalvalidation();
-
-//             $("input[type=radio][checked]").click();
-
-//             if (typeof saveInputValues === "function") {
-//                 saveInputValues("configurator");
-//             } else {
-//                 const json = [];
-//                 $(`#configurator input:not(.navigation-button), #configurator select`).each((index, input) => {
-//                     if (input.getAttribute("ignore") === "true") {
-//                         return;
-//                     }
-
-//                     const id = input.getAttribute("id");
-//                     if (!id || id === "INPUT_JSON" || id === "OUTPUT_JSON") {
-//                         return;
-//                     }
-
-//                     const value = input.getAttribute("type") === "radio"
-//                         ? input.hasAttribute("checked")
-//                         : input.value;
-
-//                     json.push({ id, value, desc: input.innerText ? input.innerText.trim() : "" });
-//                 });
-
-//                 setInputJsonValue(JSON.stringify(json));
-//             }
-
-//         })
-//         .fail((xhr) => {
-
-//             console.error("Apply Defaults Failed");
-//             console.error(xhr);
-
-//         });
-// }
-
-// function applyDefaults() {
-
-//     $.ajax({
-//         url: "/spr/custom/jpoc/json/849871261?162059085"
-//     })
-//     .done((res) => {
-
-//         if (!res || !res.INPUT_SETTINGS) {
-//             return;
-//         }
-
-//         const defaultValues = JSON.parse(res.INPUT_SETTINGS);
-//         console.log("defaultValues", defaultValues);
-
-//         if (!Array.isArray(defaultValues)) {
-//             console.error("INPUT_SETTINGS is not an array:", defaultValues);
-//             return;
-//         }
-
-//         defaultValues.forEach((node) => {
-
-//             if (!node || !node.id) {
-//                 return;
-//             }
-
-//             if (!nodeset[node.id]) {
-//                 console.warn(`Node not found: ${node.id}`);
-//                 return;
-//             }
-
-//             // Update nodeset value
-//             nodeset[node.id].value = node.value;
-
-//             // Handle radio groups
-//             if (nodeset[node.id].type === "RADIO_PARENT") {
-
-//                 $(`input[type="radio"][name="${node.id}"]`)
-//                     .prop("checked", false);
-
-//                 $(`input[type="radio"][name="${node.id}"][value="${node.value}"]`)
-//                     .prop("checked", true);
-
-//                 return;
-//             }
-
-//             const $input = $("#" + node.id);
-
-//             if (!$input.length) {
-//                 return;
-//             }
-
-//             // Handle checkboxes
-//             if ($input.attr("type") === "checkbox") {
-
-//                 $input.prop(
-//                     "checked",
-//                     node.value === true ||
-//                     node.value === "true" ||
-//                     node.value === 1 ||
-//                     node.value === "1"
-//                 );
-
-//                 return;
-//             }
-
-//             // Everything else
-//             $input.val(node.value);
-//         });
-
-//         finalvalidation();
-
-//         $('input[type="radio"]:checked').trigger("click");
-//     })
-//     .fail((res) => {
-//         console.log(res);
-//     });
-// }
 
 function applyDefaults() {
 
@@ -2152,7 +2903,8 @@ function applyDefaults() {
                 if (
                     node.id === "COLOR" ||
                     node.id === "FRAME_COLOR" ||
-                    node.id === "INSERT_COLOR"
+                    node.id === "INSERT_COLOR" ||
+                    node.id === "JAMB_SEAL_COLOR"
                 ) {
                     nodeset[node.id].value = node.value;
                     return;
@@ -2242,7 +2994,7 @@ function applyDefaults() {
                 }
 
                 // Restore COLOR, FRAME_COLOR, INSERT_COLOR
-                ["COLOR", "FRAME_COLOR", "INSERT_COLOR"].forEach(id => {
+                ["COLOR", "FRAME_COLOR", "INSERT_COLOR", "JAMB_SEAL_COLOR"].forEach(id => {
 
                     const colorDefault = defaultValues.find(x => x.id === id);
 
@@ -2279,7 +3031,18 @@ function applyDefaults() {
 
                 finalvalidation();
 
-                $('input[type="radio"]:checked').trigger("click");
+                // $('input[type="radio"]:checked').trigger("click");
+                $('input[type="radio"]:checked').each(function () {
+
+                    $(this)
+                        .closest('.rw-button')
+                        .addClass('btn-checked');
+
+                    $(this)
+                        .closest('.rw-sliding-button')
+                        .addClass('selected btn-checked');
+
+                });
 
             }, 50);
 
@@ -2329,7 +3092,6 @@ function clickHandler() {
     $("input[type='radio']")
         .not("input[name='AVAILABLE_COLOR'], input[name='OPTIONAL_COLOR']")
         .on("click", function (e) {
-
             const group = e.target.name;
 
             // Remove active class + unchecked
@@ -2380,7 +3142,11 @@ function clickHandler() {
 
             const panel_style = this.value;
 
-            appendOptionalColors(panel_style);
+            // appendOptionalColors(panel_style);
+            appendOptionalColors(
+                panel_style,
+                $("input[name='GLASS_SHAPE']:checked").val() || ""
+            );
 
             // re-select first color after render
             requestAnimationFrame(() => {
@@ -2389,72 +3155,277 @@ function clickHandler() {
             });
         });
 
-    $(document)
-        .off("click.colorSelect")
-        .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
-            const $container = $(this).closest(".colorContainer");
-            $container.find(".color-button-container").removeClass("selected");
-            $(this).addClass("selected");
-            $container.find("input[name='COLOR']").prop("checked", false);
-            $(this).find("input[name='COLOR']").prop("checked", true).trigger("change");
+    // $(document)
+    //     .off("click.colorSelect")
+    //     .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
+    //         const $container = $(this).closest(".colorContainer");
+    //         $container.find(".color-button-container").removeClass("selected");
+    //         $(this).addClass("selected");
 
-            const color = $(this).find("input[name='COLOR']").val();
-            //setState && setState("COLOR", color);
+    //         $container.find("input[name='COLOR']").prop("checked", false);
+    //         $(this).find("input[name='COLOR']").prop("checked", true).trigger("change");
 
-            frameColorUserOverride = false;
-            insertColorUserOverride = false;
+    //         const color = $(this).find("input[name='COLOR']").val();
+    //         //setState && setState("COLOR", color);
 
-            rw(getNode("COLOR"));
-            rw(getNode("FRAME_COLOR"));
-            rw(getNode("INSERT_COLOR"));
+    //         frameColorUserOverride = false;
+    //         insertColorUserOverride = false;
+    //         jambSealColorUserOverride = false;
 
-            // ── Sync selected class to new door color ──
-            requestAnimationFrame(() => {
-                [
-                    $("#AvailableFrameColorsSection .colorContainer"),
-                    $("#OptionalFrameColorsSection .colorContainer"),
-                    $("#AvailableInsertColorsSection .colorContainer"),
-                    $("#OptionalInsertColorsSection .colorContainer")
-                ].forEach($c => {
-                    $c.find(".color-button-container").removeClass("selected");
-                    $c.find("input[type='radio']").prop("checked", false);
+    //         rw(getNode("COLOR"));
+    //         rw(getNode("FRAME_COLOR"));
+    //         rw(getNode("INSERT_COLOR"));
+    //         rw(getNode("JAMB_SEAL_COLOR"));
 
-                    const $match = $c.find(`input[type='radio'][value="${color}"]`)
-                        .closest(".color-button-container");
+    //         // ── Sync selected class to new door color ──
+    //         requestAnimationFrame(() => {
+    //             [
+    //                 $("#AvailableFrameColorsSection .colorContainer"),
+    //                 $("#OptionalFrameColorsSection .colorContainer"),
+    //                 $("#AvailableInsertColorsSection .colorContainer"),
+    //                 $("#OptionalInsertColorsSection .colorContainer"),
+    //                 $("#AvailableJambSealColorsSection .colorContainer"),
+    //                 $("#OptionalJambSealColorsSection .colorContainer")
+    //             ].forEach($c => {
+    //                 $c.find(".color-button-container").removeClass("selected");
+    //                 $c.find("input[type='radio']").prop("checked", false);
 
-                    if ($match.length) {
-                        $match.addClass("selected");
-                        $match.find("input[type='radio']").prop("checked", true);
-                    }
-                });
-            });
-        });
+    //                 const $match = $c.find(`input[type='radio'][value="${color}"]`)
+    //                     .closest(".color-button-container");
 
+    //                 if ($match.length) {
+    //                     $match.addClass("selected");
+    //                     $match.find("input[type='radio']").prop("checked", true);
+    //                 }
+    //             });
+    //         });
+    //     });
+
+
+    // $(document)
+    //     .off("click.colorSelect")
+    //     .on("click.colorSelect", `.colorsSection .color-button-container`, function () {
+
+    //         const $container = $(this).closest(".colorContainer");            
+    //         $container.find(".color-button-container").removeClass("selected");
+    //         $(this).addClass("selected");
+
+    //         const inputName = $(this).find("input[type='radio']").attr("name") || "COLOR";
+
+    //         // If the user is specifically picking the primary door color, run the synchronization tree loops
+    //         if (inputName === "COLOR") {
+    //             $container.find("input[name='COLOR']").prop("checked", false).removeAttr("checked");
+    //             $(this).find("input[name='COLOR']").prop("checked", true).attr("checked", "checked").trigger("change");
+
+    //             const color = $(this).find("input[name='COLOR']").val();
+
+    //             frameColorUserOverride = false;
+    //             insertColorUserOverride = false;
+    //             jambSealColorUserOverride = false;
+
+    //             rw(getNode("COLOR"));
+    //             rw(getNode("FRAME_COLOR"));
+    //             rw(getNode("INSERT_COLOR"));
+    //             rw(getNode("JAMB_SEAL_COLOR"));
+
+    //             // Sync sister color highlighted wrapper rings natively
+    //             requestAnimationFrame(() => {
+    //                 [
+    //                     $("#AvailableFrameColorsSection .colorContainer"),
+    //                     $("#OptionalFrameColorsSection .colorContainer"),
+    //                     $("#AvailableInsertColorsSection .colorContainer"),
+    //                     $("#OptionalInsertColorsSection .colorContainer"),
+    //                     $("#AvailableJambSealColorsSection .colorContainer"),
+    //                     $("#OptionalJambSealColorsSection .colorContainer")
+    //                 ].forEach($c => {
+    //                     $c.find(".color-button-container").removeClass("selected");
+    //                     $c.find("input[type='radio']").prop("checked", false);
+
+    //                     const $match = $c.find(`input[type='radio'][value="${color}"]`)
+    //                         .closest(".color-button-container");
+
+    //                     if ($match.length) {
+    //                         $match.addClass("selected");
+    //                         $match.find("input[type='radio']").prop("checked", true);
+    //                     }
+    //                 });
+    //             });
+    //         }
+    //     });
 
     // FRAME color — user explicitly picked, set override
-    $('#FRAME_COLOR').on('click', '.color-button-container', function () {
-        const color = $(this).find(`input[type='radio']`).val();
 
-        const color_info = [
-            ...AvailableColorImages,
-            ...OptionalColorImages,
-            SilverColor
-        ].find(c => c.value == color);
-        if (!color_info) return;
+    $(document)
+        .off("click.colorSelect")
+        .on(
+            "click.colorSelect",
+            ".colorsSection .color-button-container",
+            function () {
+
+                const inputName =
+                    $(this)
+                        .find("input[type='radio']")
+                        .attr("name") || "COLOR";
+
+                // COLOR selection
+                if (inputName === "COLOR") {
+
+                    // Remove ALL color selections first
+                    $(".colorsSection .color-button-container")
+                        .removeClass("selected");
+
+                    $("input[name='COLOR']")
+                        .prop("checked", false)
+                        .removeAttr("checked");
+
+                    // Select clicked color
+                    $(this)
+                        .addClass("selected");
+
+                    $(this)
+                        .find("input[name='COLOR']")
+                        .prop("checked", true)
+                        .attr("checked", "checked")
+                        .trigger("change");
+
+                    const color =
+                        $(this)
+                            .find("input[name='COLOR']")
+                            .val();
+
+                    frameColorUserOverride = false;
+                    insertColorUserOverride = false;
+                    jambSealColorUserOverride = false;
+
+                    rw(getNode("COLOR"));
+                    rw(getNode("FRAME_COLOR"));
+                    rw(getNode("INSERT_COLOR"));
+                    rw(getNode("JAMB_SEAL_COLOR"));
+
+                    // Sync corresponding selections
+                    requestAnimationFrame(() => {
+
+                        [
+                            $("#AvailableFrameColorsSection .colorContainer"),
+                            $("#OptionalFrameColorsSection .colorContainer"),
+                            $("#AvailableInsertColorsSection .colorContainer"),
+                            $("#OptionalInsertColorsSection .colorContainer"),
+                            $("#AvailableJambSealColorsSection .colorContainer"),
+                            $("#OptionalJambSealColorsSection .colorContainer")
+                        ].forEach($c => {
+
+                            $c.find(".color-button-container")
+                                .removeClass("selected");
+
+                            $c.find("input[type='radio']")
+                                .prop("checked", false);
+
+                            const $match =
+                                $c.find(
+                                    `input[type='radio'][value="${color}"]`
+                                )
+                                    .closest(".color-button-container");
+
+                            if ($match.length) {
+
+                                $match.addClass("selected");
+
+                                $match.find("input[type='radio']")
+                                    .prop("checked", true)
+                                    .attr("checked", "checked");
+                            }
+                        });
+                    });
+                }
+            }
+        );
+
+    $('#FRAME_COLOR').on('click', '.color-button-container', function () {
+
+        const color =
+            $(this)
+                .find('input[type="radio"]')
+                .val();
+
+        const color_info =
+            [
+                ...AvailableColorImages,
+                ...OptionalColorImages,
+                SilverColor
+            ].find(c => c.value == color);
+
+        if (!color_info) {
+            return;
+        }
 
         frameColorUserOverride = true;
+
         setState("FRAME_COLOR", color_info);
+
+        $("#AvailableFrameColorsSection .color-button-container, " +
+            "#OptionalFrameColorsSection .color-button-container")
+            .removeClass("selected");
+
+        $(`input[name='FRAME_COLOR']`)
+            .prop("checked", false);
+
+        $(`input[name='FRAME_COLOR'][value='${color}']`)
+            .prop("checked", true)
+            .closest(".color-button-container")
+            .addClass("selected");
     });
 
-    // INSERT color — user explicitly picked, set override
+
+    // INSERT color — user explicitly picked, set override  
     $('#INSERT_COLOR').on('click', '.color-button-container', function () {
+
+        const color =
+            $(this)
+                .find('input[type="radio"]')
+                .val();
+
+        const color_info =
+            [...AvailableColorImages, ...OptionalColorImages]
+                .find(c => c.value == color);
+
+        if (!color_info) {
+            return;
+        }
+
+        insertColorUserOverride = true;
+
+        setState("INSERT_COLOR", color_info);
+
+        $("#AvailableInsertColorsSection .color-button-container, " +
+            "#OptionalInsertColorsSection .color-button-container")
+            .removeClass("selected");
+
+        $(`input[name='INSERT_COLOR']`)
+            .prop("checked", false);
+
+        $(`input[name='INSERT_COLOR'][value='${color}']`)
+            .prop("checked", true)
+            .closest(".color-button-container")
+            .addClass("selected");
+    });
+
+
+    // JAMB SEAL color — user explicitly picked, set override
+    $('#JAMB_SEAL_COLOR').on('click', '.color-button-container', function () {
         const color = $(this).find(`input[type='radio']`).val();
         const color_info = [...AvailableColorImages, ...OptionalColorImages]
             .find(c => c.value == color);
         if (!color_info) return;
 
-        insertColorUserOverride = true;
-        setState("INSERT_COLOR", color_info);
+        jambSealColorUserOverride = true;
+        setState("JAMB_SEAL_COLOR", color_info);
+        $("#AvailableJambSealColorsSection .color-button-container, " + "#OptionalJambSealColorsSection .color-button-container")
+            .removeClass("selected");
+        $(`input[name='JAMB_SEAL_COLOR']`).prop("checked", false);
+        $(`input[name='JAMB_SEAL_COLOR'][value='${color}']`)
+            .prop("checked", true)
+            .closest(".color-button-container")
+            .addClass("selected");
     });
 
     // DOOR OPTION
@@ -2480,22 +3451,94 @@ function clickHandler() {
             $selected.closest(".rw-sliding-button").addClass("selected");
         });
 
+    // --- FIXED GLASS SHAPE LOOKUP BLOCK ---
+    // If we have an existing configuration payload coming from input_json, we initialize 
+    // the target data pointers on page load to completely prevent automated validation resets.
+    // const savedInputsString = getInputJsonValue();
+    // if (savedInputsString !== '') {
+    //     try {
+    //         const savedArr = JSON.parse(savedInputsString);
+    //         const savedShapeObj = savedArr.find(x => x && x.id === "GLASS_SHAPE");
+    //         if (savedShapeObj && savedShapeObj.value) {
+    //             const $savedRadio = $(`input[name="GLASS_SHAPE"][value="${savedShapeObj.value}"]`);
+    //             if ($savedRadio.length) {
+    //                 $('input[name="GLASS_SHAPE"]').prop('checked', false).data('checked', false);
+    //                 $savedRadio.prop('checked', true).data('checked', true);
+    //                 $savedRadio.parent().addClass("btn-checked selected");
+    //                 setState("GLASS_SHAPE", savedShapeObj.value);
+    //             }
+    //         }
+    //     } catch (err) {
+    //         console.error("Failed to parse saved inputs inside clickHandler pass:", err);
+    //     }
+    // }
 
     //select and deselect the glass inputs on glazing tab
+
     $('input[name="GLASS_SHAPE"]').on('click', function () {
 
-        if ($(this).data('checked')) {
+        console.log("glass shape value", $(this).val());
+
+        //if ($(this).data('checked')) {
+        if (
+            $(this).data('checked') &&
+            window.isRestoringInputs !== true
+        ) {
             $(this).prop('checked', false);
             $(this).data('checked', false);
             $(this).parent().removeClass("btn-checked");
             setState("GLASS_SHAPE", '');
+
+            appendOptionalColors(
+                $('input[name="FACE"]:checked').val(),
+                ""
+            );
+
         } else {
             $('input[name="GLASS_SHAPE"]').data('checked', false);
             $(this).data('checked', true);
             $(this).prop('checked', true);
             $(this).parent().addClass("btn-checked");
-            setState("GLASS_SHAPE", $(this).val());
+            const selectedGlassShape = $(this).val();
+
+            setState("GLASS_SHAPE", selectedGlassShape);
+
+            // Polar White is not allowed on Slim.
+            // Automatically switch back to White.
+            if (selectedGlassShape.includes("slim")) {
+
+                const selectedColor =
+                    $("input[name='COLOR']:checked").val();
+
+                if (selectedColor === "R") {
+
+                    $(".colorsSection .color-button-container")
+                        .removeClass("selected");
+
+                    $("input[name='COLOR']")
+                        .prop("checked", false)
+                        .removeAttr("checked");
+
+                    const $white =
+                        $("input[name='COLOR'][value='W']");
+
+                    $white
+                        .prop("checked", true)
+                        .attr("checked", "checked")
+                        .closest(".color-button-container")
+                        .addClass("selected");
+
+                    rw(getNode("COLOR"));
+                }
+            }
+
+            appendOptionalColors(
+                $('input[name="FACE"]:checked').val(),
+                selectedGlassShape
+            );
         }
+
+
     });
 
     // Glass type
@@ -2525,68 +3568,232 @@ function clickHandler() {
 
     //select and deselect the hardware set inputs on hardware tab
     // Initialize currently checked item
-    $('input[name="HARDWARE_SET"]:checked')
-        .data('checked', true)
-        .closest('.rw-button')
-        .addClass('btn-checked');
+    // $('input[name="HARDWARE_SET"]:checked')
+    //     .data('checked', true)
+    //     .closest('.rw-button')
+    //     .addClass('btn-checked');
 
-    $('input[name="HARDWARE_SET"]')
-        .off('click.hardwareSet')
-        .on('click.hardwareSet', function (e) {
+    // $('input[name="HARDWARE_SET"]')
+    //     .off('click.hardwareSet')
+    //     .on('click.hardwareSet', function (e) {
 
-            const wasChecked = $(this).data('checked') === true;
+    //         const wasChecked = $(this).data('checked') === true;
+
+    //         e.preventDefault();
+
+    //         if (wasChecked) {
+
+    //             // Deselect current selection
+    //             $(this)
+    //                 .prop('checked', false)
+    //                 .removeAttr('checked')
+    //                 .data('checked', false);
+
+    //             $(this)
+    //                 .closest('.rw-button')
+    //                 .removeClass('btn-checked');
+
+    //             setState("HARDWARE_SET", '');
+
+    //             // hide commercial-only UI if needed
+    //             $(".inclined-track").hide();
+
+    //         } else {
+
+    //             // Clear all others
+    //             $('input[name="HARDWARE_SET"]')
+    //                 .prop('checked', false)
+    //                 .removeAttr('checked')
+    //                 .data('checked', false)
+    //                 .closest('.rw-button')
+    //                 .removeClass('btn-checked');
+
+    //             // Select clicked one
+    //             $(this)
+    //                 .prop('checked', true)
+    //                 .attr('checked', 'checked')
+    //                 .data('checked', true);
+
+    //             $(this)
+    //                 .closest('.rw-button')
+    //                 .addClass('btn-checked');
+
+    //             setState("HARDWARE_SET", $(this).val());
+
+    //             // Commercial logic
+    //             if ($(this).val() === "C") {
+    //                 $(".inclined-track").show();
+    //             } else {
+    //                 $(".inclined-track").hide();
+    //             }
+    //         }
+    //     });
+
+
+    // //select and deselect the snap latch input
+    // $('input[name="SNAP_LATCH_OPTION"]:checked')
+    //     .data('checked', true)
+    //     .closest('.rw-button')
+    //     .addClass('btn-checked');
+
+    // $('input[name="SNAP_LATCH_OPTION"]')
+    //     .off('click.snapLatch')
+    //     .on('click.snapLatch', function (e) {
+
+    //         const wasChecked =
+    //             $(this).data('checked') === true;
+
+    //         e.preventDefault();
+
+    //         if (wasChecked) {
+
+    //             $(this)
+    //                 .prop('checked', false)
+    //                 .removeAttr('checked')
+    //                 .data('checked', false);
+
+    //             $(this)
+    //                 .closest('.rw-button')
+    //                 .removeClass('btn-checked');
+
+    //             setState("SNAP_LATCH_OPTION", "");
+
+    //         } else {
+
+    //             $('input[name="SNAP_LATCH_OPTION"]')
+    //                 .prop('checked', false)
+    //                 .removeAttr('checked')
+    //                 .data('checked', false)
+    //                 .closest('.rw-button')
+    //                 .removeClass('btn-checked');
+
+    //             $(this)
+    //                 .prop('checked', true)
+    //                 .attr('checked', 'checked')
+    //                 .data('checked', true);
+
+    //             $(this)
+    //                 .closest('.rw-button')
+    //                 .addClass('btn-checked');
+
+    //             setState(
+    //                 "SNAP_LATCH_OPTION",
+    //                 $(this).val()
+    //             );
+    //         }
+    //     });
+    setupToggleRadioGroup(
+        "HARDWARE_SET"
+    );
+
+    setupToggleRadioGroup(
+        "SNAP_LATCH_OPTION"
+    );
+
+    setupToggleRadioGroup(
+        "DEC_HARDWARE"
+    );
+
+    setupToggleRadioGroup(
+        "OPERATOR_BRACKET_MOUNT"
+    );
+
+    $(document)
+        .off("click.productTile")
+        .on("click.productTile", ".product-tile", function () {
+
+            const productType = $(this).data("value");
+
+            const productText = $(this)
+                .find(".product-tile-content h2")
+                .text()
+                .trim();
+
+            $("#PRODUCT_SELECTION_SCREEN")
+                .addClass("screen-exit");
+
+            setTimeout(() => {
+
+                $("#PRODUCT_SELECTION_SCREEN").remove();
+
+                $("#configurator").show();
+
+                setTimeout(() => {
+
+                    setState("PRODUCT_TYPE", {
+                        value: productType,
+                        text: productText
+                    });
+
+                    applyDefaults();
+
+                }, 0);
+
+            }, 250);
+
+        });
+}
+
+function setupToggleRadioGroup(
+    groupName,
+    stateKey = groupName,
+    selectedClass = "btn-checked"
+) {
+
+    $(`input[name="${groupName}"]:checked`)
+        .data("checked", true)
+        .closest(".rw-button")
+        .addClass(selectedClass);
+
+    $(`input[name="${groupName}"]`)
+        .off(`click.${groupName}`)
+        .on(`click.${groupName}`, function (e) {
+
+            const wasChecked =
+                $(this).data("checked") === true;
 
             e.preventDefault();
 
             if (wasChecked) {
 
-                // Deselect current selection
                 $(this)
-                    .prop('checked', false)
-                    .removeAttr('checked')
-                    .data('checked', false);
-
-                $(this)
-                    .closest('.rw-button')
-                    .removeClass('btn-checked');
-
-                setState("HARDWARE_SET", '');
-
-                // hide commercial-only UI if needed
-                $(".inclined-track").hide();
-
-            } else {
-
-                // Clear all others
-                $('input[name="HARDWARE_SET"]')
-                    .prop('checked', false)
-                    .removeAttr('checked')
-                    .data('checked', false)
-                    .closest('.rw-button')
-                    .removeClass('btn-checked');
-
-                // Select clicked one
-                $(this)
-                    .prop('checked', true)
-                    .attr('checked', 'checked')
-                    .data('checked', true);
+                    .prop("checked", false)
+                    .removeAttr("checked")
+                    .data("checked", false);
 
                 $(this)
-                    .closest('.rw-button')
-                    .addClass('btn-checked');
+                    .closest(".rw-button")
+                    .removeClass(selectedClass);
 
-                setState("HARDWARE_SET", $(this).val());
+                setState(stateKey, "");
 
-                // Commercial logic
-                if ($(this).val() === "C") {
-                    $(".inclined-track").show();
-                } else {
-                    $(".inclined-track").hide();
-                }
+                return;
             }
-        });
 
+            $(`input[name="${groupName}"]`)
+                .prop("checked", false)
+                .removeAttr("checked")
+                .data("checked", false)
+                .closest(".rw-button")
+                .removeClass(selectedClass);
+
+            $(this)
+                .prop("checked", true)
+                .attr("checked", "checked")
+                .data("checked", true);
+
+            $(this)
+                .closest(".rw-button")
+                .addClass(selectedClass);
+
+            setState(
+                stateKey,
+                $(this).val()
+            );
+        });
 }
+
+
 
 function selectFirstColor($container) {
 
@@ -2638,12 +3845,14 @@ function appendOverlappingColors() {
 
     // Append each image
     optionalimagesToShow.forEach((imgSrc, index) => {
-        const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
+        // const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
+        const html = `<div class="color-${imgSrc.desc} color-image stacked-optional-img" style="background: ${imgSrc.hex}">`
         $optionalfieldset.append(html);
     });
 
     AvailableimagesToShow.forEach((imgSrc, index) => {
-        const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
+        // const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
+        const html = `<div class="color-${imgSrc.desc} color-image stacked-optional-img" style="background: ${imgSrc.hex}">`
         $availablefieldset.append(html);
     });
 }
@@ -2652,20 +3861,23 @@ function appendAvailableColorsTo(containerSelector) {
     const $container = $(containerSelector + " .colorContainer");
     $container.empty();
 
+    // <img src="${src_path + imgSrc.url}" class="color-image" /> 
     AvailableColorImages.forEach((imgSrc) => {
         const html = `
       <div class="color-button-container">
         <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
-          <img src="${src_path + imgSrc.url}" class="color-image" />
-          <input
-            type="radio"
-            name="COLOR"
-            value="${imgSrc.value}"
-            hex="${imgSrc.hex}"
-            desc="${imgSrc.desc}"
-            colorName="${imgSrc.colorName}"
-            style="display:none"
-          />
+         
+        <div class="color-${imgSrc.desc} color-image" style="background: ${imgSrc.hex}">
+            <input
+                type="radio"
+                name="COLOR"
+                value="${imgSrc.value}"
+                hex="${imgSrc.hex}"
+                desc="${imgSrc.desc}"
+                colorName="${imgSrc.colorName}"
+                style="display:none"
+            />
+          </div>
         </div>
       </div>
     `;
@@ -2677,7 +3889,12 @@ function appendAvailableColorsTo(containerSelector) {
 }
 
 
-function appendColorsTo(containerSelector, colorArray, panel_style = null) {
+function appendColorsTo(
+    containerSelector,
+    colorArray,
+    panel_style = null,
+    glass_shape = ""
+) {
 
     const $container = $(containerSelector + " .colorContainer");
     $container.empty();
@@ -2697,10 +3914,23 @@ function appendColorsTo(containerSelector, colorArray, panel_style = null) {
                 }
 
                 // Remove restricted colors
+                // if (
+                //     (panel_style === "F" || panel_style === "T") &&
+                //     item.restricted 
+                // ) {
+                //     return false;
+                // }
+
+                //remove polar white for raynor
+                //slim and Recessed grooved colonial - not available
                 if (
-                    (panel_style === "F" || panel_style === "T") &&
-                    item.restricted
+                    item.colorName === "Polar White" &&
+                    (
+                        panel_style === "B" ||
+                        glass_shape.includes("slim")
+                    )
                 ) {
+
                     return false;
                 }
 
@@ -2709,19 +3939,22 @@ function appendColorsTo(containerSelector, colorArray, panel_style = null) {
     }
 
     filteredColors.forEach(imgSrc => {
+        // <img src="${src_path + imgSrc.url}" class="color-image" />
         const html = `
       <div class="color-button-container">
         <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
-          <img src="${src_path + imgSrc.url}" class="color-image" />
-          <input
-            type="radio"
-            name="COLOR"
-            value="${imgSrc.value}"
-            hex="${imgSrc.hex}"
-            desc="${imgSrc.desc}"
-            colorName="${imgSrc.colorName}"
-            style="display:none"
-          />
+         
+          <div class="color-${imgSrc.desc} color-image" style="background: ${imgSrc.hex}">
+            <input
+                type="radio"
+                name="COLOR"
+                value="${imgSrc.value}"
+                hex="${imgSrc.hex}"
+                desc="${imgSrc.desc}"
+                colorName="${imgSrc.colorName}"
+                style="display:none"
+            />
+            </div>
         </div>
       </div>
     `;
@@ -2730,30 +3963,20 @@ function appendColorsTo(containerSelector, colorArray, panel_style = null) {
     });
 
     registerColorEvents();
-    // 🔥 IMPORTANT FIX: re-select AFTER filtering
     // requestAnimationFrame(() => {
     //     selectFirstColor($container);
     // });
 }
 
-function appendOptionalColors(panel_style) {
-    appendColorsTo("#OptionalColorsSection", OptionalColorImages, panel_style);
+function appendOptionalColors(panel_style, glass_shape = "") {
+    appendColorsTo(
+        "#OptionalColorsSection",
+        OptionalColorImages,
+        panel_style,
+        glass_shape
+    );
 }
 
-// function registerColorEvents() {
-//     $(document).on("click", ".color-button-container", function () {
-//         const $container = $(this).closest(".colorContainer");
-
-//         // ── Scope to THIS container only, not all color buttons globally ──
-//         $container.find(".color-button-container").removeClass("selected");
-//         $(this).addClass("selected");
-
-//         const inputName = $(this).find("input[type='radio']").attr("name");
-
-//         $container.find(`input[type='radio'][name='${inputName}']`).prop("checked", false);
-//         $(this).find(`input[type='radio']`).prop("checked", true).trigger("change");
-//     });
-// }
 
 function registerColorEvents() {
     $(document)
@@ -2859,6 +4082,17 @@ function toggleStackColors() {
     });
 
 
+    $("#optionalStackJambSealColors").on("click", function () {
+        setTimeout(animateTransition, 20);
+        hideStack($("#optionalStackJambSealColors"));
+        showContainer($("#OptionalJambSealColorsSection .colorContainer"));
+        hideContainer($("#AvailableJambSealColorsSection .colorContainer"));
+        showStack($("#availableStackJambSealColors"));
+        registerColorEvents();
+        // rw(getNode("COLOR"))
+    });
+
+
 
     $("#availableStackColors").on("click", function () {
 
@@ -2899,6 +4133,17 @@ function toggleStackColors() {
         showContainer($("#AvailableInsertColorsSection .colorContainer"));
         hideContainer($("#OptionalInsertColorsSection .colorContainer"));
         showStack($("#optionalStackInsertColors"));
+        registerColorEvents();
+        // rw(getNode("COLOR"))
+
+    });
+
+    $("#availableStackJambSealColors").on("click", function () {
+        setTimeout(animateTransition, 20);
+        hideStack($("#availableStackJambSealColors"));
+        showContainer($("#AvailableJambSealColorsSection .colorContainer"));
+        hideContainer($("#OptionalJambSealColorsSection .colorContainer"));
+        showStack($("#optionalStackJambSealColors"));
         registerColorEvents();
         // rw(getNode("COLOR"))
 
@@ -3123,29 +4368,80 @@ function getCounterVal(toggle_Switch) {
 }
 
 
-function increaseValue(button, limit) {
-    const $num = $(button).closest('.quantity-field').find('.number');
-    let value = parseInt($num.text(), 10);
+// function increaseValue(button, limit) {
+//     const $num = $(button).closest('.quantity-field').find('.number');
+//     let value = parseInt($num.text(), 10);
 
-    if (isNaN(value)) value = 0;
-    if (limit && value >= limit) return;
+//     if (isNaN(value)) value = 0;
+//     if (limit && value >= limit) return;
+
+//     const nextValue = value + 1;
+//     $num.text(nextValue);
+//     syncQuantityNode($num, nextValue);
+// }
+
+// function decreaseValue(button) {
+//     const $num = $(button).closest('.quantity-field').find('.number');
+//     let value = parseInt($num.text(), 10);
+
+//     if (isNaN(value)) value = 0;
+//     if (value < 1) return;
+
+//     const nextValue = value - 1;
+//     $num.text(nextValue);
+//     syncQuantityNode($num, nextValue);
+// }
+
+function increaseValue(button, limit) {
+
+    const $num = $(button)
+        .closest('.quantity-field')
+        .find('.number');
+
+    let value = Number($num.val());
+
+    if (!Number.isFinite(value)) {
+        value = 0;
+    }
+
+    value = Math.floor(value);
+
+    if (limit && value >= limit) {
+        return;
+    }
 
     const nextValue = value + 1;
-    $num.text(nextValue);
+
+    $num.val(nextValue);
+
     syncQuantityNode($num, nextValue);
 }
 
 function decreaseValue(button) {
-    const $num = $(button).closest('.quantity-field').find('.number');
-    let value = parseInt($num.text(), 10);
 
-    if (isNaN(value)) value = 0;
-    if (value < 1) return;
+    const $num = $(button)
+        .closest('.quantity-field')
+        .find('.number');
+
+    let value = Number($num.val());
+
+    if (!Number.isFinite(value)) {
+        value = 0;
+    }
+
+    value = Math.floor(value);
+
+    if (value <= 0) {
+        return;
+    }
 
     const nextValue = value - 1;
-    $num.text(nextValue);
+
+    $num.val(nextValue);
+
     syncQuantityNode($num, nextValue);
 }
+``
 
 function syncQuantityNode($num, value) {
     const id = $num.attr('id');
@@ -3180,11 +4476,25 @@ function additionalSaves(json) {
         text: $("#JAMB_SEAL_SCREW_PACKAGES").text().trim()
     });
 
+    // json.push({
+    //     id: "WEIGHT",
+    //     value: getState("WEIGHT"),
+    //     desc: getState("WEIGHT"),
+    //     text: getState("WEIGHT")
+    // });
+    const productType = getState("PRODUCT_TYPE");
+
     json.push({
-        id: "WEIGHT",
-        value: getState("WEIGHT"),
-        desc: getState("WEIGHT"),
-        text: getState("WEIGHT")
+        id: "PRODUCT_TYPE",
+        value:
+            typeof productType === "object"
+                ? productType.value
+                : productType || "",
+        text:
+            typeof productType === "object"
+                ? productType.text
+                : "",
+        desc: ""
     });
 
 }
@@ -3220,27 +4530,34 @@ function loadGlazingUI() {
 
     const $frameColors = $("#AvailableFrameColorsSection .colorContainer").empty();
     const $insertColors = $("#AvailableInsertColorsSection .colorContainer").empty();
+    const $jambSealColors = $("#AvailableJambSealColorsSection .colorContainer").empty();
 
     function generateColorHTML(imgSrc, index, inputName) {
+        /*<img
+                    src="${src_path + imgSrc.url}"
+                    alt="${imgSrc.colorName}"
+                    class="color-image"
+                /> */
         const isSelected = index === 0;
         return `
         <div class="color-button-container ${isSelected ? "selected" : ""}">
             <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
-                <img
-                    src="${src_path + imgSrc.url}"
-                    alt="${imgSrc.colorName}"
-                    class="color-image"
-                />
-                <input
-                    type="radio"
-                    name="${inputName}"
-                    value="${imgSrc.value}"
-                    ${isSelected ? "checked" : ""}
-                    hex="${imgSrc.hex}"
-                    desc="${imgSrc.desc}"
-                    colorName="${imgSrc.colorName}"
-                    style="display:none"
-                />
+                
+                <div class="color-${imgSrc.desc} color-image" style="background: ${imgSrc.hex}">
+                    <input
+                        type="radio"
+                        name="${inputName}"
+                        value="${imgSrc.value}"
+                        ${isSelected ? "checked" : ""}
+                        hex="${imgSrc.hex}"
+                        desc="${imgSrc.desc}"
+                        colorName="${imgSrc.colorName}"
+                        ${inputName === "JAMB_SEAL_COLOR"
+                ? `jambscrews="${imgSrc.jambscrews || ""}"`
+                : ""}
+                        style="display:none"
+                    /> 
+                </div>
             </div>
         </div>
     `;
@@ -3260,40 +4577,59 @@ function loadGlazingUI() {
         $insertColors.append(generateColorHTML(imgSrc, index, "INSERT_COLOR"));
     });
 
+    AvailableColorImages.forEach((imgSrc, index) => {
+        // $frameColors.append(generateColorHTML(imgSrc, index, "FRAME_COLOR"));
+        $jambSealColors.append(generateColorHTML(imgSrc, index, "JAMB_SEAL_COLOR"));
+    });
+
     const $optFrameColors = $("#OptionalFrameColorsSection .colorContainer").empty();
     const $optInsertColors = $("#OptionalInsertColorsSection .colorContainer").empty();
+    const $optJambSealColors = $("#OptionalJambSealColorsSection .colorContainer").empty();
 
     OptionalColorImages.forEach((imgSrc, index) => {
         $optFrameColors.append(generateColorHTML(imgSrc, index, "FRAME_COLOR"));
         $optInsertColors.append(generateColorHTML(imgSrc, index, "INSERT_COLOR"));
+        $optJambSealColors.append(generateColorHTML(imgSrc, index, "JAMB_SEAL_COLOR"));
     });
 
     const $optionalfieldset_frame = $("#optionalStackFrameColors").empty();
     const $availablefieldset_frame = $("#availableStackFrameColors").empty();
     const $optionalfieldset_insert = $("#optionalStackInsertColors").empty();
     const $availablefieldset_insert = $("#availableStackInsertColors").empty();
+    const $optionalfieldset_jamb = $("#optionalStackJambSealColors").empty();
+    const $availablefieldset_jamb = $("#availableStackJambSealColors").empty();
 
     OptionalColorImages.slice(0, 3).forEach((imgSrc) => {
         const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
         $optionalfieldset_frame.append(html);
         $optionalfieldset_insert.append(html);
+        $optionalfieldset_jamb.append(html);
     });
 
     AvailableColorImages.slice(0, 3).forEach((imgSrc) => {
         const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
         $availablefieldset_frame.append(html);
         $availablefieldset_insert.append(html);
+        $availablefieldset_jamb.append(html);
     });
 
     // ── Sync frame & insert UI selection to door color on load ──
     requestAnimationFrame(() => {
         const doorValue = getNode("COLOR")?.value?.value;
+        // existing restoration json string is actively being initialized.
+        const isRestoringJson = (typeof getInputJsonValue === "function" ? getInputJsonValue() : "");
+        if (isRestoringJson !== "") {
+            console.log("Restoration active: Insulating insert color highlight selections.");
+            return;
+        }
         if (doorValue) {
             [
                 $("#AvailableFrameColorsSection .colorContainer"),
                 $("#OptionalFrameColorsSection .colorContainer"),
                 $("#AvailableInsertColorsSection .colorContainer"),
-                $("#OptionalInsertColorsSection .colorContainer")
+                $("#OptionalInsertColorsSection .colorContainer"),
+                $("#AvailableJambSealColorsSection .colorContainer"),
+                $("#OptionalJambSealColorsSection .colorContainer"),
             ].forEach($c => {
                 $c.find(".color-button-container").removeClass("selected");
                 $c.find("input[type='radio']").prop("checked", false);
@@ -3353,8 +4689,104 @@ function loadGlazingUI() {
 
         forceRedraw();
     });
+
+  $("#configurator section")
+    .off("show.windowHints")
+    .on("show.windowHints", function () {
+
+        const state = getState("WINDOW_STATE");
+
+        if (!state) {
+            return;
+        }
+
+        const sectionIndex =
+            Number($(this).attr("index"));
+
+        if (sectionIndex === 1) {
+
+            $("#window_position_container").show();
+
+            const glass_shape =
+                getState("GLASS_SHAPE") || "";
+
+            if (glass_shape.includes("slim")) {
+                $(`[data-id="section_slim_temp"]`).show();
+            }
+
+            addSlimUi();
+
+            state.hints = true;
+
+        } else {
+
+            $("#window_position_container").hide();
+
+            $(`[data-id="section_slim_temp"]`).remove();
+            $("#slim_spacing_container").remove();
+
+            state.hints = false;
+
+            if (Array.isArray(state.sections)) {
+                state.sections.forEach(section => {
+                    section.selected = false;
+                });
+            }
+        }
+
+        setState("WINDOW_STATE", {
+            ...state,
+            sections: [...state.sections]
+        });
+
+        forceRedraw();
+    });
+
+    // Fix layout tree initialization lags on UI rendering phases
+    $(document).off("change.countFix").on("change.countFix", "#DOOR_WIDTH_FEET, input[name='SIZE']", function () {
+        if (typeof nodeset !== "undefined" && nodeset["NUM_OF_WINDOWS"]) {
+            // Force Wilcox to re-run the updated logic block created in Step 1
+            rw(nodeset["NUM_OF_WINDOWS"]);
+        }
+    });
+
+    // Re-trigger once on UI load to establish text states immediately
+    setTimeout(function () {
+        if (typeof nodeset !== "undefined" && nodeset["NUM_OF_WINDOWS"]) {
+            rw(nodeset["NUM_OF_WINDOWS"]);
+        }
+    }, 150);
+
 }
 
+function loadPricebook() {
 
+    const customerName = encodeURIComponent(
+        document.ui.DC_CUSTOMER_NAME.value || ""
+    );
 
+    console.log("customerName", customerName);
 
+    return $.ajax({
+        method: "POST",
+        url: `/spr/custom/jpoc/json/1728612690?customer=${customerName}`
+    })
+        .done(function (res) {
+
+            console.log("SUCCESS RESPONSE", res);
+
+            window.PRICEBOOK_CACHE =
+                Array.isArray(res)
+                    ? (res[0] || {})
+                    : (res || {});
+
+        })
+        .fail(function (xhr, status, error) {
+
+            console.log("AJAX FAILED");
+            console.log("status", status);
+            console.log("error", error);
+            console.log("responseText", xhr.responseText);
+
+        });
+}

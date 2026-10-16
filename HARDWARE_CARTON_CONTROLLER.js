@@ -231,11 +231,10 @@ function addHardwareDrivers() {
         const endStiles = ["double", "Y"].includes(getState("END_CAPS")) ? "DE" : ""
 
         if (product_id == "162059085") {
-            doorModel = getState("DOOR_MODEL").getAttribute("desc");
+            doorModel = getNode("DOOR_MODEL").getAttribute("desc");
         } else {
             doorModel = "Stilo";
         }
-
 
         this.value = [
             "HC",
@@ -246,7 +245,7 @@ function addHardwareDrivers() {
         ]
             .filter(v => v != null && v !== "")
             .join(" ");
-
+        
     }, ["WIDTH", "HEIGHT", "END_CAPS", "LIFT_TYPE", "GL_PRODUCT_ID"])
 
     // addNode({

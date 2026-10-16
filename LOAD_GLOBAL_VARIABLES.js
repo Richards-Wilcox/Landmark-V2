@@ -1,5 +1,60 @@
 function loadGlobalNodes() {
 
+  addNode({
+    id: "PRODUCT_TYPE",
+    value: ""
+  }, []);
+
+  createNode(
+    "PRODUCT_TYPE_TAB_VISIBILITY",
+    function () {
+
+      const productType = getState("PRODUCT_TYPE").value;
+
+      if (productType === "ASSEMBLED_PANEL") {
+
+        enableSection("GLAZING");
+        //enableSection("HARDWARE");
+
+        disableSection("HARDWARE");
+        disableSection("OPERATOR_OPTIONS");
+
+        if ($("#OPERATOR_OPTIONS").is(":visible")) {
+          showSection(0);
+        }
+
+      }
+      else if (productType === "RAW_PANEL") {
+
+        enableSection("GLAZING");
+
+        disableSection("OPERATOR_OPTIONS");
+        // disableSection("GLAZING");
+        disableSection("HARDWARE");
+
+        if (
+          $("#OPERATOR_OPTIONS").is(":visible") ||
+          $("#GLAZING").is(":visible") ||
+          $("#HARDWARE").is(":visible")
+        ) {
+          showSection(0);
+        }
+
+      }
+      else if (productType === "COMPLETE_DOOR") {
+
+        enableSection("GLAZING");
+        enableSection("HARDWARE");
+        enableSection("OPERATOR_OPTIONS");
+
+      }
+
+    },
+    "",
+    document.createElement("div"),
+    ["PRODUCT_TYPE"]
+  );
+
   addLogic("SIZE", function () {
     let toggle_Switch = getState("customSwitch");
     //if (toggle_Switch === "off") {
@@ -101,7 +156,6 @@ function loadGlobalNodes() {
   }, ["WIDTH", "HEIGHT", "COLOR", "HANGER_ANGLE", "HANGER_ANGLE_QTY", "END_CAPS",
     "TRUSS_QTY", "WINDOW_POSITION", "GLASS_SHAPE", "LIFT_TYPE"])
 
-
   addNode({
     id: "HANGER_ANGLE_QTY",
     logic: function () {
@@ -171,7 +225,6 @@ function loadGlobalNodes() {
   }, ["SIZE"]);
 
 
-
   addLogic("HARDWARE_YESNO", function () {
     let hardware = getState("HARDWARE_SET");
     if (!hardware) {
@@ -186,11 +239,43 @@ function loadGlobalNodes() {
     } else this.value = 1;
   }, ["OPERATOR"])
 
+  addLogic("WINDOW_CUTOUTS_YESNO", function () {
+    this.value = getState("WINDOW_CUTOUTS");
+  }, ["WINDOW_CUTOUTS"])
+
+
+  addLogic("RAYNOR_DOOR", function () {
+
+    const colorState = getState("COLOR");
+
+    const color =
+      typeof colorState === "object"
+        ? colorState?.value
+        : colorState;
+
+    const face = getState("FACE");
+
+    this.value =
+      color === "X" ||
+        color === "Y" ||
+        face === "B"
+        ? "Y"
+        : "N";
+  }, ["COLOR", "FACE"]);
+
+
+
+
   setupQtyLogic("ADDITIONAL_TRANSMITTER", "ADDITIONAL_TRANSMITTER_QTY");
   setupQtyLogic("ADDITIONAL_CONTROL_PANEL", "ADDITIONAL_CONTROL_PANEL_QTY");
   setupQtyLogic("ADDITIONAL_KEYLESS_ENTRY", "ADDITIONAL_KEYLESS_ENTRY_QTY");
-
-
+  setupQtyLogic("FULL_SETS", "FULL_SETS_QTY");
+  setupQtyLogic("L_HANDLE", "L_HANDLE_QTY");
+  setupQtyLogic("HANDLE", "HANDLE_QTY");
+  setupQtyLogic("DOOR_KNOCKER", "DOOR_KNOCKER_QTY");
+  setupQtyLogic("DOOR_STUDS", "DOOR_STUDS_QTY");
+  setupQtyLogic("MAGNETIC_SET", "MAGNETIC_SET_QTY");
+  setupQtyLogic("STRAPS", "STRAPS_QTY");
 
 }
 
@@ -242,9 +327,10 @@ function getHiLift() {
   return (Number)($("#HIGHLIFT").val())
 }
 function getTotalCenterHingeQTY() {
-
-  return 1 //Yeah this isn't right but whatever
+  // return 1;
+  return Number(getState("CENTER_HINGE_QTY")) || 0;
 }
+
 function getNumberOfGlazedSections() {
   if ($('#BOTTOM_SECTION > option:selected').val() === "Kick Panel")
     return getNumberofSections() - 1
@@ -318,7 +404,7 @@ function operatorImageOnChangeLM(select) {
 
   } else {
 
-    img.src = "/HTML/products/210005530/images/" + imageName;
+    img.src = "/HTML/products/162059085/images/" + imageName;
     img.style.display = "block";
 
     placeholder.style.display = "none";
@@ -332,25 +418,71 @@ function operatorImageOnChangeLM(select) {
   }
 }
 
+function magneticSetOnChange(select) {
+
+  let qty = document.getElementById("MAGNETIC_SET_QTY");
+
+  if (!qty) {
+    return;
+  }
+
+  if (select.value === "NONE") {
+
+    document.getElementById("MAGNETIC_SET_QTY").innerText = "0";
+
+    let decreaseBtn = qty.parentElement.querySelector(".decrease-button");
+    let increaseBtn = qty.parentElement.querySelector(".increase-button");
+
+    decreaseBtn.disabled = true;
+    increaseBtn.disabled = true;
+
+  } else {
+
+    let decreaseBtn = qty.parentElement.querySelector(".decrease-button");
+    let increaseBtn = qty.parentElement.querySelector(".increase-button");
+
+    decreaseBtn.disabled = false;
+    increaseBtn.disabled = false;
+  }
+}
+
+
 function setupQtyLogic(selectFieldId, qtyFieldId) {
+
   addLogic(qtyFieldId, function () {
+
     const selectedValue = getState(selectFieldId);
     const qty = document.getElementById(qtyFieldId);
 
     if (!qty) return;
 
     if (selectedValue === "NONE") {
+
       this.value = "0";
       qty.disabled = true;
+
     } else {
+
       qty.disabled = false;
 
-      // only default to 1 when currently empty/0
-      if (this.value === "0" || this.value === "" || this.value == null) {
-        this.value = "1";
+      if (
+        this.value === "0" ||
+        this.value === "" ||
+        this.value == null
+      ) {
+
+        const firstValidOption = [...qty.options].find(
+          option => option.value !== "0"
+        );
+
+        if (firstValidOption) {
+          this.value = firstValidOption.value;
+        }
       }
     }
+
   }, [selectFieldId]);
+
 }
 
 
@@ -487,3 +619,5 @@ function getStackChart() {
     ]
   }
 }
+
+

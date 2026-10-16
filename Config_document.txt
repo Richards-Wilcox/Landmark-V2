@@ -9,35 +9,27 @@ function loadInputJson(inputJson) {
         return;
     }
 
-    inputJson = String(inputJson).trim();
+    inputJson = String(inputJson)
+        .replace(/^\uFEFF/, "")
+        .trim();
 
     if (inputJson === "") {
         return;
     }
 
-    inputJson = inputJson.replace(/&quot;/g, '"');
-
-    inputJson = inputJson
-        .replace(/"\s*i\s*d\s*"/g, '"id"')
-        .replace(/"\s*v\s*a\s*l\s*u\s*e\s*"/g, '"value"')
-        .replace(/"\s*d\s*e\s*s\s*c\s*"/g, '"desc"')
-        .replace(/"\s*t\s*e\s*x\s*t\s*"/g, '"text"');
-
-    inputJson = inputJson
-        .replace(/\bn\s*u\s*l\s*l\b/gi, 'null')
-        .replace(/\bf\s*a\s*l\s*s\s*e\b/gi, 'false')
-        .replace(/\bt\s*r\s*u\s*e\b/gi, 'true');
-
     var data;
 
     try {
-        data = JSON.parse(inputJson);
-    }
-    catch (e) {
 
-        out.println("JSON.parse failed:");
-        out.println(inputJson);
+        out.println("JSON Length: " + inputJson.length);
+
+        data = JSON.parse(inputJson);
+
+    } catch (e) {
+
+        out.println("JSON.parse failed");
         out.println("Error: " + e);
+        out.println(inputJson);
 
         return;
     }
@@ -71,53 +63,41 @@ function loadInputJson(inputJson) {
         if (
             value === null ||
             value === undefined ||
-            value === 'null' ||
-            value === 'undefined' ||
-            value === 'NONE'
+            value === "null" ||
+            value === "undefined" ||
+            value === "NONE"
         ) {
-            value = '';
+            value = "";
         }
 
-        if (
-            desc === null ||
-            desc === undefined
-        ) {
-            desc = '';
+        if (desc == null) {
+            desc = "";
         }
 
-        if (
-            text === null ||
-            text === undefined
-        ) {
-            text = '';
+        if (text == null) {
+            text = "";
         }
 
         value = String(value);
         desc = String(desc);
         text = String(text);
 
-        var finalValue = '';
+        var finalValue = text || desc || value;
 
-        if (text !== '') {
-            finalValue = text;
-        }
-        else if (desc !== '') {
-            finalValue = desc;
-        }
-        else {
-            finalValue = value;
-        }
-
-        finalValue = finalValue.replace(/\\/g, '');
+        finalValue = finalValue.replace(/\\/g, "");
 
         sections[id] = finalValue;
     }
 }
 
-loadInputJson(processText("<doc>design.value.INPUT_JSON_1</doc>"));
-loadInputJson(processText("<doc>design.value.INPUT_JSON_2</doc>"));
-loadInputJson(processText("<doc>design.value.INPUT_JSON_3</doc>"));
-loadInputJson(processText("<doc>design.value.INPUT_JSON_4</doc>"));
+var fullInputJson = "";
+
+fullInputJson += processText("<doc>design.value.INPUT_JSON_1</doc>") || "";
+fullInputJson += processText("<doc>design.value.INPUT_JSON_2</doc>") || "";
+fullInputJson += processText("<doc>design.value.INPUT_JSON_3</doc>") || "";
+fullInputJson += processText("<doc>design.value.INPUT_JSON_4</doc>") || "";
+
+loadInputJson(fullInputJson);
 
 var doorWidth =
     (sections['DOOR_WIDTH_FEET'] || '')
@@ -141,6 +121,8 @@ html += '<table class="product-details-table">';
 
 html += '<tr><th><b>Input Field</b></th><th><b>Value</b></th></tr>';
 
+
+html += '<tr><td>Product Type</td><td>' + (sections['PRODUCT_TYPE'] || '') + '</td></tr>';
 html += '<tr><td>Door Model</td><td>' + (sections['DOOR_MODEL'] || '') + '</td></tr>';
 html += '<tr><td>Door Width</td><td>' + doorWidth + '</td></tr>';
 html += '<tr><td>Door Height</td><td>' + doorHeight + '</td></tr>';
@@ -180,7 +162,7 @@ html += '<tr><th><b>Input Field</b></th><th><b>Value</b></th></tr>';
 
 html += '<tr><td>Hardware Set</td><td>' + (sections['HARDWARE_SET'] || '') + '</td></tr>';
 html += '<tr><td>Spring Type</td><td>' + (sections['SPRING_TYPE'] || '') + '</td></tr>';
-html += '<tr><td>Inclined Track</td><td>' + (sections['INCLINEDTRACK'] || '') + '</td></tr>';
+html += '<tr><td>Inclined Track</td><td>' + (sections['INCLINED_TRACK'] || '') + '</td></tr>';
 html += '<tr><td>Lift Type</td><td>' + (sections['LIFT_TYPE'] || '') + '</td></tr>';
 
 if (sections['LIFT_TYPE'] == 'HL') {
