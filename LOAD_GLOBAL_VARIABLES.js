@@ -9,7 +9,7 @@ function loadGlobalNodes() {
     "PRODUCT_TYPE_TAB_VISIBILITY",
     function () {
 
-      const productType = getState("PRODUCT_TYPE");
+      const productType = getState("PRODUCT_TYPE").value;
 
       if (productType === "ASSEMBLED_PANEL") {
 
@@ -239,23 +239,32 @@ function loadGlobalNodes() {
     } else this.value = 1;
   }, ["OPERATOR"])
 
-  addLogic("WINDOW_CUTOUTS_YESNO", function(){
+  addLogic("WINDOW_CUTOUTS_YESNO", function () {
     this.value = getState("WINDOW_CUTOUTS");
   }, ["WINDOW_CUTOUTS"])
 
 
-addLogic("RAYNOR_DOOR", function () {
-    const color = getState("COLOR").value;
+  addLogic("RAYNOR_DOOR", function () {
+
+    const colorState = getState("COLOR");
+
+    const color =
+      typeof colorState === "object"
+        ? colorState?.value
+        : colorState;
+
     const face = getState("FACE");
 
     this.value =
-        color === "X" ||
+      color === "X" ||
         color === "Y" ||
         face === "B"
-            ? "Y"
-            : "N";
+        ? "Y"
+        : "N";
+  }, ["COLOR", "FACE"]);
 
-}, ["COLOR", "FACE"]);
+
+
 
   setupQtyLogic("ADDITIONAL_TRANSMITTER", "ADDITIONAL_TRANSMITTER_QTY");
   setupQtyLogic("ADDITIONAL_CONTROL_PANEL", "ADDITIONAL_CONTROL_PANEL_QTY");
@@ -318,9 +327,10 @@ function getHiLift() {
   return (Number)($("#HIGHLIFT").val())
 }
 function getTotalCenterHingeQTY() {
-
-  return 1 //Yeah this isn't right but whatever
+  // return 1;
+  return Number(getState("CENTER_HINGE_QTY")) || 0;
 }
+
 function getNumberOfGlazedSections() {
   if ($('#BOTTOM_SECTION > option:selected').val() === "Kick Panel")
     return getNumberofSections() - 1

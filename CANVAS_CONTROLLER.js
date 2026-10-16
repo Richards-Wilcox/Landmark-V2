@@ -45,11 +45,91 @@ function addRenderNode() {
 		value: false
 	}, []);
 
+	// addLogic("GLASS_SHAPE", function () {
+
+	// 	const glass_shape = $("input[name='GLASS_SHAPE']:checked").val() || "";
+	// 	const prevGlassShape = this._prevGlassShape || "";
+
+	// 	this.value = glass_shape;
+
+	// 	const $all = $("input[name='WINDOW_POSITION']");
+	// 	const $top = $("input[name='WINDOW_POSITION'][value='top']");
+	// 	const $left = $("input[name='WINDOW_POSITION'][value='left']");
+
+	// 	if (glass_shape && glass_shape !== prevGlassShape) {
+
+	// 		const state = getState("WINDOW_STATE");
+
+	// 		if (state && Array.isArray(state.sections)) {
+	// 			state.sections.forEach(section => {
+	// 				section.shape = glass_shape;
+	// 				section.enabled = [];
+	// 				section.selected = false;
+	// 			});
+
+	// 			recalcWindowState();
+	// 		}
+
+	// 		$all.prop("checked", false)
+	// 			.closest(".rw-button")
+	// 			.removeClass("selected btn-checked");
+
+	// 		if (glass_shape.includes("slim")) {
+
+	// 			$("#POSITION_TOP").hide();
+
+	// 			$left.prop("checked", true)
+	// 				.closest(".rw-button")
+	// 				.addClass("selected btn-checked");
+
+
+	// 			setTimeout(() => {
+	// 				setState("WINDOW_POSITION", "left");
+	// 				forceRedraw();
+	// 			}, 0);
+
+	// 		} else {
+
+	// 			$("#POSITION_TOP").show();
+
+	// 			$top.prop("checked", true)
+	// 				.closest(".rw-button")
+	// 				.addClass("selected btn-checked");
+
+	// 			setTimeout(() => {
+	// 				setState("WINDOW_POSITION", "top");
+	// 				forceRedraw();
+	// 			}, 0);
+	// 		}
+	// 	}
+
+	// 	if (!glass_shape) {
+
+	// 		$all.prop("checked", false)
+	// 			.closest(".rw-button")
+	// 			.removeClass("selected btn-checked");
+
+	// 		$("#POSITION_TOP").show();
+
+	// 		setState("WINDOW_POSITION", "");
+	// 	}
+
+	// 	addSlimUi();
+
+	// 	this._prevGlassShape = glass_shape;
+
+	// }, []);
+
+
 	addLogic("GLASS_SHAPE", function () {
+		const checkedValue = $("input[name='GLASS_SHAPE']:checked").val();
 
-		const glass_shape = $("input[name='GLASS_SHAPE']:checked").val() || "";
+		const glass_shape = checkedValue ||
+			this.value ||
+			getState("GLASS_SHAPE") ||
+			"";
+
 		const prevGlassShape = this._prevGlassShape || "";
-
 		this.value = glass_shape;
 
 		const $all = $("input[name='WINDOW_POSITION']");
@@ -63,43 +143,50 @@ function addRenderNode() {
 			if (state && Array.isArray(state.sections)) {
 				state.sections.forEach(section => {
 					section.shape = glass_shape;
-					section.enabled = [];
 					section.selected = false;
+
+					// FIXED LINE: Intercept and pause array flushes purely while a data reload cycle is running
+					if (window.isRestoringInputs !== true) {
+						section.enabled = [];
+					}
 				});
 
 				recalcWindowState();
 			}
 
-			$all.prop("checked", false)
-				.closest(".rw-button")
-				.removeClass("selected btn-checked");
-
-			if (glass_shape.includes("slim")) {
-
-				$("#POSITION_TOP").hide();
-
-				$left.prop("checked", true)
+			// FIXED LINE: Block button style erasures from executing during restoration passes
+			if (window.isRestoringInputs !== true) {
+				$all.prop("checked", false)
 					.closest(".rw-button")
-					.addClass("selected btn-checked");
+					.removeClass("selected btn-checked");
+
+				if (glass_shape.includes("slim")) {
+
+					$("#POSITION_TOP").hide();
+
+					$left.prop("checked", true)
+						.closest(".rw-button")
+						.addClass("selected btn-checked");
 
 
-				setTimeout(() => {
-					setState("WINDOW_POSITION", "left");
-					forceRedraw();
-				}, 0);
+					setTimeout(() => {
+						setState("WINDOW_POSITION", "left");
+						forceRedraw();
+					}, 0);
 
-			} else {
+				} else {
 
-				$("#POSITION_TOP").show();
+					$("#POSITION_TOP").show();
 
-				$top.prop("checked", true)
-					.closest(".rw-button")
-					.addClass("selected btn-checked");
+					$top.prop("checked", true)
+						.closest(".rw-button")
+						.addClass("selected btn-checked");
 
-				setTimeout(() => {
-					setState("WINDOW_POSITION", "top");
-					forceRedraw();
-				}, 0);
+					setTimeout(() => {
+						setState("WINDOW_POSITION", "top");
+						forceRedraw();
+					}, 0);
+				}
 			}
 		}
 
@@ -119,7 +206,6 @@ function addRenderNode() {
 		this._prevGlassShape = glass_shape;
 
 	}, []);
-
 
 	addNode({
 		id: "GLASS_INSERT",
@@ -149,15 +235,27 @@ function addRenderNode() {
 	addNode({
 		id: "SPECIAL_FACE",
 		logic: function () {
-			const glass = getState('GLASS_SHAPE');
-			const face = getState("FACE_desc");
+
+			const glass = getState("GLASS_SHAPE");
+
+			let face = getState("FACE_desc");
+
+			if (face === "colonial_grooved") {
+				face = "colonial";
+			}
 
 			const special_ranch = ["colonial", "ranch"];
-			const special = glass != face && special_ranch.includes(glass) && special_ranch.includes(face);
-			this.value = special;
+
+			this.value =
+				glass !== face &&
+				special_ranch.includes(glass) &&
+				special_ranch.includes(face);
+
 		},
-		value: false,
-	}, ["FACE_desc", "GLASS_SHAPE"])
+		value: false
+	}, ["FACE_desc", "GLASS_SHAPE"]);
+
+
 
 	addNode({
 		id: "WINDOW_STATE",
@@ -209,7 +307,7 @@ function addRenderNode() {
 				return section.enabled.some(x => x == true);
 			});
 
-			for (const section of sections) {
+			for (const [i, section] of sections.entries()) {
 
 				const wasSpecial = section._wasSpecial || false;
 
@@ -241,9 +339,7 @@ function addRenderNode() {
 						section._mixedPatternKey !== mixedPatternKey;
 
 				} else {
-
 					positions = getPanelPositions(shape, width);
-
 				}
 
 				if (!glass_shape && face !== "mixed") {
@@ -314,13 +410,37 @@ function addRenderNode() {
 					section_enabled.length === positions.length &&
 					!mixedDesignChanged
 				) {
-
 					enabled = section_enabled;
-
 				} else {
+					if (face === "colonial_grooved" && glass_shape === "ranch") {
+						if (section_glass || (!has_glass && i === 0)) {
+							const ranchPositions = getPanelPositions("ranch", width);
+							enabled = Array(ranchPositions.length).fill(false);
+							positions = ranchPositions;
+						} else {
+							const groovedPositions = getPanelPositions("colonial_grooved", width);
+							enabled = Array(groovedPositions.length).fill(false);
+							positions = groovedPositions;
+						}
+					} else {
+						const activeSavedPayload = (typeof getInputJsonValue === "function" ? getInputJsonValue() : "");
+						if (activeSavedPayload !== "" && glass_shape && glass_shape !== "NONE") {
+							enabled = Array(positions.length).fill(true);
+						} else {
+							enabled = Array(positions.length).fill(false);
 
-					enabled = Array(positions.length).fill(false);
+							const currentPosition =
+								getNode("WINDOW_POSITION")?.value;
 
+							if (
+								currentPosition === "top" &&
+								i === 0
+							) {
+								enabled.fill(true);
+							}							
+
+						}
+					}
 				}
 
 				if (special && section_glass) {
@@ -328,10 +448,17 @@ function addRenderNode() {
 				}
 
 				if (getPanelConfigurationKey(face) == "windemere") {
-					shape =
-						(face == "colonial_grooved")
-							? "colonial"
-							: "ranch";
+					if (face === "colonial_grooved" && glass_shape === "ranch") {
+						if (section_glass || (!has_glass && i === 0)) {
+							shape = "ranch";
+							positions = getPanelPositions("ranch", width);
+						} else {
+							shape = "colonial_grooved";
+							positions = getPanelPositions("colonial_grooved", width);
+						}
+					} else {
+						shape = (face == "colonial_grooved") ? "colonial" : "ranch";
+					}
 				}
 
 				section.positions = positions;
@@ -353,13 +480,21 @@ function addRenderNode() {
 						panelConfigurations.mixed?.panelHeightCol;
 
 				} else {
+					// =========================================================================
+					// --- FIXED CONFIG GEOMETRY MATRIX DIMENSION PASSTHROUGH ---
+					// =========================================================================
+					// Colonial Grooved needs colonial blueprint item dimensions (19.9375 width) 
+					// to cleanly size its 8 grooved panel sectors.
+					let lookupShapeKey = shape;
+					if (shape === "colonial_grooved") {
+						lookupShapeKey = "colonial";
+					}
 
 					section.panel_width =
-						panelConfigurations[shape]?.panelWidth;
+						panelConfigurations[lookupShapeKey]?.panelWidth;
 
 					section.panel_height =
-						panelConfigurations[shape]?.panelHeight;
-
+						panelConfigurations[lookupShapeKey]?.panelHeight;
 				}
 
 				section._wasSpecial = special;
@@ -376,8 +511,12 @@ function addRenderNode() {
 			"SPECIAL_FACE",
 			"SLIM_WINDOW_SPACING",
 			"SLIM_WINDOW_LITES",
-			"DESIGN_CODE"
+			"DESIGN_CODE",
+			"NUM_OF_PANELS",
+			"NUM_OF_WINDOWS"
+
 		]);
+
 
 	addLogic("WINDOW_POSITION", function () {
 		const face = getState("FACE_desc");
@@ -408,7 +547,7 @@ function addRenderNode() {
 		if (glass_shape.includes("slim")) {
 
 			$("#POSITION_TOP").hide();
-			$("#POSITION_CUSTOM").show();
+			//$("#POSITION_CUSTOM").show();
 
 			const wasTopSelected = $top.is(":checked");
 
@@ -422,10 +561,11 @@ function addRenderNode() {
 					.addClass("selected btn-checked");
 			}
 
-		} else {
+		}
 
+		else {
 			$("#POSITION_TOP").show();
-			$("#POSITION_CUSTOM").hide();
+			//$("#POSITION_CUSTOM").hide();
 		}
 
 		let position = $("input[name='WINDOW_POSITION']:checked").val() ?? "";
@@ -468,9 +608,6 @@ function addRenderNode() {
 		// IMPORTANT:
 		// If user manually clicked glass on canvas,
 		// don't re-apply default left/top positions.
-		// IMPORTANT:
-		// If user manually clicked glass on canvas,
-		// don't re-apply default left/top positions.	
 		if (!position && has_glass && !special) {
 			if (customSelected) {
 				position = "custom";
@@ -481,7 +618,7 @@ function addRenderNode() {
 			}
 		}
 
-		// Apply defaults ONLY when no glass exists yet
+		// Apply defaults ONLY when no glass exists yet and form entry reload is not running
 		if (!position && !has_glass) {
 
 			if (face === "mixed") {
@@ -490,9 +627,14 @@ function addRenderNode() {
 				return;
 			}
 
-			position = glass_shape.includes("slim")
-				? "left"
-				: "top";
+			// FIXED LINE: Swapped out the raw string chunk check for the universal runtime flag checker.
+			// This blocks programmatic overrides on edit loads while keeping fresh runs 100% active.
+			if (window.isRestoringInputs === true) {
+				this.value = "top";
+				return;
+			}
+
+			position = glass_shape.includes("slim") ? "left" : "top";
 
 			$all.prop("checked", false)
 				.closest(".rw-button")
@@ -525,7 +667,13 @@ function addRenderNode() {
 
 		forceRedraw();
 
-	}, ["GLASS_SHAPE", "SPECIAL_FACE", "WINDOW_STATE"]);
+	}, [
+		"WINDOW_STATE",
+		"GLASS_SHAPE",
+		"FACE_desc",
+		"SPECIAL_FACE"
+	]);
+	//"GLASS_SHAPE", ""SPECIAL_FACE""
 
 
 	addNode({
@@ -588,7 +736,17 @@ function addRenderNode() {
 			return;
 		}
 
-		if (glass_shape.includes("slim") && node?.value !== "custom") {
+		const isFlushGlass =
+			getState("FACE_desc") === "flush" &&
+			(
+				glass_shape === "colonial" ||
+				glass_shape === "ranch"
+			);
+
+		if (
+			(glass_shape.includes("slim") || isFlushGlass) &&
+			node?.value !== "custom"
+		) {
 			return;
 		}
 
@@ -694,18 +852,54 @@ function addRenderNode() {
 		}
 	});
 
-	$(document).on("click", "input[name='WINDOW_POSITION']", function () {
-		setState("CUSTOM_WINDOWS", false);
+	// $(document).on("click", "input[name='WINDOW_POSITION']", function () {
+	// 	setState("CUSTOM_WINDOWS", false);
 
-		const position = $(this).val();
+	// 	const position = $(this).val();
 
-		if (position === "custom") {
-			resetSlimCustomState();
-			setState("CUSTOM_WINDOWS", true);
-		}
+	// 	if (position === "custom") {
+	// 		resetSlimCustomState();
+	// 		setState("CUSTOM_WINDOWS", true);
+	// 	}
+	// });
 
+$(document).on("click", "input[name='WINDOW_POSITION']", function () {
 
-	});
+    const position = $(this).val();
+
+    setState("CUSTOM_WINDOWS", false);
+
+    const node = getNode("WINDOW_POSITION");
+
+    if (node) {
+        node.value = position;
+    }
+
+    if (position === "custom") {
+
+        setState("CUSTOM_WINDOWS", true);
+
+        if (
+            (getState("GLASS_SHAPE") || "").includes("slim")
+        ) {
+            resetSlimCustomState();
+        }
+
+        const state = getState("WINDOW_STATE");
+
+        if (state) {
+
+            state.hints = true;
+
+            setState("WINDOW_STATE", {
+                ...state,
+                sections: [...state.sections]
+            });
+        }
+
+        forceRedraw();
+    }
+});
 
 	$(document).off('mousemove.canvasFix');
 
@@ -1069,7 +1263,17 @@ function forceRedraw() {
 
 async function renderDoor() {
 
+	// LOOK HERE: Safety fallback guard checking if nodeset is ready in memory before calculating
+	if (typeof nodeset === "undefined" || !nodeset || !nodeset["WIDTH"] || !nodeset["HEIGHT"] || !nodeset["COLOR"]) {
+		console.warn("renderDoor deferred: Core graph nodeset registers are initializing...");
+		return;
+	}
+
 	const state = getState("WINDOW_STATE");
+	if (!state) {
+		console.warn("renderDoor skipped: WINDOW_STATE empty.");
+		return;
+	}
 
 	const renderKey = JSON.stringify({
 		width: getState("WIDTH"),
@@ -1083,7 +1287,7 @@ async function renderDoor() {
 		insertColor: getState("INSERT_COLOR")?.value,
 		glassTempered: getState("GLASS_TEMPERED"),
 
-		sections: (state?.sections || []).map(section => ({
+		sections: (state.sections || []).map(section => ({
 			shape: section.shape,
 			enabled: [...section.enabled],
 			slim_one: section.slim_one,
@@ -1097,18 +1301,14 @@ async function renderDoor() {
 	}
 
 	this._renderKey = renderKey;
-
 	const requestId = ++renderRequestId;
 
-	// Initial page load loader
 	if (!initialCanvasRendered) {
 		showConfigureLoader();
 	}
 
 	try {
-
 		const layer_obj = getDoorInfo();
-
 		this.value = layer_obj;
 
 		await new Promise(requestAnimationFrame);
@@ -1126,20 +1326,17 @@ async function renderDoor() {
 		initialCanvasRendered = true;
 
 	} catch (err) {
-
 		console.error("renderDoor failed", err);
-
 	} finally {
-
 		if (
 			requestId === renderRequestId &&
 			!configureInProgress
 		) {
 			hideConfigureLoader();
 		}
-
 	}
 }
+
 
 // function setWindowPositions(position) {
 // 	const state = getState("WINDOW_STATE");
@@ -1651,33 +1848,188 @@ function getCanvasDoorPosition(door_width, door_height) {
 }
 
 // get inch offsets from the leftmost point of the door "0"
+// function getPanelPositions(panel_type, door_width, special = false) {
+
+// 	const rule = getRule(panel_type, door_width);
+
+// 	if (!rule) return [];
+
+// 	let panel_qty = rule.qtyOfPanels;
+// 	let muttSpacing = rule.muttSpacing;
+
+// 	const customPanelQty =
+// 		Number(getState("NUM_OF_PANELS")) || 0;
+
+// 	// Custom panel override
+// 	if (
+// 		getState("FACE") === "C" &&
+// 		customPanelQty > 0
+// 	) {
+
+// 		panel_qty = customPanelQty;
+
+// 		// keep RW's spacing values
+// 		if ("special" in rule) {
+// 			muttSpacing =
+// 				rule.special.muttSpacing;
+// 		}
+
+// 	}
+// 	// Existing special logic
+// 	else if (
+// 		special &&
+// 		"special" in rule
+// 	) {
+
+// 		panel_qty = rule.special.qtyOfPanels;
+// 		muttSpacing = rule.special.muttSpacing;
+// 	}
+
+// 	const panel_width =
+// 		panelConfigurations[
+// 			getPanelConfigurationKey(panel_type)
+// 		].panelWidth;
+
+// 	const startX =
+// 		(
+// 			door_width -
+// 			(
+// 				panel_qty * panel_width +
+// 				(panel_qty - 1) * muttSpacing
+// 			)
+// 		) / 2;
+
+// 	let positions_x = [];
+
+// 	for (let p = 0; p < panel_qty; p++) {
+
+// 		const px =
+// 			startX +
+// 			p * (panel_width + muttSpacing);
+
+// 		positions_x.push(px);
+// 	}
+
+// 	if (panel_type === "colonial_grooved") {
+
+// 		const offset =
+// 			panel_width -
+// 			panelConfigurations.colonial.panelWidth;
+
+// 		positions_x =
+// 			positions_x.flatMap(pos => [
+// 				pos,
+// 				pos + offset
+// 			]);
+// 	}
+
+// 	return positions_x;
+// }
+
 function getPanelPositions(panel_type, door_width, special = false) {
+
 	const rule = getRule(panel_type, door_width);
+
 	if (!rule) return [];
+
 	let panel_qty = rule.qtyOfPanels;
 	let muttSpacing = rule.muttSpacing;
-	if (special && "special" in rule) {
-		panel_qty = rule.special.qtyOfPanels;
-		muttSpacing = rule.special.muttSpacing;
-	}
-	const panel_width = panelConfigurations[getPanelConfigurationKey(panel_type)].panelWidth;
 
-	const startX = (door_width - (panel_qty * panel_width + (panel_qty - 1) * muttSpacing)) / 2;
+	const selectedPanels =
+		Number(getState("NUM_OF_PANELS")) || 0;
+
+	const selectedWindows =
+		Number(getState("NUM_OF_WINDOWS")) || 0;
+
+	// ------------------------------------------------
+	// NUM_OF_WINDOWS SPECIAL
+	// Works exactly like NUM_OF_PANELS
+	// ------------------------------------------------
+	if (
+		getState("FACE") === "F" &&
+		getState("GLASS_SHAPE") === "colonial" &&
+		rule.special &&
+		selectedWindows === rule.special.qtyOfPanels
+	) {
+
+		panel_qty =
+			rule.special.qtyOfPanels;
+
+		muttSpacing =
+			rule.special.muttSpacing;
+	}
+
+	// ------------------------------------------------
+	// Existing NUM_OF_PANELS logic
+	// ------------------------------------------------
+	else if (
+		getState("FACE") === "C" &&
+		rule.special &&
+		selectedPanels === rule.special.qtyOfPanels
+	) {
+
+		panel_qty =
+			rule.special.qtyOfPanels;
+
+		muttSpacing =
+			rule.special.muttSpacing;
+	}
+
+	// ------------------------------------------------
+	// Existing special logic
+	// ------------------------------------------------
+	else if (
+		special &&
+		"special" in rule
+	) {
+
+		panel_qty =
+			rule.special.qtyOfPanels;
+
+		muttSpacing =
+			rule.special.muttSpacing;
+	}
+
+	const panel_width =
+		panelConfigurations[
+			getPanelConfigurationKey(panel_type)
+		].panelWidth;
+
+	const startX =
+		(
+			door_width -
+			(
+				panel_qty * panel_width +
+				(panel_qty - 1) * muttSpacing
+			)
+		) / 2;
 
 	let positions_x = [];
+
 	for (let p = 0; p < panel_qty; p++) {
-		const px = startX + p * (panel_width + muttSpacing);
+
+		const px =
+			startX +
+			p * (panel_width + muttSpacing);
+
 		positions_x.push(px);
 	}
 
-	if (panel_type == "colonial_grooved") {
-		const offset = panel_width - panelConfigurations.colonial.panelWidth;
-		positions_x = positions_x.flatMap(pos => [pos, pos + offset]);
+	if (panel_type === "colonial_grooved") {
+
+		const offset =
+			panel_width -
+			panelConfigurations.colonial.panelWidth;
+
+		positions_x =
+			positions_x.flatMap(pos => [
+				pos,
+				pos + offset
+			]);
 	}
 
 	return positions_x;
 }
-
 // The legacy configurator stores mixed designs as a C/R pattern.  Read that
 // pattern from the option text (for example, "CRRCRC (MP-7)") so the display
 // works even when the option value itself is only "MP-7".
@@ -1753,8 +2105,6 @@ function getDoorInfo() {
 	const url_woodgrain = `/HTML/products/162059085/images/woodgrain_dark.png`;
 	const url_stucco = `/HTML/products/162059085/images/stucco4.png`;
 
-
-
 	let scale = 0.03;
 
 	let url = url_woodtexture;
@@ -1776,6 +2126,7 @@ function getDoorInfo() {
 	const flush = ["flush", "plank"].includes(face);
 	const glass_shape = getState("GLASS_SHAPE") ?? "";
 	const special = getState("SPECIAL_FACE");
+	const windowPosition = getState("WINDOW_POSITION");
 
 	const width = getState("WIDTH");
 	const height = getState("HEIGHT");
@@ -1789,6 +2140,7 @@ function getDoorInfo() {
 
 	const insert = getNode("GLASS_INSERT").value;
 	const selectedInsertValue = getSelectedInsertValue(insert);
+
 
 	let sum = 0;
 	const sections = [];
@@ -1911,6 +2263,18 @@ function getDoorInfo() {
 	if (glass_shape.includes('grand') || special) {
 		hints = false;
 	}
+
+	if (
+		flush &&
+		(
+			glass_shape === "colonial" ||
+			glass_shape === "ranch"
+		) &&
+		windowPosition !== "custom"
+	) {
+		hints = false;
+	}
+
 	return {
 		mouse_x: mouse_x,
 		mouse_y: mouse_y,
@@ -2090,17 +2454,17 @@ function getMaxSlimWindowQty(shape, doorWidth, spacing, singleEndcap) {
 // }
 
 function showConfigureLoader() {
-   // console.log("SHOW LOADER", performance.now());
+	// console.log("SHOW LOADER", performance.now());
 
-    $("#canvas-loader-backdrop").css("display", "flex");
-    $("#canvas-loader").show();
+	$("#canvas-loader-backdrop").css("display", "flex");
+	$("#canvas-loader").show();
 }
 
 function hideConfigureLoader() {
-    //console.log("HIDE LOADER", performance.now());
+	//console.log("HIDE LOADER", performance.now());
 
-    $("#canvas-loader-backdrop").hide();
-    $("#canvas-loader").hide();
+	$("#canvas-loader-backdrop").hide();
+	$("#canvas-loader").hide();
 }
 function prepareSlimPositionMode(section) {
 	if (!section.shape?.includes("slim")) return;

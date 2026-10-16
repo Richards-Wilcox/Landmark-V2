@@ -15,8 +15,9 @@ const OptionalColorImages = [
     { url: "images/Bronze_2.jpg", value: "Z", colorName: "Bronze", hex: "#463a2e", desc: "Brz", jambscrews: "215-302Z-050" },
     { url: "images/Desert Tan_2.jpg", value: "E", colorName: "Desert Tan", hex: "#bfb6a4", desc: "DTan", jambscrews: "215-302E-050" },
     { url: "images/Almond_2.jpg", value: "A", colorName: "Almond", hex: "#d1cbb3", desc: "Alm", jambscrews: "215-302A-050" },
-    { url: "images/Honey Cedar.png", value: "X", colorName: "Honey Cedar", restricted: true, hex: "#914e27", jambscrews: "215-302X-050" },
-    { url: "images/Cocoa Hickory.png", value: "Y", colorName: "Cocoa Hickory", restricted: true, hex: "#45261c", jambscrews: "215-302Y-050" }
+    { url: "images/Honey Cedar.png", value: "X", colorName: "Honey Cedar", restricted: true, desc: "Hon", hex: "#914e27", jambscrews: "215-302X-050" },
+    { url: "images/Cocoa Hickory.png", value: "Y", colorName: "Cocoa Hickory", restricted: true, desc: "Coc", hex: "#45261c", jambscrews: "215-302Y-050" },
+    { url: "", value: "R", colorName: "Polar White", restricted: true, desc: "PWht", hex: "#F4F5F3 ", jambscrews: "215-302R-050" }
 ];
 
 const SilverColor = {
@@ -82,74 +83,180 @@ function setInputJsonValue(value) {
     }
 }
 
+// function loadForm() {
+
+//     loadPricebook();
+//     toggleAccordion();
+
+//     const form = createForm();
+//     //Here is where we append the HTML
+//     $('.concept-ui-form.scrollable').append(form);
+
+//     // Hide configurator initially
+
+//     const inputJsonValue = getInputJsonValue();
+//     if (inputJsonValue === '') {
+//         $("#configurator").hide();
+
+//         createProductSelectionScreen();
+//     } else {
+//         $("#configurator").show();
+//     }
+
+//     $('.concept-ui-form.scrollable').removeClass('concept-ui-form scrollable')
+
+//     loadUI();
+
+
+//     createNode("NEXT_PAGE_BTN_0", function () {
+//         if (!isFormValid())
+//             this.setAttribute("disabled", 'true')
+//         else
+//             this.removeAttribute("disabled")
+//     }, "container", $("button[name=nextPageBtn]")[0], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
+
+//     createNode("NEXT_PAGE_BTN_1", function () {
+//         if (!isFormValid())
+//             this.setAttribute("disabled", 'true')
+//         else
+//             this.removeAttribute("disabled")
+//     }, "container", $("button[name=nextPageBtn]")[1], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
+
+//     //The save button isn't compatible with a single page configurator
+//     $("div.button-set.button-2.location-border button")[0].remove()
+//     $("button[onclick='nextPage()']").text("Configure")
+
+
+//     //Adding indicies to sections
+//     $('#configurator section').each((index, e) => { e.setAttribute('index', index) })
+
+//     $(`#collapse1159850199`).remove();
+//     $(`#section_select`).on('change', (evt) => {
+//         showSection(Number(evt.target.value))
+//     })
+
+//     //Load the caching system.
+//     rw_init("configurator");
+
+//     $('.rw-warning').hide()
+//     // $("#DEFAULTS_PLUGIN").html(DEFAULTS_PLUGIN.load("162059085"))
+//     $('#configurator button').on("click", evt => evt.preventDefault())
+//     $('#LOAD_DEFAULTS').on('click', applyDefaults)
+//     $("#LIFT_TYPE").change((e) => $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display")))
+
+//     populateCarousel()
+
+
+//     if (inputJsonValue === '')
+//         applyDefaults()
+//     else {
+//         loadInputValues("configurator");
+//         $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display"))
+//     }
+
+
+
+// }
+
+
 function loadForm() {
+
+    console.time("loadForm");
 
     loadPricebook();
     toggleAccordion();
 
     const form = createForm();
-    //Here is where we append the HTML
+
     $('.concept-ui-form.scrollable').append(form);
 
-    // Hide configurator initially
-
     const inputJsonValue = getInputJsonValue();
+
     if (inputJsonValue === '') {
+
         $("#configurator").hide();
         createProductSelectionScreen();
-    } else {
-        $("#configurator").show();
-    }
 
-    $('.concept-ui-form.scrollable').removeClass('concept-ui-form scrollable')
+    } else {
+
+        $("#configurator").show();
+
+    }
+    $('.concept-ui-form.scrollable')
+        .removeClass('concept-ui-form scrollable');
 
     loadUI();
 
+    createNode(
+        "NEXT_PAGE_BTN_0",
+        function () {
+            if (!isFormValid())
+                this.setAttribute("disabled", "true");
+            else
+                this.removeAttribute("disabled");
+        },
+        "container",
+        $("button[name=nextPageBtn]")[0],
+        ["SPRING_SOLUTION", "WEIGHT", "PRICE"]
+    );
 
-    createNode("NEXT_PAGE_BTN_0", function () {
-        if (!isFormValid())
-            this.setAttribute("disabled", 'true')
-        else
-            this.removeAttribute("disabled")
-    }, "container", $("button[name=nextPageBtn]")[0], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
+    createNode(
+        "NEXT_PAGE_BTN_1",
+        function () {
+            if (!isFormValid())
+                this.setAttribute("disabled", "true");
+            else
+                this.removeAttribute("disabled");
+        },
+        "container",
+        $("button[name=nextPageBtn]")[1],
+        ["SPRING_SOLUTION", "WEIGHT", "PRICE"]
+    );
 
-    createNode("NEXT_PAGE_BTN_1", function () {
-        if (!isFormValid())
-            this.setAttribute("disabled", 'true')
-        else
-            this.removeAttribute("disabled")
-    }, "container", $("button[name=nextPageBtn]")[1], ["SPRING_SOLUTION", "WEIGHT", "PRICE"])
+    $("div.button-set.button-2.location-border button")[0].remove();
 
-    //The save button isn't compatible with a single page configurator
-    $("div.button-set.button-2.location-border button")[0].remove()
-    $("button[onclick='nextPage()']").text("Configure")
+    $("button[onclick='nextPage()']").text("Configure");
 
+    $('#configurator section').each((index, e) => {
+        e.setAttribute('index', index);
+    });
 
-    //Adding indicies to sections
-    $('#configurator section').each((index, e) => { e.setAttribute('index', index) })
+    $('#collapse1159850199').remove();
 
-    $(`#collapse1159850199`).remove();
-    $(`#section_select`).on('change', (evt) => {
-        showSection(Number(evt.target.value))
-    })
+    $('#section_select').on('change', evt => {
+        showSection(Number(evt.target.value));
+    });
 
-    //Load the caching system.
     rw_init("configurator");
 
-    $('.rw-warning').hide()
-    // $("#DEFAULTS_PLUGIN").html(DEFAULTS_PLUGIN.load("162059085"))
-    $('#configurator button').on("click", evt => evt.preventDefault())
-    $('#LOAD_DEFAULTS').on('click', applyDefaults)
-    $("#LIFT_TYPE").change((e) => $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display")))
+    $('.rw-warning').hide();
 
-    if (inputJsonValue === '')
-        applyDefaults()
-    else {
+    $('#configurator button').on(
+        "click",
+        evt => evt.preventDefault()
+    );
+
+    $('#LOAD_DEFAULTS').on(
+        'click',
+        applyDefaults
+    );
+
+    $("#LIFT_TYPE").change((e) =>
+        $("#LIFT_TYPE_DISPLAY")
+            .html($("#LIFT_TYPE > option:selected").attr("display"))
+    );
+
+
+
+    populateCarousel();
+
+    if (inputJsonValue !== '') {
+
         loadInputValues("configurator");
-        $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display"))
-    }
 
-    populateCarousel()
+        $("#LIFT_TYPE_DISPLAY")
+            .html($("#LIFT_TYPE > option:selected").attr("display"));
+    }
 
 }
 
@@ -195,7 +302,7 @@ function createForm() {
                         <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_BOTH"
                             name="WINDOW_POSITION" desc="Both" code="both" value="both">
                     </div>
-                    <div class="rw-button" tabindex="0" id="POSITION_CUSTOM" style="display:none;">
+                    <div class="rw-button" tabindex="0" id="POSITION_CUSTOM">
                         <label for="WINDOW_POSITION_CUSTOM">Custom</label>
                         <input type="radio" class="rw-button-toggle" style="display:none;" id="WINDOW_POSITION_CUSTOM"
                             name="WINDOW_POSITION" desc="Custom" code="custom" value="custom">
@@ -300,50 +407,61 @@ function createForm() {
 
                     <div class="custom-dimension-container">
                         <div class="custom-dimension-section">
+
+                            <!-- Door Width -->
                             <div class="dropdown-item">
                                 <h3>Door Width</h3>
+
                                 <div class="dropdown-pair">
                                     <div class="dropdown-subitem">
-                                        <label for="DOOR_WIDTH_FEET">Feet</label>
+                                        <label for="DOOR_WIDTH_FEET">Ft</label>
                                         <select id="DOOR_WIDTH_FEET" name="DOOR_WIDTH_FEET">
                                         </select>
                                     </div>
 
                                     <div class="dropdown-subitem">
-                                        <label for="DOOR_WIDTH_INCHES">Inches</label>
+                                        <label for="DOOR_WIDTH_INCHES">In</label>
                                         <select id="DOOR_WIDTH_INCHES" name="DOOR_WIDTH_INCHES">
                                         </select>
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- Door Height -->
                             <div class="dropdown-item">
                                 <h3>Door Height</h3>
+
                                 <div class="dropdown-pair">
                                     <div class="dropdown-subitem">
-                                        <label for="DOOR_HEIGHT_FEET">Feet</label>
+                                        <label for="DOOR_HEIGHT_FEET">Ft</label>
                                         <select id="DOOR_HEIGHT_FEET" name="DOOR_HEIGHT_FEET">
                                         </select>
                                     </div>
 
                                     <div class="dropdown-subitem">
-                                        <label for="DOOR_HEIGHT_INCHES">Inches</label>
+                                        <label for="DOOR_HEIGHT_INCHES">In</label>
                                         <select id="DOOR_HEIGHT_INCHES" name="DOOR_HEIGHT_INCHES">
                                         </select>
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- Number Of Sections -->
                             <div class="dropdown-item">
                                 <h3>Number Of Sections</h3>
-                                <div class="dimension-layout">
-                                    <select id="NUM_OF_SEC" name="NUM_OF_SEC">
-                                    </select>
-                                </div>
 
+                                <select id="NUM_OF_SEC" name="NUM_OF_SEC">
+                                </select>
                             </div>
-                        </div>
 
+                            <!-- Number Of Panels -->
+                            <div class="dropdown-item" id="CustomPanelLayout">
+                                <h3>Number Of Panels</h3>
+                                <select id="NUM_OF_PANELS" name="NUM_OF_PANELS">
+                                </select>
+                            </div>
+
+                        </div>
                     </div>
 
                     <div class="dropdown-item">
@@ -433,7 +551,7 @@ function createForm() {
                                         <div aria-labelledby="colors" tabindex="0" id="optionalStackColors"
                                             class="colorsFieldset"></div>
                                         <div class="tooltip">
-                                            <p>View Other Colors</p>
+                                            <p>View More Colors</p>
                                         </div>
                                     </div>
 
@@ -870,6 +988,55 @@ function createForm() {
                     </div>
                 </div>
                 <!-- tempered glass end -->
+
+                <!-- Number Of Windows -->              
+              <div
+    class="dropdown-item"
+    id="WINDOW_COUNT_LAYOUT"
+    style="display:none;">
+
+    <h3>Number Of Windows</h3>
+
+    <div class="combined-button-container">
+        <div class="combined-button-container-inner">
+
+            <div class="rw-sliding-button selected">
+
+                <label
+                    for="WINDOWS_DEFAULT"
+                    id="WINDOWS_DEFAULT_LABEL">
+                    Default
+                </label>
+
+                <input
+                    type="radio"
+                    id="WINDOWS_DEFAULT"
+                    name="NUM_OF_WINDOWS"
+                    value="DEFAULT"
+                    checked
+                    style="display:none;">
+            </div>
+
+            <div class="rw-sliding-button">
+
+                <label
+                    for="WINDOWS_SPECIAL"
+                    id="WINDOWS_SPECIAL_LABEL">
+                    Special
+                </label>
+
+                <input
+                    type="radio"
+                    id="WINDOWS_SPECIAL"
+                    name="NUM_OF_WINDOWS"
+                    value="SPECIAL"
+                    style="display:none;">
+            </div>
+
+        </div>
+    </div>
+
+</div>
             </section>
 
             <!-- HARDWARE SECTION -->
@@ -1053,15 +1220,9 @@ function createForm() {
                                     <div class="quantity-field">
                                         <button class="value-button decrease-button"
                                             onclick="decreaseValue(this)">-</button>
-                                        
-                                          <input
-                                                type="number"
-                                                class="number"
-                                                id="HANGER_ANGLE_QTY"
-                                                value="0"
-                                                min="0"
-                                                max="10"
-                                                oninput="syncQuantityNode($(this), this.value)">
+
+                                        <input type="number" class="number" id="HANGER_ANGLE_QTY" value="0" min="0"
+                                            max="10" oninput="syncQuantityNode($(this), this.value)">
                                         <button class="value-button increase-button" onclick="increaseValue(this, 10)">+
                                         </button>
                                     </div>
@@ -1074,15 +1235,9 @@ function createForm() {
                                     <div class="quantity-field">
                                         <button class="value-button decrease-button"
                                             onclick="decreaseValue(this)">-</button>
-                                        
-                                          <input
-                                            type="number"
-                                            class="number"
-                                            id="JAMB_SEAL_SCREW_PACKAGES"
-                                            value="0"
-                                            min="0"
-                                            max="50"
-                                            oninput="syncQuantityNode($(this), this.value)">
+
+                                        <input type="number" class="number" id="JAMB_SEAL_SCREW_PACKAGES" value="0"
+                                            min="0" max="50" oninput="syncQuantityNode($(this), this.value)">
                                         <button class="value-button increase-button" onclick="increaseValue(this, 10)">+
                                         </button>
                                     </div>
@@ -1155,6 +1310,42 @@ function createForm() {
 
 
                 <div class="operator-accessories">
+                    <div class="operator-accessory-card">
+
+                        <div class="horizontal-inputs" style="width:100%;">
+                            <div class="image-input-cell" style="width:100%;">
+
+                                <h3 class="config-option-label-style">
+                                    Operator Bracket Mount
+                                </h3>
+
+                                <div class="dimension-layout">
+
+                                    <div class="rw-button" tabindex="0">
+                                        <label for="ADJUSTABLE_BRACKET">
+                                            Adjustable Bracket
+                                        </label>
+
+                                        <input type="radio" id="ADJUSTABLE_BRACKET" name="OPERATOR_BRACKET"
+                                            value="ADJUSTABLE_BRACKET">
+                                    </div>
+
+                                    <div class="rw-button" tabindex="0">
+                                        <label for="CLAW_BRACKET">
+                                            Claw Bracket
+                                        </label>
+
+                                        <input type="radio" id="CLAW_BRACKET" name="OPERATOR_BRACKET"
+                                            value="CLAW_BRACKET">
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
                     <div class="operator-accessory-card">
                         <a href="" target="_blank" style="pointer-events:none;">
                             <div class="image-placeholder-container">
@@ -1398,7 +1589,7 @@ function createForm() {
 
 
                     <!-- window cut outs -->
-                      <div class="dropdown-item" style="flex-direction:row">
+                    <div class="dropdown-item" style="flex-direction:row">
                         <div class="end-cap-container">
                             <h3 for="WINDOW_CUTOUTS">Window Cut Outs</h3>
                             <div style="display:flex;justify-content: flex-start;">
@@ -1406,8 +1597,8 @@ function createForm() {
                                     <div class="combined-button-container-inner">
                                         <div class="rw-sliding-button selected">
                                             <label for="CUTOUT_NO">NO</label>
-                                            <input type="radio" style="display:none;" id="CUTOUT_NO" name="WINDOW_CUTOUTS"
-                                                value="N" checked>
+                                            <input type="radio" style="display:none;" id="CUTOUT_NO"
+                                                name="WINDOW_CUTOUTS" value="N" checked>
                                         </div>
                                         <div class="rw-sliding-button">
                                             <label for="CUTOUT_YES">YES</label>
@@ -1614,7 +1805,7 @@ function createForm() {
                                         <option value="0" selected>0</option>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
-                                    
+
                                     </select>
                                 </div>
                             </div>
@@ -1787,7 +1978,7 @@ function createForm() {
                                         </h3>
 
                                         <select id="DOOR_KNOCKER" name="DOOR_KNOCKER"
-                                            onchange="operatorImageOnChangeLM(this)"  style="width:75%" >
+                                            onchange="operatorImageOnChangeLM(this)" style="width:75%">
 
                                             <option value="NONE" selected>NONE</option>
                                             <option value="324-404" img="324-404 Lion-Knocker.jpg"
@@ -1845,8 +2036,8 @@ function createForm() {
                                             Straps
                                         </h3>
 
-                                        <select id="STRAPS" name="STRAPS"
-                                            style="width:75%" onchange="operatorImageOnChangeLM(this)">
+                                        <select id="STRAPS" name="STRAPS" style="width:75%"
+                                            onchange="operatorImageOnChangeLM(this)">
 
                                             <option value="NONE" selected>NONE</option>
                                             <option value="324-419" smartpartnum="324-419"
@@ -1924,15 +2115,9 @@ function createForm() {
                                         <button class="value-button decrease-button"
                                             onclick="decreaseValue(this)">-</button>
 
-                                        <input
-                                            type="number"
-                                            class="number"
-                                            id="DOOR_STUDS_QTY"
-                                            value="0"
-                                            min="0"
-                                            max="100"
-                                            oninput="syncQuantityNode($(this), this.value)">
-                                     
+                                        <input type="number" class="number" id="DOOR_STUDS_QTY" value="0" min="0"
+                                            max="100" oninput="syncQuantityNode($(this), this.value)">
+
                                         <button class="value-button increase-button"
                                             onclick="increaseValue(this,100)">+</button>
                                     </div>
@@ -1993,14 +2178,8 @@ function createForm() {
                                     <div class="quantity-field">
                                         <button class="value-button decrease-button"
                                             onclick="decreaseValue(this)">-</button>
-                                          <input
-                                                type="number"
-                                                class="number"
-                                                id="MAGNETIC_SET_QTY"
-                                                value="0"
-                                                min="0"
-                                                max="10"
-                                                oninput="syncQuantityNode($(this), this.value)">
+                                        <input type="number" class="number" id="MAGNETIC_SET_QTY" value="0" min="0"
+                                            max="10" oninput="syncQuantityNode($(this), this.value)">
 
                                         <button class="value-button increase-button"
                                             onclick="increaseValue(this, 10)">+</button>
@@ -2079,9 +2258,14 @@ function createForm() {
 }
 
 function createProductSelectionScreen() {
+    const inputJsonValue = getInputJsonValue();
 
     const html = `
    <div id="PRODUCT_SELECTION_SCREEN">
+    
+    <div id="PRODUCT_SCREEN_LOADER" class="canvas-loader-backdrop">
+        <div class="canvas-loader"></div>
+    </div>
 
     <div class="product-selection-header">
         <h1>Select Product Type</h1>
@@ -2134,22 +2318,62 @@ function createProductSelectionScreen() {
 </div>`
 
     $("#configurator").before(html);
+
+    if (
+        !getInputJsonValue() ||
+        String(getInputJsonValue()).trim() === ""
+    ) {
+
+        $(".product-tile").css({
+            pointerEvents: "none"
+        });
+
+        setTimeout(function () {
+
+            $("#PRODUCT_SCREEN_LOADER").fadeOut(300);
+
+            $(".product-tile").css({
+                pointerEvents: "auto"
+            });
+
+        }, 3000);
+    }
 }
 
-$(document)
-    .off("click.productTile")
-    .on("click.productTile", ".product-tile", function () {
+// $(document)
+//     .off("click.productTile")
+//     .on("click.productTile", ".product-tile", function () {
 
-        const productType = $(this).data("value");
+//         const productType = $(this).data("value");
 
-        setState("PRODUCT_TYPE", productType);
+//         const productText = $(this)
+//             .find(".product-tile-content h2")
+//             .text()
+//             .trim();
 
-        $("#PRODUCT_SELECTION_SCREEN").remove();
+//         setState("PRODUCT_TYPE", {
+//             value: productType,
+//             text: productText
+//         });
 
-        $("#configurator").fadeIn(250);
+//         $("#PRODUCT_SELECTION_SCREEN")
+//             .addClass("screen-exit");
 
-        finalvalidation();
-    });
+//         setTimeout(() => {
+
+//             $("#PRODUCT_SELECTION_SCREEN").remove();
+
+//             $("#configurator")
+//                 .show()
+//                 .addClass("screen-enter");
+
+//             applyDefaults();
+
+//         }, 250);
+
+//     });
+
+
 
 
 function toggleAccordion() {
@@ -2160,7 +2384,7 @@ function toggleAccordion() {
     $('#accordion991246024').hide(); //weight controller    
     $('#accordion1406547076').hide()  //Hides the outputs
     $("#accordion1094153584").hide()//Hides the global data for JDE
-    $("#accordion9757245").hide() //section bundle
+    //  $("#accordion9757245").hide() //section bundle
     $("#accordion321627220").hide() //Glazing code
     $("#accordion1892755284").hide() //Scheduling code
     $("#accordion51537489").hide(); //price_controller
@@ -2217,16 +2441,23 @@ function populateCarousel() {
             setupRadioSelectionTwoButtons("SPRING_CYCLE");
             setupRadioSelectionTwoButtons("INCLINED_TRACK");
             setupRadioSelectionTwoButtons("WINDOW_CUTOUTS");
+            setupRadioSelectionTwoButtons("NUM_OF_WINDOWS");
 
 
 
             function updatedColorSelection() {
-                $(".color-button-container").removeClass("selected");
-                $(".door-color-text").removeClass("selected");
-                const $selected = $("input[name='COLOR']:checked");
+                // FIXED LINE: Confine the clearing selectors context exclusively to the Door Colour parent section wrapper container.
+                // This stops the layout engine from accidentally wiping out classes on your Insert, Frame, or Jamb Seal choices.
+                const $doorColorSection = $(`div[data-id="COLOR"]`);
+
+                $doorColorSection.find(".color-button-container").removeClass("selected");
+                $doorColorSection.find(".door-color-text").removeClass("selected");
+
+                const $selected = $doorColorSection.find("input[name='COLOR']:checked");
                 $selected.closest(".color-button-container").addClass("selected");
                 $selected.siblings(".door-color-text").addClass("selected");
             }
+
 
             updatedColorSelection();
 
@@ -2563,29 +2794,6 @@ function updateCarouselPosition(index) {
     carousel.style.transform = `translateX(-${index * 100}%)`;
 }
 
-//162059085
-
-// function saveDefaults() {
-//     const defaults = {};
-//     Object.values(nodeset).forEach((node) => {
-//         if (node.id !== "SPC_BOM" && node.id !== "INPUT_JSON_1" && node.id !== "SPRING_SOLUTION" && !node.id.startsWith("GL_") && node.id !== "RENDER")
-//             defaults[node.id] = node.value;        
-//     });
-
-//     console.log("data", JSON.stringify(defaults))
-//     $.ajax({
-//         url: `/spr/custom/jpoc/json/849871261?162059085`,
-//         type: "POST",
-//         data: JSON.stringify(defaults),
-//         contentType: "application/json; charset=utf-8",
-//         error: function (err, textStatus, errorThrown) {
-//             console.log(err, textStatus, errorThrown);
-//             simpleConfirm("Error, new defaults not saved.");
-//         },
-//     }).done((res) => {
-//         simpleConfirm("New Defaults Saved");
-//     });
-// }
 
 function saveDefaults() {
 
@@ -2823,7 +3031,18 @@ function applyDefaults() {
 
                 finalvalidation();
 
-                $('input[type="radio"]:checked').trigger("click");
+                // $('input[type="radio"]:checked').trigger("click");
+                $('input[type="radio"]:checked').each(function () {
+
+                    $(this)
+                        .closest('.rw-button')
+                        .addClass('btn-checked');
+
+                    $(this)
+                        .closest('.rw-sliding-button')
+                        .addClass('selected btn-checked');
+
+                });
 
             }, 50);
 
@@ -2923,7 +3142,11 @@ function clickHandler() {
 
             const panel_style = this.value;
 
-            appendOptionalColors(panel_style);
+            // appendOptionalColors(panel_style);
+            appendOptionalColors(
+                panel_style,
+                $("input[name='GLASS_SHAPE']:checked").val() || ""
+            );
 
             // re-select first color after render
             requestAnimationFrame(() => {
@@ -2932,77 +3155,260 @@ function clickHandler() {
             });
         });
 
-    $(document)
-        .off("click.colorSelect")
-        .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
-            const $container = $(this).closest(".colorContainer");
-            $container.find(".color-button-container").removeClass("selected");
-            $(this).addClass("selected");
-            $container.find("input[name='COLOR']").prop("checked", false);
-            $(this).find("input[name='COLOR']").prop("checked", true).trigger("change");
+    // $(document)
+    //     .off("click.colorSelect")
+    //     .on("click.colorSelect", `div[data-id="COLOR"] .color-button-container`, function () {
+    //         const $container = $(this).closest(".colorContainer");
+    //         $container.find(".color-button-container").removeClass("selected");
+    //         $(this).addClass("selected");
 
-            const color = $(this).find("input[name='COLOR']").val();
-            //setState && setState("COLOR", color);
+    //         $container.find("input[name='COLOR']").prop("checked", false);
+    //         $(this).find("input[name='COLOR']").prop("checked", true).trigger("change");
 
-            frameColorUserOverride = false;
-            insertColorUserOverride = false;
-            jambSealColorUserOverride = false;
+    //         const color = $(this).find("input[name='COLOR']").val();
+    //         //setState && setState("COLOR", color);
 
-            rw(getNode("COLOR"));
-            rw(getNode("FRAME_COLOR"));
-            rw(getNode("INSERT_COLOR"));
-            rw(getNode("JAMB_SEAL_COLOR"));
+    //         frameColorUserOverride = false;
+    //         insertColorUserOverride = false;
+    //         jambSealColorUserOverride = false;
 
-            // ── Sync selected class to new door color ──
-            requestAnimationFrame(() => {
-                [
-                    $("#AvailableFrameColorsSection .colorContainer"),
-                    $("#OptionalFrameColorsSection .colorContainer"),
-                    $("#AvailableInsertColorsSection .colorContainer"),
-                    $("#OptionalInsertColorsSection .colorContainer"),
-                    $("#AvailableJambSealColorsSection .colorContainer"),
-                    $("#OptionalJambSealColorsSection .colorContainer")
-                ].forEach($c => {
-                    $c.find(".color-button-container").removeClass("selected");
-                    $c.find("input[type='radio']").prop("checked", false);
+    //         rw(getNode("COLOR"));
+    //         rw(getNode("FRAME_COLOR"));
+    //         rw(getNode("INSERT_COLOR"));
+    //         rw(getNode("JAMB_SEAL_COLOR"));
 
-                    const $match = $c.find(`input[type='radio'][value="${color}"]`)
-                        .closest(".color-button-container");
+    //         // ── Sync selected class to new door color ──
+    //         requestAnimationFrame(() => {
+    //             [
+    //                 $("#AvailableFrameColorsSection .colorContainer"),
+    //                 $("#OptionalFrameColorsSection .colorContainer"),
+    //                 $("#AvailableInsertColorsSection .colorContainer"),
+    //                 $("#OptionalInsertColorsSection .colorContainer"),
+    //                 $("#AvailableJambSealColorsSection .colorContainer"),
+    //                 $("#OptionalJambSealColorsSection .colorContainer")
+    //             ].forEach($c => {
+    //                 $c.find(".color-button-container").removeClass("selected");
+    //                 $c.find("input[type='radio']").prop("checked", false);
 
-                    if ($match.length) {
-                        $match.addClass("selected");
-                        $match.find("input[type='radio']").prop("checked", true);
-                    }
-                });
-            });
-        });
+    //                 const $match = $c.find(`input[type='radio'][value="${color}"]`)
+    //                     .closest(".color-button-container");
 
+    //                 if ($match.length) {
+    //                     $match.addClass("selected");
+    //                     $match.find("input[type='radio']").prop("checked", true);
+    //                 }
+    //             });
+    //         });
+    //     });
+
+
+    // $(document)
+    //     .off("click.colorSelect")
+    //     .on("click.colorSelect", `.colorsSection .color-button-container`, function () {
+
+    //         const $container = $(this).closest(".colorContainer");            
+    //         $container.find(".color-button-container").removeClass("selected");
+    //         $(this).addClass("selected");
+
+    //         const inputName = $(this).find("input[type='radio']").attr("name") || "COLOR";
+
+    //         // If the user is specifically picking the primary door color, run the synchronization tree loops
+    //         if (inputName === "COLOR") {
+    //             $container.find("input[name='COLOR']").prop("checked", false).removeAttr("checked");
+    //             $(this).find("input[name='COLOR']").prop("checked", true).attr("checked", "checked").trigger("change");
+
+    //             const color = $(this).find("input[name='COLOR']").val();
+
+    //             frameColorUserOverride = false;
+    //             insertColorUserOverride = false;
+    //             jambSealColorUserOverride = false;
+
+    //             rw(getNode("COLOR"));
+    //             rw(getNode("FRAME_COLOR"));
+    //             rw(getNode("INSERT_COLOR"));
+    //             rw(getNode("JAMB_SEAL_COLOR"));
+
+    //             // Sync sister color highlighted wrapper rings natively
+    //             requestAnimationFrame(() => {
+    //                 [
+    //                     $("#AvailableFrameColorsSection .colorContainer"),
+    //                     $("#OptionalFrameColorsSection .colorContainer"),
+    //                     $("#AvailableInsertColorsSection .colorContainer"),
+    //                     $("#OptionalInsertColorsSection .colorContainer"),
+    //                     $("#AvailableJambSealColorsSection .colorContainer"),
+    //                     $("#OptionalJambSealColorsSection .colorContainer")
+    //                 ].forEach($c => {
+    //                     $c.find(".color-button-container").removeClass("selected");
+    //                     $c.find("input[type='radio']").prop("checked", false);
+
+    //                     const $match = $c.find(`input[type='radio'][value="${color}"]`)
+    //                         .closest(".color-button-container");
+
+    //                     if ($match.length) {
+    //                         $match.addClass("selected");
+    //                         $match.find("input[type='radio']").prop("checked", true);
+    //                     }
+    //                 });
+    //             });
+    //         }
+    //     });
 
     // FRAME color — user explicitly picked, set override
-    $('#FRAME_COLOR').on('click', '.color-button-container', function () {
-        const color = $(this).find(`input[type='radio']`).val();
 
-        const color_info = [
-            ...AvailableColorImages,
-            ...OptionalColorImages,
-            SilverColor
-        ].find(c => c.value == color);
-        if (!color_info) return;
+    $(document)
+        .off("click.colorSelect")
+        .on(
+            "click.colorSelect",
+            ".colorsSection .color-button-container",
+            function () {
+
+                const inputName =
+                    $(this)
+                        .find("input[type='radio']")
+                        .attr("name") || "COLOR";
+
+                // COLOR selection
+                if (inputName === "COLOR") {
+
+                    // Remove ALL color selections first
+                    $(".colorsSection .color-button-container")
+                        .removeClass("selected");
+
+                    $("input[name='COLOR']")
+                        .prop("checked", false)
+                        .removeAttr("checked");
+
+                    // Select clicked color
+                    $(this)
+                        .addClass("selected");
+
+                    $(this)
+                        .find("input[name='COLOR']")
+                        .prop("checked", true)
+                        .attr("checked", "checked")
+                        .trigger("change");
+
+                    const color =
+                        $(this)
+                            .find("input[name='COLOR']")
+                            .val();
+
+                    frameColorUserOverride = false;
+                    insertColorUserOverride = false;
+                    jambSealColorUserOverride = false;
+
+                    rw(getNode("COLOR"));
+                    rw(getNode("FRAME_COLOR"));
+                    rw(getNode("INSERT_COLOR"));
+                    rw(getNode("JAMB_SEAL_COLOR"));
+
+                    // Sync corresponding selections
+                    requestAnimationFrame(() => {
+
+                        [
+                            $("#AvailableFrameColorsSection .colorContainer"),
+                            $("#OptionalFrameColorsSection .colorContainer"),
+                            $("#AvailableInsertColorsSection .colorContainer"),
+                            $("#OptionalInsertColorsSection .colorContainer"),
+                            $("#AvailableJambSealColorsSection .colorContainer"),
+                            $("#OptionalJambSealColorsSection .colorContainer")
+                        ].forEach($c => {
+
+                            $c.find(".color-button-container")
+                                .removeClass("selected");
+
+                            $c.find("input[type='radio']")
+                                .prop("checked", false);
+
+                            const $match =
+                                $c.find(
+                                    `input[type='radio'][value="${color}"]`
+                                )
+                                    .closest(".color-button-container");
+
+                            if ($match.length) {
+
+                                $match.addClass("selected");
+
+                                $match.find("input[type='radio']")
+                                    .prop("checked", true)
+                                    .attr("checked", "checked");
+                            }
+                        });
+                    });
+                }
+            }
+        );
+
+    $('#FRAME_COLOR').on('click', '.color-button-container', function () {
+
+        const color =
+            $(this)
+                .find('input[type="radio"]')
+                .val();
+
+        const color_info =
+            [
+                ...AvailableColorImages,
+                ...OptionalColorImages,
+                SilverColor
+            ].find(c => c.value == color);
+
+        if (!color_info) {
+            return;
+        }
 
         frameColorUserOverride = true;
+
         setState("FRAME_COLOR", color_info);
+
+        $("#AvailableFrameColorsSection .color-button-container, " +
+            "#OptionalFrameColorsSection .color-button-container")
+            .removeClass("selected");
+
+        $(`input[name='FRAME_COLOR']`)
+            .prop("checked", false);
+
+        $(`input[name='FRAME_COLOR'][value='${color}']`)
+            .prop("checked", true)
+            .closest(".color-button-container")
+            .addClass("selected");
     });
 
-    // INSERT color — user explicitly picked, set override
+
+    // INSERT color — user explicitly picked, set override  
     $('#INSERT_COLOR').on('click', '.color-button-container', function () {
-        const color = $(this).find(`input[type='radio']`).val();
-        const color_info = [...AvailableColorImages, ...OptionalColorImages]
-            .find(c => c.value == color);
-        if (!color_info) return;
+
+        const color =
+            $(this)
+                .find('input[type="radio"]')
+                .val();
+
+        const color_info =
+            [...AvailableColorImages, ...OptionalColorImages]
+                .find(c => c.value == color);
+
+        if (!color_info) {
+            return;
+        }
 
         insertColorUserOverride = true;
+
         setState("INSERT_COLOR", color_info);
+
+        $("#AvailableInsertColorsSection .color-button-container, " +
+            "#OptionalInsertColorsSection .color-button-container")
+            .removeClass("selected");
+
+        $(`input[name='INSERT_COLOR']`)
+            .prop("checked", false);
+
+        $(`input[name='INSERT_COLOR'][value='${color}']`)
+            .prop("checked", true)
+            .closest(".color-button-container")
+            .addClass("selected");
     });
+
 
     // JAMB SEAL color — user explicitly picked, set override
     $('#JAMB_SEAL_COLOR').on('click', '.color-button-container', function () {
@@ -3045,22 +3451,94 @@ function clickHandler() {
             $selected.closest(".rw-sliding-button").addClass("selected");
         });
 
+    // --- FIXED GLASS SHAPE LOOKUP BLOCK ---
+    // If we have an existing configuration payload coming from input_json, we initialize 
+    // the target data pointers on page load to completely prevent automated validation resets.
+    // const savedInputsString = getInputJsonValue();
+    // if (savedInputsString !== '') {
+    //     try {
+    //         const savedArr = JSON.parse(savedInputsString);
+    //         const savedShapeObj = savedArr.find(x => x && x.id === "GLASS_SHAPE");
+    //         if (savedShapeObj && savedShapeObj.value) {
+    //             const $savedRadio = $(`input[name="GLASS_SHAPE"][value="${savedShapeObj.value}"]`);
+    //             if ($savedRadio.length) {
+    //                 $('input[name="GLASS_SHAPE"]').prop('checked', false).data('checked', false);
+    //                 $savedRadio.prop('checked', true).data('checked', true);
+    //                 $savedRadio.parent().addClass("btn-checked selected");
+    //                 setState("GLASS_SHAPE", savedShapeObj.value);
+    //             }
+    //         }
+    //     } catch (err) {
+    //         console.error("Failed to parse saved inputs inside clickHandler pass:", err);
+    //     }
+    // }
 
     //select and deselect the glass inputs on glazing tab
+
     $('input[name="GLASS_SHAPE"]').on('click', function () {
 
-        if ($(this).data('checked')) {
+        console.log("glass shape value", $(this).val());
+
+        //if ($(this).data('checked')) {
+        if (
+            $(this).data('checked') &&
+            window.isRestoringInputs !== true
+        ) {
             $(this).prop('checked', false);
             $(this).data('checked', false);
             $(this).parent().removeClass("btn-checked");
             setState("GLASS_SHAPE", '');
+
+            appendOptionalColors(
+                $('input[name="FACE"]:checked').val(),
+                ""
+            );
+
         } else {
             $('input[name="GLASS_SHAPE"]').data('checked', false);
             $(this).data('checked', true);
             $(this).prop('checked', true);
             $(this).parent().addClass("btn-checked");
-            setState("GLASS_SHAPE", $(this).val());
+            const selectedGlassShape = $(this).val();
+
+            setState("GLASS_SHAPE", selectedGlassShape);
+
+            // Polar White is not allowed on Slim.
+            // Automatically switch back to White.
+            if (selectedGlassShape.includes("slim")) {
+
+                const selectedColor =
+                    $("input[name='COLOR']:checked").val();
+
+                if (selectedColor === "R") {
+
+                    $(".colorsSection .color-button-container")
+                        .removeClass("selected");
+
+                    $("input[name='COLOR']")
+                        .prop("checked", false)
+                        .removeAttr("checked");
+
+                    const $white =
+                        $("input[name='COLOR'][value='W']");
+
+                    $white
+                        .prop("checked", true)
+                        .attr("checked", "checked")
+                        .closest(".color-button-container")
+                        .addClass("selected");
+
+                    rw(getNode("COLOR"));
+                }
+            }
+
+            appendOptionalColors(
+                $('input[name="FACE"]:checked').val(),
+                selectedGlassShape
+            );
         }
+
+
     });
 
     // Glass type
@@ -3215,6 +3693,45 @@ function clickHandler() {
     setupToggleRadioGroup(
         "DEC_HARDWARE"
     );
+
+    setupToggleRadioGroup(
+        "OPERATOR_BRACKET_MOUNT"
+    );
+
+    $(document)
+        .off("click.productTile")
+        .on("click.productTile", ".product-tile", function () {
+
+            const productType = $(this).data("value");
+
+            const productText = $(this)
+                .find(".product-tile-content h2")
+                .text()
+                .trim();
+
+            $("#PRODUCT_SELECTION_SCREEN")
+                .addClass("screen-exit");
+
+            setTimeout(() => {
+
+                $("#PRODUCT_SELECTION_SCREEN").remove();
+
+                $("#configurator").show();
+
+                setTimeout(() => {
+
+                    setState("PRODUCT_TYPE", {
+                        value: productType,
+                        text: productText
+                    });
+
+                    applyDefaults();
+
+                }, 0);
+
+            }, 250);
+
+        });
 }
 
 function setupToggleRadioGroup(
@@ -3276,6 +3793,8 @@ function setupToggleRadioGroup(
         });
 }
 
+
+
 function selectFirstColor($container) {
 
     const $items = $container.find(".color-button-container");
@@ -3326,12 +3845,14 @@ function appendOverlappingColors() {
 
     // Append each image
     optionalimagesToShow.forEach((imgSrc, index) => {
-        const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
+        // const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
+        const html = `<div class="color-${imgSrc.desc} color-image stacked-optional-img" style="background: ${imgSrc.hex}">`
         $optionalfieldset.append(html);
     });
 
     AvailableimagesToShow.forEach((imgSrc, index) => {
-        const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
+        // const html = `<img src="${src_path + imgSrc.url}" class="stacked-optional-img" />`;
+        const html = `<div class="color-${imgSrc.desc} color-image stacked-optional-img" style="background: ${imgSrc.hex}">`
         $availablefieldset.append(html);
     });
 }
@@ -3340,20 +3861,23 @@ function appendAvailableColorsTo(containerSelector) {
     const $container = $(containerSelector + " .colorContainer");
     $container.empty();
 
+    // <img src="${src_path + imgSrc.url}" class="color-image" /> 
     AvailableColorImages.forEach((imgSrc) => {
         const html = `
       <div class="color-button-container">
         <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
-          <img src="${src_path + imgSrc.url}" class="color-image" />
-          <input
-            type="radio"
-            name="COLOR"
-            value="${imgSrc.value}"
-            hex="${imgSrc.hex}"
-            desc="${imgSrc.desc}"
-            colorName="${imgSrc.colorName}"
-            style="display:none"
-          />
+         
+        <div class="color-${imgSrc.desc} color-image" style="background: ${imgSrc.hex}">
+            <input
+                type="radio"
+                name="COLOR"
+                value="${imgSrc.value}"
+                hex="${imgSrc.hex}"
+                desc="${imgSrc.desc}"
+                colorName="${imgSrc.colorName}"
+                style="display:none"
+            />
+          </div>
         </div>
       </div>
     `;
@@ -3365,7 +3889,12 @@ function appendAvailableColorsTo(containerSelector) {
 }
 
 
-function appendColorsTo(containerSelector, colorArray, panel_style = null) {
+function appendColorsTo(
+    containerSelector,
+    colorArray,
+    panel_style = null,
+    glass_shape = ""
+) {
 
     const $container = $(containerSelector + " .colorContainer");
     $container.empty();
@@ -3385,10 +3914,23 @@ function appendColorsTo(containerSelector, colorArray, panel_style = null) {
                 }
 
                 // Remove restricted colors
+                // if (
+                //     (panel_style === "F" || panel_style === "T") &&
+                //     item.restricted 
+                // ) {
+                //     return false;
+                // }
+
+                //remove polar white for raynor
+                //slim and Recessed grooved colonial - not available
                 if (
-                    (panel_style === "F" || panel_style === "T") &&
-                    item.restricted
+                    item.colorName === "Polar White" &&
+                    (
+                        panel_style === "B" ||
+                        glass_shape.includes("slim")
+                    )
                 ) {
+
                     return false;
                 }
 
@@ -3397,19 +3939,22 @@ function appendColorsTo(containerSelector, colorArray, panel_style = null) {
     }
 
     filteredColors.forEach(imgSrc => {
+        // <img src="${src_path + imgSrc.url}" class="color-image" />
         const html = `
       <div class="color-button-container">
         <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
-          <img src="${src_path + imgSrc.url}" class="color-image" />
-          <input
-            type="radio"
-            name="COLOR"
-            value="${imgSrc.value}"
-            hex="${imgSrc.hex}"
-            desc="${imgSrc.desc}"
-            colorName="${imgSrc.colorName}"
-            style="display:none"
-          />
+         
+          <div class="color-${imgSrc.desc} color-image" style="background: ${imgSrc.hex}">
+            <input
+                type="radio"
+                name="COLOR"
+                value="${imgSrc.value}"
+                hex="${imgSrc.hex}"
+                desc="${imgSrc.desc}"
+                colorName="${imgSrc.colorName}"
+                style="display:none"
+            />
+            </div>
         </div>
       </div>
     `;
@@ -3423,8 +3968,13 @@ function appendColorsTo(containerSelector, colorArray, panel_style = null) {
     // });
 }
 
-function appendOptionalColors(panel_style) {
-    appendColorsTo("#OptionalColorsSection", OptionalColorImages, panel_style);
+function appendOptionalColors(panel_style, glass_shape = "") {
+    appendColorsTo(
+        "#OptionalColorsSection",
+        OptionalColorImages,
+        panel_style,
+        glass_shape
+    );
 }
 
 
@@ -3926,11 +4476,25 @@ function additionalSaves(json) {
         text: $("#JAMB_SEAL_SCREW_PACKAGES").text().trim()
     });
 
+    // json.push({
+    //     id: "WEIGHT",
+    //     value: getState("WEIGHT"),
+    //     desc: getState("WEIGHT"),
+    //     text: getState("WEIGHT")
+    // });
+    const productType = getState("PRODUCT_TYPE");
+
     json.push({
-        id: "WEIGHT",
-        value: getState("WEIGHT"),
-        desc: getState("WEIGHT"),
-        text: getState("WEIGHT")
+        id: "PRODUCT_TYPE",
+        value:
+            typeof productType === "object"
+                ? productType.value
+                : productType || "",
+        text:
+            typeof productType === "object"
+                ? productType.text
+                : "",
+        desc: ""
     });
 
 }
@@ -3969,28 +4533,31 @@ function loadGlazingUI() {
     const $jambSealColors = $("#AvailableJambSealColorsSection .colorContainer").empty();
 
     function generateColorHTML(imgSrc, index, inputName) {
+        /*<img
+                    src="${src_path + imgSrc.url}"
+                    alt="${imgSrc.colorName}"
+                    class="color-image"
+                /> */
         const isSelected = index === 0;
         return `
         <div class="color-button-container ${isSelected ? "selected" : ""}">
             <div class="color-button color-tooltip" data-tooltip="${imgSrc.colorName}">
-                <img
-                    src="${src_path + imgSrc.url}"
-                    alt="${imgSrc.colorName}"
-                    class="color-image"
-                />
-                <input
-                    type="radio"
-                    name="${inputName}"
-                    value="${imgSrc.value}"
-                    ${isSelected ? "checked" : ""}
-                    hex="${imgSrc.hex}"
-                    desc="${imgSrc.desc}"
-                    colorName="${imgSrc.colorName}"
-                     ${inputName === "JAMB_SEAL_COLOR"
+                
+                <div class="color-${imgSrc.desc} color-image" style="background: ${imgSrc.hex}">
+                    <input
+                        type="radio"
+                        name="${inputName}"
+                        value="${imgSrc.value}"
+                        ${isSelected ? "checked" : ""}
+                        hex="${imgSrc.hex}"
+                        desc="${imgSrc.desc}"
+                        colorName="${imgSrc.colorName}"
+                        ${inputName === "JAMB_SEAL_COLOR"
                 ? `jambscrews="${imgSrc.jambscrews || ""}"`
                 : ""}
-                    style="display:none"
-                /> 
+                        style="display:none"
+                    /> 
+                </div>
             </div>
         </div>
     `;
@@ -4049,6 +4616,12 @@ function loadGlazingUI() {
     // ── Sync frame & insert UI selection to door color on load ──
     requestAnimationFrame(() => {
         const doorValue = getNode("COLOR")?.value?.value;
+        // existing restoration json string is actively being initialized.
+        const isRestoringJson = (typeof getInputJsonValue === "function" ? getInputJsonValue() : "");
+        if (isRestoringJson !== "") {
+            console.log("Restoration active: Insulating insert color highlight selections.");
+            return;
+        }
         if (doorValue) {
             [
                 $("#AvailableFrameColorsSection .colorContainer"),
@@ -4116,18 +4689,104 @@ function loadGlazingUI() {
 
         forceRedraw();
     });
+
+  $("#configurator section")
+    .off("show.windowHints")
+    .on("show.windowHints", function () {
+
+        const state = getState("WINDOW_STATE");
+
+        if (!state) {
+            return;
+        }
+
+        const sectionIndex =
+            Number($(this).attr("index"));
+
+        if (sectionIndex === 1) {
+
+            $("#window_position_container").show();
+
+            const glass_shape =
+                getState("GLASS_SHAPE") || "";
+
+            if (glass_shape.includes("slim")) {
+                $(`[data-id="section_slim_temp"]`).show();
+            }
+
+            addSlimUi();
+
+            state.hints = true;
+
+        } else {
+
+            $("#window_position_container").hide();
+
+            $(`[data-id="section_slim_temp"]`).remove();
+            $("#slim_spacing_container").remove();
+
+            state.hints = false;
+
+            if (Array.isArray(state.sections)) {
+                state.sections.forEach(section => {
+                    section.selected = false;
+                });
+            }
+        }
+
+        setState("WINDOW_STATE", {
+            ...state,
+            sections: [...state.sections]
+        });
+
+        forceRedraw();
+    });
+
+    // Fix layout tree initialization lags on UI rendering phases
+    $(document).off("change.countFix").on("change.countFix", "#DOOR_WIDTH_FEET, input[name='SIZE']", function () {
+        if (typeof nodeset !== "undefined" && nodeset["NUM_OF_WINDOWS"]) {
+            // Force Wilcox to re-run the updated logic block created in Step 1
+            rw(nodeset["NUM_OF_WINDOWS"]);
+        }
+    });
+
+    // Re-trigger once on UI load to establish text states immediately
+    setTimeout(function () {
+        if (typeof nodeset !== "undefined" && nodeset["NUM_OF_WINDOWS"]) {
+            rw(nodeset["NUM_OF_WINDOWS"]);
+        }
+    }, 150);
+
 }
 
 function loadPricebook() {
 
+    const customerName = encodeURIComponent(
+        document.ui.DC_CUSTOMER_NAME.value || ""
+    );
+
+    console.log("customerName", customerName);
+
     return $.ajax({
         method: "POST",
-        url: "/spr/custom/jpoc/json/1728612690"
-    }).done(res => {
+        url: `/spr/custom/jpoc/json/1728612690?customer=${customerName}`
+    })
+        .done(function (res) {
 
-        window.PRICEBOOK_CACHE = res?.[0] || {};
+            console.log("SUCCESS RESPONSE", res);
 
-        console.log("Pricebook loaded");
-    });
+            window.PRICEBOOK_CACHE =
+                Array.isArray(res)
+                    ? (res[0] || {})
+                    : (res || {});
+
+        })
+        .fail(function (xhr, status, error) {
+
+            console.log("AJAX FAILED");
+            console.log("status", status);
+            console.log("error", error);
+            console.log("responseText", xhr.responseText);
+
+        });
 }
-

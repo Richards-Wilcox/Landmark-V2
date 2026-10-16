@@ -38,25 +38,33 @@ function loadStyles() {
 }
 
 #PRODUCT_SELECTION_SCREEN{
-    width:100%;
-    min-height:700px;
+     height: calc(100vh - 260px);
 
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
+    min-height: 500px;
 
-    gap:40px;
+    width: 100%;
 
-    border-radius:20px;
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 40px;
+
+    padding: 40px;
+
+    box-sizing: border-box;
+
+    border-radius: 20px;
 
     background: radial-gradient(
         circle,
         rgba(255,255,255,1) 0%,
         rgba(180,180,180,1) 100%
     );
-
-    padding:40px;
 }
 
 .product-selection-header{
@@ -164,7 +172,46 @@ function loadStyles() {
     border:2px solid #000;
     transform:translateY(-4px);
 }
+
+
+#PRODUCT_SCREEN_LOADER {
+    position: absolute;
+    inset: 0;
+    z-index: 999999;
+    border-radius: 20px;
+}
     
+#PRODUCT_SELECTION_SCREEN.screen-exit {
+    opacity: 0;
+    transform: scale(.95);
+}
+
+#PRODUCT_SELECTION_SCREEN {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity .25s ease,
+                transform .25s ease;
+}
+
+.configurator-enter {
+    animation: configuratorFadeIn .25s ease forwards;
+}
+
+@keyframes configuratorFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(.98);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+#collapse906473341{
+  display:none;
+}
+
 #DEFAULTS_PLUGIN {
     			width: 100%;
     			display: block;
@@ -284,7 +331,7 @@ function loadStyles() {
 .cobalt.autodesk360 .dropdown-container{
   display: flex;
   flex-direction: column;
-  gap: 20px;           /* space between dropdowns */
+  gap: 10px;           /* space between dropdowns */
   /* align-items: flex-start; */
   flex-wrap: wrap;     /* allows wrapping on small screens */
 }
@@ -296,10 +343,7 @@ function loadStyles() {
   justify-content: space-between;
   //flex: 1;                /* equal width */
   //min-width: 200px;       /* ensures readability on small screens */
-}
-
-.dropdown-item h3{
-
+  width:100%;
 }
 
 .cobalt.autodesk360 .custom-dimension-item{
@@ -315,8 +359,11 @@ function loadStyles() {
 }
 
 .cobalt.autodesk360 .custom-dimension-section{
-	display: flex;
-	gap:20px;
+display:grid;
+grid-template-columns: 2fr 2fr 1fr 1fr;
+gap:20px;
+align-items:end;
+width:100%;
 }
 
 .cobalt.autodesk360 .custom-dimension-item,
@@ -339,7 +386,8 @@ function loadStyles() {
   outline: none;
   box-shadow: none;
   transition: border-color 0.2s ease;
-  cursor: pointer
+  cursor: pointer;
+  width:100%;
 }
 
 .cobalt.autodesk360 .dropdown-item select:hover {
@@ -451,6 +499,9 @@ function loadStyles() {
     transform: translateY(1px);
   }
 
+}
+.stack-wrapper.bottom{
+  z-index: 999999
 }
 
 .right:hover {transform: translateX(6px); }
@@ -838,38 +889,45 @@ input:focus + .slider {
   border:1px solid ${COLORS.gray500};
 	border-radius: 10px;
   box-shadow: var(--box-shadow--primary-button);
+}
 
-	& label{
-	    color: black;
-	    margin:0;
-	    padding:0;
-	    width:100%;
-	    height:100%;
-	    text-align: center;
-	    line-height: 2;
-
-
-	}
-
-	& label:hover{
-	    cursor: pointer;
-	}
-
-	& input{
+.rw-button input{
 	    display:none !important;
 	}
-}
 
 .rw-button:hover{
   background: ${COLORS.gray200};
   color: #000;
+  cursor: pointer;
+}
 
+
+#configurator div.rw-button label{
+     display: flex;
+	    justify-content: center;
+	    align-items: center;
+      padding: 5px;
+	    font-size: 14px;
+      text-wrap:auto;
+      color: black;          
+      margin: 0;    
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      //line-height: 2;
 }
 
 
 
-.btn-checked{
-	// background:#000;
+#configurator div.rw-button label:hover{
+	    cursor: pointer;
+	}
+
+#configurator div.rw-button input{
+    display:none;
+}
+
+.btn-checked{	
  background:${COLORS.gray300};
  border-color: ${COLORS.gray900};
 }
@@ -961,12 +1019,12 @@ input:focus + .slider {
 }
 
 #NAVIGATION_SPC div.radio-layout--selected{
-background:rgba(0,0,0,0);
-border-bottom: 3px solid black;
-
-.navigation-tab{
-  font-weight: 900 !important;
+    background:rgba(0,0,0,0);
+    border-bottom:3px solid black;
 }
+
+#NAVIGATION_SPC div.radio-layout--selected .navigation-tab{
+    font-weight:900 !important;
 }
 
 .navigation-tab{
@@ -1010,61 +1068,50 @@ div.radio-layout{
 	align-items: center;
 	flex-direction: column;
 	margin: 30px 0 0 0;
+}
 
-
-	.window-position-container {
+.window-position-container {
 		 display:flex;
 		 width: 700px;
 		 justify-content:center;
 		 flex-wrap: wrap;
 		 gap: 8px;
-
-		.rw-button {
-		  min-width: 70px;
-      height: 30px !important;
-      padding: 0 10px;
-      border-radius: 8px;
-      background: #fff;
-
-        label {
-          font-size: 14px;
-          font-weight: 500;
-          line-height: 42px;
-          color: #000;
-        }
-		}
-
-    .disabled{
-      background-color: ${COLORS.gray500} !important;
-      border-color: ${COLORS.gray500};
-
-        label{
-          color: #fff;
-        }
-    }
-
-    .disabled:hover{
-      cursor: not-allowed;
-    }
+		       
 	 }
+
+.postion-container .window-position-container .rw-button{
+    min-width:70px;
+    height:30px !important;
+    padding:0 10px;
+    border-radius:8px;
+    background:#fff;
+}
+
+.postion-container .window-position-container .rw-button label{
+    font-size:14px;
+    font-weight:500;
+    line-height:42px;
+    color:#000;
+}
+
+.postion-container .window-position-container .disabled,
+.operator-accessory-card .disabled{
+    background-color:${COLORS.gray500} !important;
+    border-color:${COLORS.gray500};
+}
+
+.postion-container .window-position-container .disabled label,
+  .operator-accessory-card .dimension-layout .disabled label
+{
+    color:#fff !important;
+}
+
+.postion-container .window-position-container .disabled:hover,
+ .operator-accessory-card .dimension-layout .disabled:hover{
+    cursor:not-allowed !important;
 }
 
 
-
-.window-position-container .rw-button 
-
-// .slim-options-container {
-// 	display: flex;
-// 	justify-content: center;
-// 	align-items: center;
-// 	flex-direction: column;
-// 	padding: 4px;
-// 	background:white;
-// 	gap: 2px;
-//      border:1px solid black;
-// }
-
-/* ✅ Popup Container */
 .slim-options-container {
     position: absolute;
     width: 150px;
@@ -1194,6 +1241,7 @@ div.radio-layout{
     justify-content: center;
     align-items: center;
     margin: 0 0 10px 0;
+    
 
     & input{
 		display:none;
@@ -1234,14 +1282,14 @@ div.radio-layout{
     width: 60px;
 }
 
-.color-button-container.selected{
+#configurator div.color-button-container.selected{
 	 border: 2px solid ${COLORS.gray900};
     background-color: #4d4a4a15;
+     cursor: pointer;
 }
 
-#configurator div.color-button-container.selected {
-    border: 2px solid ${COLORS.gray900};
-    background-color: #4d4a4a15;
+#configurator div.color-button-container:hover{
+  cursor: pointer;
 }
 
 #configurator div.color-button .color-image{
@@ -1253,11 +1301,15 @@ div.radio-layout{
      justify-content: center;
      align-items: center;
      box-sizing: border-box;
+}
 
-     & input{
+
+#configurator div.color-button .color-image input{
 		display:none;
 	}
-	& label {
+
+
+#configurator div.color-button .color-image label {
        display: flex;
        justify-content: center;
        align-items: center;
@@ -1268,8 +1320,6 @@ div.radio-layout{
        position:relative;
 	  bottom:-45px;
 	  color:black;
-
-}
 }
 
 .combined-button-container {
@@ -1349,13 +1399,6 @@ div.radio-layout{
 }
 
 
-
-
-
-#configurator div.color-button:hover {
-	cursor: pointer;
-}
-
 #configurator div.color-button--black{
     	    background: #000;
 	    border: 2px solid #151B54;
@@ -1423,7 +1466,7 @@ div.radio-layout{
   {
     content: "✓";
     position: absolute;
-    right: 12px;
+    right: 5px;
     top: 50%;
     transform: translateY(-50%);
     width: 15px;
@@ -1439,19 +1482,6 @@ div.radio-layout{
     line-height: 1;
     text-align: center;
     box-sizing: border-box;
-}
-
-.dim-button-container{
-display:flex;justify-content:space-evenly;
-height: 75px;
-	button{
-	width:15%;
-	border-radius:4px;
-	border:1px solid lightblue;
-	box-shadow: var(--box-shadow--primary-button);
-	align-items: center;
-     justify-content: center;
-}
 }
 
 
@@ -1559,37 +1589,6 @@ height: 75px;
 }
 
 
-#rw-diff-text {
-	text-align: center;
-}
-
-
-.rw-warning{
-color:red;
-}
-
-.rw-button-back {
-
-        background: linear-gradient(#ff4747 0%, #d72430 100%);
-	clip-path: polygon(100% 0%,
-                   100% 100%,
-                    0% 50%);
-    }
-.rw-button-forward {
-
-        background: linear-gradient(#ff4747 0%, #d72430 100%);
-	clip-path: polygon(0% 0%,
-                   100% 50%,
-                    0% 100%);
-}
-.rw-arrow-button{
- color: rgba(0,0,0,0);
-        border: transparent;
-        border-radius: 4px;
-        min-height: 50px;
-    min-width: 30px;
-max-width:30px;
-}
 .rw-configurator{
 width:100%;
 display:flex;
@@ -1658,19 +1657,20 @@ width:auto;
 
 .horizontal-inputs.jamb-seal-inputs{
 	flex-direction:column;
+}
 
-	div {
-		width: 100%;
-	}
+.horizontal-inputs.jamb-seal-inputs div {
+	width: 100%;
+}
 
-	.jamb-seal-design {
+.horizontal-inputs.jamb-seal-inputs	.jamb-seal-design {
 		display: flex;
 		align-items: baseline;
 		justify-content: space-between;
 		column-gap: 12px;
 		width: 100%;
-	}
 }
+
 
 .rw-button-container{
     display: flex;
@@ -1702,20 +1702,7 @@ align-items:baseline;
 .rw-doorsize{
 width:50%;
 }
-.rw-configurator__page--sections{
-display:flex;
-flex-direction:row;
-column-gap:20px;
-}
-.sectionoptions{
-display:flex;
-flex-direction:column;
-row-gap:8px;
-}
-.springs-scroll{
-	height:100%;
-	overflow:scroll;
-}
+
 .unselectable-text {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -1724,14 +1711,7 @@ row-gap:8px;
     -ms-user-select: none;
     user-select: none;
 }
-option--disabled {
-	display:none;
-}
 
-<!-- Implementing CSS Ivan-->
-.chevron-model-container {
-
-}
 
 .chevron-outer-container {
 	display: flex;
@@ -1829,6 +1809,7 @@ option--disabled {
     display:flex;
     gap:20px;
 }
+
 
 .operator-accessory-card img{
     width:80px;
@@ -1932,8 +1913,9 @@ option--disabled {
 	min-height: 100px;
 	width: 100%;
 	position: relative;
+}
 
-	h2 {
+.operator-group-container h2 {
 		font-size: 1.2rem;
 		line-height: 1.5rem;
 		font-weight: normal;
@@ -1941,7 +1923,7 @@ option--disabled {
 		text-align: center;
 	}
 
-}
+
 .cobalt.autodesk360 .operator-pagination {
     display: flex;
     justify-content: center;
@@ -1951,6 +1933,7 @@ option--disabled {
 }
 
 .cobalt.autodesk360 .operator-pagination .operator-dot {
+    all: unset;         
     width: 10px !important;
     min-width: 10px !important;
     max-width: 10px !important;
@@ -1972,10 +1955,14 @@ option--disabled {
 
     appearance: none;
     -webkit-appearance: none;
+
+    
+    display: block;
 }
 
 .cobalt.autodesk360 .operator-pagination .operator-dot:hover {
     background: ${COLORS.gray500} !important;
+     cursor: pointer;
 }
 
 .cobalt.autodesk360 .operator-pagination .operator-dot.operator-dot-active {
@@ -1983,18 +1970,6 @@ option--disabled {
     transform: scale(1.2);
 }
 
-.cobalt.autodesk360 .operator-pagination .operator-dot {
-    all: unset;
-
-    width: 10px !important;
-    height: 10px !important;
-
-    border-radius: 50% !important;
-    background: ${COLORS.gray300}  !important;
-
-    cursor: pointer;
-    display: block;
-}
 
 .cobalt.autodesk360 .operator-pagination .operator-dot.active {
     background: #2f5dff !important;
@@ -2065,9 +2040,9 @@ option--disabled {
   position: absolute;
   bottom: 5px;
   width: 100%;
-  font-size: 20px;
+  font-size: 14px;
   font-weight: bold;
-  text-align: center;
+  text-align: center;  
 }
 
 .carousel-operator-image {
@@ -2092,86 +2067,6 @@ option--disabled {
     opacity: 1;
 }
 
-
-.next-button-carousel {
-	display:flex;
-	justify-content: center;
-	align-items: center;
-	height: 30px;
-	width: 30px;
-	position: absolute;
-	right: 15%;
-	bottom: 0px;
-}
-
-.next-button-carousel:hover {
-	cursor: pointer;
-}
-
-
-.prev-button-carousel {
-	display:flex;
-	justify-content: center;
-	align-items: center;
-	height: 30px;
-	width: 30px;
-	position: absolute;
-	left: 15%;
-	bottom: 0px
-}
-
-.prev-button-carousel:hover {
-	cursor: pointer;
-}
-
-.chevron-icon-prev {
-	width: 25px
-	height: 25px;
-	fill: #000;
-}
-
-
-.setOpacityZero {
-	//opacity: 0;
-}
-
-#configurator div.rw-button{
-	& label{
-	    display: flex;
-	    justify-content: center;
-	    align-items: center;
-      padding: 5px;
-	    font-size: 14px;
-      text-wrap:auto;
-	}
-
-	& label:hover{
-	    cursor: pointer;
-	}
-
-	& input{
-	    display:none;
-	}
-}
-
-.carousel-operator-item h3 {
-  font-size: 14px;
-}
-
-.next-button-carousel {
-	height: 25px;
-	width: 25px;
-}
-
-.prev-button-carousel {
-	height: 25px;
-	width: 25px;
-}
-
-.chevron-icon-prev {
-	width: 20px
-	height: 20px;
-}
 
 
 
@@ -2223,21 +2118,6 @@ option--disabled {
   border-radius: 0 8px 8px 0;
 }
 
-// .cobalt.autodesk360 .quantity-field .number{
-//   display: inline-block;
-//   text-align: center;
-//   border: none;
-//   border-top: 1px solid #000;
-//   border-bottom: 1px solid #000;
-//   margin: 0px;
-//   width: 40px;
-//   height: 100%;
-//   line-height: 35px;
-//   font-size: 11pt;
-//   box-sizing: border-box;
-//   background: white;
-//   font-family: calibri;
-// }
 
 .cobalt.autodesk360 .quantity-field .number::selection{
   background: none;
@@ -2269,10 +2149,6 @@ option--disabled {
     -webkit-appearance:none;
     margin:0;
 }
-
-
-
-
 
 .rw-button-container-inner {
 	  //  display: flex;
@@ -2321,17 +2197,50 @@ option--disabled {
 
 
 .rw-button-container-inner.selected {
-	// background-color: yellow;
-  
- 
     background: linear-gradient(135deg, #e21f2e, #c01824, #9f101b);
     border-color: #c01824;
 
 }
 
-
 .rw-button-container-inner.selected i {
     color: #ffffff;
+}
+
+.operator-bracket-tooltip{
+    position: relative;
+}
+
+.operator-bracket-tooltip::after{
+    content: attr(data-tooltip);
+
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 260px;
+
+    background: #333;
+    color: #fff;
+
+    padding: 10px;
+    border-radius: 8px;
+
+    font-size: 12px;
+    line-height: 1.4;
+
+    text-align: center;
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: opacity .2s ease;
+
+    z-index: 99999;
+}
+
+.operator-bracket-tooltip:hover::after{
+    opacity: 1;
 }
 
 @media (max-width: 1024px) {
@@ -2393,7 +2302,6 @@ option--disabled {
 }
 
 @media (min-width: 1600px) and (max-width: 2600px) {
-
 
 
 }

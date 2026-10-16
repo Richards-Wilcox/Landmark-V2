@@ -4,9 +4,9 @@ let configureInProgress = false;
 function runNodeLogic(id) {
     const node = getNode(id);
 
-    if (node && typeof node.logic === "function") {        
+    if (node && typeof node.logic === "function") {
         node.logic.call(node);
-    } else {        
+    } else {
     }
 }
 
@@ -15,14 +15,14 @@ function initializeDriversOnDemand() {
     if (sectionBundleDriversAdded) {
         return Promise.resolve();
     }
-    try {        
-        addSectionBundleDrivers();        
-        addGlazingCodeLogic();        
+    try {
+        addSectionBundleDrivers();
+        addGlazingCodeLogic();
         addSchedulingCodeLogic();
-        addHardwareDrivers();        
-        addTrackDrivers();    
+        addHardwareDrivers();
+        addTrackDrivers();
         addOperatorEvents();
-        
+
         sectionBundleDriversAdded = true;
 
         return Promise.resolve();
@@ -50,7 +50,7 @@ function finalvalidation(options) {
     renderSuspended = true;
 
     return forceInitialValidationLM()
-    // return forceInitialValidation()
+        // return forceInitialValidation()
         .then(function (res) {
 
             renderSuspended = false;
@@ -59,15 +59,15 @@ function finalvalidation(options) {
                 isConfigureClick &&
                 renderNode &&
                 typeof renderNode.logic === "function"
-            ) {                
+            ) {
 
                 return Promise.resolve(
                     renderNode.logic.call(renderNode)
                 )
-                .then(() => {
-                    return res;
+                    .then(() => {
+                        return res;
 
-                });
+                    });
             }
             return res;
         });
@@ -87,6 +87,8 @@ function finalvalidation(options) {
 // }
 
 async function Configure(event) {
+
+    clearGlazingCache();
 
     if (event && typeof event.preventDefault === "function") {
         event.preventDefault();
@@ -110,12 +112,12 @@ async function Configure(event) {
 
     try {
 
+
         await initializeDriversOnDemand();
 
         await finalvalidation({
             isConfigureClick: true
         });
-
         nextPage();
 
     }

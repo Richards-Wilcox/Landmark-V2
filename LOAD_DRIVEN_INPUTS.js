@@ -477,7 +477,18 @@ function loadDrivenInputEvents() {
   addLogic("PANEL_SPACING", function () {
     const panel_style = getState("FACE") || "";
     const glass_shape = getState("GLASS_SHAPE") || "";
+    const numOfPanels =
+      String(getState("NUM_OF_PANELS"));
 
+    if (
+      numOfPanels === "2" ||
+      numOfPanels === "4" ||
+      numOfPanels === "6" ||
+      numOfPanels === "8"
+    ) {
+      this.value = "P";
+      return;
+    }
     // face style - C, R, M => S
     // face style - B, S, T => C
 
@@ -512,14 +523,14 @@ function loadDrivenInputEvents() {
       this.value = "";
     }
 
-  }, ["FACE", "GLASS_SHAPE"])
+  }, ["FACE", "GLASS_SHAPE", "NUM_OF_PANELS"])
 
   addLogic("CENTER_HINGE_CODE", function () {
-    const width = getState("WIDTH");
-    const panel_style = getState("FACE");
-    const spacing = getState("PANEL_SPACING") || "";
 
-    if (!spacing) {
+    const glassShape = getState("GLASS_SHAPE") || "";
+
+    // if (!spacing) {
+    if (!glassShape) {
       const value = getCenterHingeCodeEarly();
       this.value = value;
     }
@@ -531,7 +542,7 @@ function loadDrivenInputEvents() {
       const result = resolveLiteResult({
         width: getState("WIDTH"),
         panel_style: getState("FACE"),
-        glass_shape: getState("GLASS_SHAPE") || "",
+        glass_shape: glassShape,
         spacing: getState("PANEL_SPACING") || ""
       });
       this.value = result ? (result.center_hinge_code || "") : "";
@@ -648,17 +659,21 @@ function loadDrivenInputEvents() {
         $(this).closest(".rw-button").toggle(show);
       });
 
+
       // If the currently-selected shape is now hidden, deselect it and clear glass type too
       const $checked = $("input[name='GLASS_SHAPE']:checked");
       if ($checked.length && !$checked.closest(".rw-button").is(":visible")) {
-        clearRadio("GLASS_SHAPE");
-        clearRadio("GLASS_TYPE");
 
-        clearRadio("GLASS_INSERT");
-        setState("WINDOW_POSITION", "");
-        forceRedraw();
+        // FIXED LINE: Block early form initialization loops from erasing glass parameters
+        const activeRestorationJson = (typeof getInputJsonValue === "function" ? getInputJsonValue() : "");
+        if (activeRestorationJson === "") {
+          clearRadio("GLASS_SHAPE");
+          clearRadio("GLASS_TYPE");
+          clearRadio("GLASS_INSERT");
+          setState("WINDOW_POSITION", "");
+          forceRedraw();
+        }
       }
-
     },
     "",
     $("#GLASS_SHAPE_VISIBILITY")[0],
@@ -844,6 +859,7 @@ function loadDrivenInputEvents() {
           $(this).closest(".rw-button").toggle(show);
         });
 
+
         if (currentInsert) {
 
           const currentValue =
@@ -851,10 +867,19 @@ function loadDrivenInputEvents() {
               ? currentInsert.value
               : currentInsert;
 
-          if (!allowedMixed.includes(currentValue)) {
-            clearRadio("GLASS_INSERT");
+          const $selected = $(`input[name='GLASS_INSERT'][value='${currentValue}']`);
+
+          if ($selected.length && !$selected.closest(".rw-button").is(":visible")) {
+
+            // FIXED LINE: Only clear out the loaded insert variables if the user is actively viewing 
+            // the Glazing tab panel container (index 1). This blocks backstage initialization passes from zeroing data.
+            if (typeof currentSection !== "undefined" && currentSection == 1) {
+              clearRadio("GLASS_INSERT");
+            }
+
           }
         }
+
 
         const visibleMain = $("#glass_insert_section .rw-button").filter(function () {
           return $(this).css("display") !== "none";
@@ -883,7 +908,13 @@ function loadDrivenInputEvents() {
        * No glass shape means no insert.
        */
       if (!glass_shape) {
-        clearRadio("GLASS_INSERT");
+
+        // FIXED LINE: Block automated flushes from zeroing out your values backstage
+        const activeRestorationJson = (typeof getInputJsonValue === "function" ? getInputJsonValue() : "");
+        if (activeRestorationJson === "") {
+          clearRadio("GLASS_INSERT");
+        }
+
         $glassInsertSection.hide();
         $moreToggleRow.hide();
         $moreContainer.hide();
@@ -945,7 +976,13 @@ function loadDrivenInputEvents() {
         const $selected = $(`input[name='GLASS_INSERT'][value='${currentValue}']`);
 
         if ($selected.length && !$selected.closest(".rw-button").is(":visible")) {
-          clearRadio("GLASS_INSERT");
+
+          // FIXED LINE: Protect your checked variables from getting wiped by invisible elements
+          const activeRestorationJson = (typeof getInputJsonValue === "function" ? getInputJsonValue() : "");
+          if (activeRestorationJson === "") {
+            clearRadio("GLASS_INSERT");
+          }
+
         }
       }
 
@@ -1185,7 +1222,6 @@ function loadDrivenInputEvents() {
     ["HARDWARE_SET"]
   );
 
-
   //Spring cycle visibility
   createNode(
     "SPRING_CYCLE_VISIBILITY",
@@ -1343,6 +1379,7 @@ function loadDrivenInputEvents() {
     ["HARDWARE_SET"]
   );
 
+  //FRAME COLOR
   createNode(
     "FRAME_COLOR_VISIBILITY",
     function () {
@@ -1353,64 +1390,66 @@ function loadDrivenInputEvents() {
     ["DOOR_MODEL", "GLASS_SHAPE", "COLOR"]
   );
 
+  //INSERT COLOR
+  createNode(
+    "INSERT_COLOR_VISIBILITY",
+    function () {
 
-createNode(
-  "INSERT_COLOR_VISIBILITY",
-  function () {
+      const glassShape =
+        (getState("GLASS_SHAPE") || "").toLowerCase();
 
-    const glassShape =
-      (getState("GLASS_SHAPE") || "").toLowerCase();
+      const isSlim =
+        glassShape.includes("slim");
 
-    const isSlim =
-      glassShape.includes("slim");
+      const doorColor =
+        getNode("COLOR")?.value?.value;
 
-    const doorColor =
-      getNode("COLOR")?.value?.value;
+      const isWoodTone =
+        doorColor === "X" ||
+        doorColor === "Y";
 
-    const isWoodTone =
-      doorColor === "X" ||
-      doorColor === "Y";
+      if (isSlim) {
 
-    if (isSlim) {
+        $("#INSERT_COLOR").hide();
 
-      $("#INSERT_COLOR").hide();
+        insertColorUserOverride = false;
+        setState("INSERT_COLOR", "");
 
-      insertColorUserOverride = false;
-      setState("INSERT_COLOR", "");
+      } else {
 
-    } else {
+        $("#INSERT_COLOR").show();
 
-      $("#INSERT_COLOR").show();
+        $("#OptionalInsertColorsSection .color-button-container").each(function () {
 
-      $("#OptionalInsertColorsSection .color-button-container").each(function () {
+          const value = $(this)
+            .find("input[type='radio']")
+            .val();
 
-        const value = $(this)
-          .find("input[type='radio']")
-          .val();
+          // X and Y only visible for woodtone doors
+          if (
+            value === "X" ||
+            value === "Y"
+          ) {
 
-        // X and Y only visible for woodtone doors
-        if (
-          value === "X" ||
-          value === "Y"
-        ) {
+            $(this).toggle(isWoodTone);
 
-          $(this).toggle(isWoodTone);
+          } else {
 
-        } else {
+            $(this).show();
 
-          $(this).show();
+          }
 
-        }
+        });
 
-      });
+      }
 
-    }
+    },
+    "",
+    $("#INSERT_COLOR_VISIBILITY")[0],
+    ["GLASS_SHAPE", "COLOR"]
+  );
 
-  },
-  "",
-  $("#INSERT_COLOR_VISIBILITY")[0],
-  ["GLASS_SHAPE", "COLOR"]
-);
+
   //Full set Visibility - Decorative hardware
   createNode(
     "FULL_SETS_VISIBILITY",
@@ -1479,6 +1518,7 @@ createNode(
     ["DEC_HARDWARE"]
   );
 
+  //Magnetic set
   createNode(
     "MAGNETIC_SETS_VISIBILITY",
     function () {
@@ -1496,6 +1536,293 @@ createNode(
     $("#MAGNETIC_SETS_VISIBILITY")[0],
     ["DEC_HARDWARE"]
   );
+
+  //Operator bracket
+  createNode(
+    "OPERATOR_BRACKET_VISIBILITY",
+    function () {
+      let truss = Number(getState("TRUSS_QTY")) || 0;
+
+      if (truss === 0) {
+        $('input[name="OPERATOR_BRACKET"]')
+          .prop('disabled', true)
+          .closest('.rw-button')
+          .addClass('disabled operator-bracket-tooltip')
+          .attr(
+            'data-tooltip',
+            'This option requires a truss to be installed. If this option is not selectable, please choose Extra Truss in the Advanced tab.'
+          );
+
+      } else {
+        $('input[name="OPERATOR_BRACKET"]')
+          .prop('disabled', false)
+          .closest('.rw-button')
+          .removeClass('disabled operator-bracket-tooltip')
+          .removeAttr('data-tooltip');
+
+      }
+
+    }, "",
+    $("#OPERATOR_BRACKET_VISIBILITY")[0],
+    ["TRUSS_QTY"]
+  );
+
+  //Number of PAnel
+  createNode(
+    "NUM_OF_PANEL_VISIBILITY",
+    function () {
+
+      const face = getState("FACE");
+
+      const hasSpecialOption =
+        $("#NUM_OF_PANELS option").length > 1;
+
+      if (
+        face === "C" &&
+        hasSpecialOption
+      ) {
+
+        $("#CustomPanelLayout").show();
+
+      } else {
+
+        $("#CustomPanelLayout").hide();
+
+        $("#NUM_OF_PANELS").val("");
+
+        if (getState("NUM_OF_PANELS") !== "") {
+          setState("NUM_OF_PANELS", "");
+        }
+
+      }
+
+    },
+    "",
+    $("#NUM_OF_PANEL_VISIBILITY")[0],
+    [
+      "FACE",
+      "WIDTH"
+    ]
+  );
+
+  createNode(
+    "NUM_OF_PANELS",
+    function () {
+
+      const width =
+        Number(getState("WIDTH")) || 0;
+
+      const $select =
+        $("#NUM_OF_PANELS");
+
+      let defaultPanels = "";
+      let specialPanels = "";
+
+      if (width >= 72 && width <= 94) {
+        defaultPanels = "3";
+        specialPanels = "2";
+      }
+      else if (width >= 119 && width <= 142) {
+        defaultPanels = "5";
+        specialPanels = "4";
+      }
+      else if (width >= 166 && width <= 189) {
+        defaultPanels = "7";
+        specialPanels = "6";
+      }
+      else if (width >= 228 && width <= 235) {
+        defaultPanels = "9";
+        specialPanels = "8";
+      }
+
+      $select.empty();
+
+      if (!defaultPanels) {
+
+        this.value = "";
+
+        return;
+      }
+
+      $select.append(
+        `<option value="${defaultPanels}">
+        Default (${defaultPanels})
+      </option>`
+      );
+
+      $select.append(
+        `<option value="${specialPanels}">
+        Special (${specialPanels})
+      </option>`
+      );
+
+      const currentValue =
+        (
+          this.value === defaultPanels ||
+          this.value === specialPanels
+        )
+          ? this.value
+          : defaultPanels;
+
+      $select.val(currentValue);
+
+      this.value = currentValue;
+
+      if (!this.listenerAdded) {
+
+        const node = this;
+
+        $select.on("change", function () {
+
+          node.value =
+            String($select.val());
+
+          rw(node);
+
+        });
+
+        this.listenerAdded = true;
+      }
+
+    },
+    "",
+    $("#NUM_OF_PANELS")[0],
+    ["WIDTH"]
+  );
+
+  //number of window
+
+  createNode(
+    "NUM_OF_WINDOWS_VISIBILITY",
+    function () {
+
+      const width =
+        Number(getState("WIDTH")) || 0;
+
+      const face =
+        getState("FACE");
+
+      const glassShape =
+        getState("GLASS_SHAPE");
+
+      const windowPosition =
+        getState("WINDOW_POSITION");
+
+      const isSpecialWidth =
+        (width >= 72 && width <= 94) ||
+        (width >= 119 && width <= 142) ||
+        (width >= 166 && width <= 189) ||
+        (width >= 228 && width <= 235);
+
+      const show =
+        isSpecialWidth &&
+        face === "F" &&
+        glassShape === "colonial" &&
+        (
+          windowPosition === "top" ||
+          windowPosition === "custom"
+        );
+
+      $("#WINDOW_COUNT_LAYOUT").toggle(show);
+
+    },
+    "",
+    $("#NUM_OF_WINDOWS_VISIBILITY")[0],
+    [
+      "FACE",
+      "GLASS_SHAPE",
+      "WINDOW_POSITION",
+      "WIDTH"
+    ]
+  );
+
+  addLogic(
+    "NUM_OF_WINDOWS",
+    function () {
+
+      const selected =
+        $("input[name='NUM_OF_WINDOWS']:checked")
+          .val();
+
+      const width =
+        Number(getState("WIDTH")) || 0;
+
+      let defaultWindows = "";
+      let specialWindows = "";
+
+      if (width >= 72 && width <= 94) {
+        defaultWindows = "3";
+        specialWindows = "2";
+      }
+      else if (width >= 119 && width <= 142) {
+        defaultWindows = "5";
+        specialWindows = "4";
+      }
+      else if (width >= 166 && width <= 189) {
+        defaultWindows = "7";
+        specialWindows = "6";
+      }
+      else if (width >= 228 && width <= 235) {
+        defaultWindows = "9";
+        specialWindows = "8";
+      }
+
+      const defaultTxt = defaultWindows ? `Default (${defaultWindows})` : "Default";
+      const specialTxt = specialWindows ? `Special (${specialWindows})` : "Special";
+
+      // ── FORCE THE INTERNAL CACHE TO STORE STRINGS INSTEAD OF PLACEHOLDERS ──
+      if (typeof nodeset !== "undefined") {
+        if (nodeset["WINDOWS_DEFAULT_LABEL"]) {
+          nodeset["WINDOWS_DEFAULT_LABEL"].value = defaultTxt;
+        }
+        if (nodeset["WINDOWS_SPECIAL_LABEL"]) {
+          nodeset["WINDOWS_SPECIAL_LABEL"].value = specialTxt;
+        }
+      }
+
+      // Direct DOM backup to prevent race-condition flickering
+      $("#WINDOWS_DEFAULT_LABEL").text(defaultTxt);
+      $("#WINDOWS_SPECIAL_LABEL").text(specialTxt);
+
+      // actual node value
+      this.value =
+        selected === "SPECIAL"
+          ? specialWindows
+          : defaultWindows;
+
+
+    },
+    ["WIDTH", "FACE", "GLASS_SHAPE"] // Watch all layout dependencies
+  );
+
+  //custom button 
+  createNode(
+    "BTN_CUSTOM_VISIBILITY",
+    function () {
+
+      const glass_shape =
+        getState("GLASS_SHAPE") || "";
+        const face = getState("FACE") || "";
+
+      if (glass_shape.includes("slim") || face === 'F') {
+        $("#POSITION_CUSTOM").show();
+
+      } else {
+
+        $("#POSITION_CUSTOM").hide();
+
+      }
+
+    },
+    "",
+    $("#BTN_CUSTOM_VISIBILITY")[0],
+    [
+      "GLASS_SHAPE", "FACE"
+    ]
+  );
+
+
+
 
   let applyingMixedGlassTypeDefault = false;
 
@@ -1671,6 +1998,7 @@ function computeValue(field) {
 function getCenterHingeCodeEarly() {
   const width = Number(getState("WIDTH")) || 0;
   const panel_style = getState("FACE");
+  const spacing = getState("PANEL_SPACING") || "";
 
   if (!width || !panel_style) {
     return "";
@@ -1678,12 +2006,26 @@ function getCenterHingeCodeEarly() {
 
   // Default table by FACE so it can compute before glazing is selected
   let type = "";
-
-  if (panel_style === "C" || panel_style === "F" || panel_style === "B" || panel_style === "V") {
+  if (
+    panel_style === "C" && spacing === "P") {
+    type = "colonial_pass";
+  }
+  else if (
+    panel_style === "C" ||
+    panel_style === "F" ||
+    panel_style === "B" ||
+    panel_style === "V"
+  ) {
     type = "colonial_std";
-  } else if (panel_style === "R" || panel_style === "S" || panel_style === "T") {
+  }
+  else if (
+    panel_style === "R" ||
+    panel_style === "S" ||
+    panel_style === "T"
+  ) {
     type = "ranch_std";
-  } else {
+  }
+  else {
     return "";
   }
 
@@ -1704,46 +2046,89 @@ function resolveLiteResult(options) {
   let window_type = "";
 
   // FACE = C
-  if (panel_style === "C") {
-    if (glass_shape === "colonial") {
-      window_type = "colonial_std";
-    } else if (glass_shape === "ranch") {
+  // if (panel_style === "C") {
+  //   if (glass_shape === "colonial") {
+  //     window_type = "colonial_std";
+  //   } else if (glass_shape === "ranch") {
+  //     window_type = "RanchOverColonialStd";
+  //   } else if (!glass_shape) {
+  //     window_type = "colonial_std";
+  //   }
+  // }
+
+  // // FACE = R
+  // else if (panel_style === "R") {
+  //   if (glass_shape === "colonial") {
+  //     window_type = "ColonialOverRanchStd";
+  //   } else if (glass_shape === "ranch") {
+  //     window_type = "ranch_std";
+  //   } else if (!glass_shape) {
+  //     window_type = "ranch_std";
+  //   }
+  // }
+
+  // // FACE = F or V
+  // else if (panel_style === "F" || panel_style === "V") {
+  //   if (glass_shape === "colonial") {
+  //     window_type = "colonial_std";
+  //   } else if (glass_shape === "ranch") {
+  //     window_type = "ranch_std";
+  //   }
+
+  // }
+
+  if (["C", "B", "F", "V"].includes(panel_style)) {
+
+    if (glass_shape === "colonial" || !glass_shape) {
+      if (spacing === 'S') {
+        window_type = "colonial_std";
+      }
+
+      if (spacing === 'P') {
+        window_type = "colonial_pass"
+      }
+    }
+    else if (glass_shape === "ranch") {
       window_type = "RanchOverColonialStd";
-    } else if (!glass_shape) {
-      window_type = "colonial_std";
     }
+
   }
 
-  // FACE = R
-  else if (panel_style === "R") {
-    if (glass_shape === "colonial") {
+  else if (["R", "S", "T"].includes(panel_style)) {
+
+    if (glass_shape === "ranch" || !glass_shape) {
+      window_type = "ranch_std";
+    }
+
+    else if (glass_shape === "colonial") {
       window_type = "ColonialOverRanchStd";
-    } else if (glass_shape === "ranch") {
-      window_type = "ranch_std";
-    } else if (!glass_shape) {
-      window_type = "ranch_std";
     }
-  }
-
-  // FACE = F or V
-  else if (panel_style === "F" || panel_style === "V") {
-    if (glass_shape === "colonial") {
-      window_type = "colonial_std";
-    } else if (glass_shape === "ranch") {
-      window_type = "ranch_std";
-    }
-
   }
 
   if (!window_type) return null;
 
-  const cacheKey = `${width}|${panel_style}|${glass_shape}|${spacing}`;
+  // const cacheKey = `${width}|${panel_style}|${glass_shape}|${spacing}`;
+  const cacheKey =
+    `${width}|${panel_style}|${glass_shape}|${spacing}|${getState("NUM_OF_WINDOWS")}`;
 
   if (LITE_RESULT_CACHE[cacheKey]) {
     return LITE_RESULT_CACHE[cacheKey];
   }
 
   const result = getLites(width, window_type) || null;
+
+  if (result) {
+
+    const customWindows =
+      Number(getState("NUM_OF_WINDOWS")) || 0;
+
+    if (customWindows > 0) {
+
+      result.lites =
+        customWindows;
+
+    }
+  }
   LITE_RESULT_CACHE[cacheKey] = result;
 
   return result;
@@ -1767,7 +2152,7 @@ function getLites(width, type) {
     ],
     ranch_std: [
       { min: 48, max: 94, lites: 1, center_hinge_code: "B" },
-      { min: 95, max: 142, lites: 2, center_hinge_code: "C" },
+      { min: 95, max: 142, lites: 2, center_hinge_code: "B" },      
       { min: 143, max: 189, lites: 3, center_hinge_code: "C" },
       { min: 190, max: 235, lites: 4, center_hinge_code: "D" },
       { min: 236, max: 281, lites: 5, center_hinge_code: "E" },
@@ -1790,12 +2175,22 @@ function getLites(width, type) {
       { min: 179, max: 228, lites: 8, center_hinge_code: "D" },
       { min: 229, max: 259, lites: 10, center_hinge_code: "E" },
       { min: 260, max: 282, lites: 12, center_hinge_code: "F" }
+    ],
+
+    colonial_pass: [
+      { min: 48, max: 71, lites: 0, center_hinge_code: "" },
+      { min: 72, max: 94, lites: 2, center_hinge_code: "B" },
+      { min: 95, max: 118, lites: 0, center_hinge_code: "" },
+      { min: 119, max: 142, lites: 4, center_hinge_code: "B" },
+      { min: 143, max: 165, lites: 0, center_hinge_code: "" },
+      { min: 166, max: 189, lites: 6, center_hinge_code: "C" },
+      { min: 190, max: 227, lites: 0, center_hinge_code: "" },
+      { min: 228, max: 235, lites: 8, center_hinge_code: "D" },
     ]
   };
 
   const table = ranges[type];
   if (!table) return null;
-
 
   return table.find(function (r) {
     return width >= r.min && width <= r.max;

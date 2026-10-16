@@ -73,7 +73,8 @@ function rw_init(configuratorid = "configurator") {
                         type: "RADIO_PARENT",
                         logic: function () {
                             //The psuedo-operator :checked can't be changed programmatically.
-                            this.value = $(`input[type="radio"][name="${radioName}"][checked]`).val();
+                            // this.value = $(`input[type="radio"][name="${radioName}"][checked]`).val();
+                            this.value = $(`input[type="radio"][name="${radioName}"]:checked`).val();
                         },
 
                         getAttribute: function (str) {
@@ -163,6 +164,74 @@ function forceInitialValidation(configuratorid = "configurator") {
 
 // Runs every logic item on the nodeset.
 // This forces the configurator into a valid state.
+// function forceInitialValidationLM(configuratorid = "configurator") {
+
+//     return new Promise((resolve) => {
+
+//         const inputNodes = $("#" + configuratorid)
+//             .find("select, input, option[id]")
+//             .toArray()
+//             .map((element) => element.id);
+
+//         // console.log("Input Nodes:", inputNodes.length);
+//         let pending = 0;
+//         let completed = false;
+
+//         for (let i = 0; i < inputNodes.length; i++) {
+
+//             const id = inputNodes[i];
+//             if (id.includes("GLASS_SHAPE")) {
+//                 console.log(
+//                     "VALIDATING",
+//                     id,
+//                     nodeset[id]
+//                 );
+//             }
+
+//             if (!nodeset[id]) {
+//                 continue;
+//             }
+
+//             pending++;
+
+//             rw(nodeset[id], id)
+//                 .then((status) => {
+
+//                     pending--;
+
+//                     if (status === 1) {
+//                         completed = true;
+//                     }
+
+//                     if (pending === 0) {
+//                         resolve(completed ? 1 : 0);
+//                     }
+
+//                 })
+//                 .catch((err) => {
+
+//                     console.error(
+//                         "rw() failed for id:",
+//                         id,
+//                         err
+//                     );
+
+//                     pending--;
+
+//                     if (pending === 0) {
+//                         resolve(completed ? 1 : 0);
+//                     }
+
+//                 });
+//         }
+
+//         if (pending === 0) {
+//             resolve(0);
+//         }
+
+//     });
+// }
+
 function forceInitialValidationLM(configuratorid = "configurator") {
 
     return new Promise((resolve) => {
@@ -172,9 +241,82 @@ function forceInitialValidationLM(configuratorid = "configurator") {
             .toArray()
             .map((element) => element.id);
 
-        // console.log("Input Nodes:", inputNodes.length);
         let pending = 0;
         let completed = false;
+
+        // Cache RADIO_PARENT values before validation
+        const radioParentCache = {};
+
+        Object.keys(nodeset).forEach(key => {
+
+            if (
+                nodeset[key] &&
+                nodeset[key].type === "RADIO_PARENT"
+            ) {
+
+                radioParentCache[key] =
+                    nodeset[key].value;
+            }
+        });
+
+        function restoreRadioParents() {
+
+            Object.keys(radioParentCache).forEach(key => {
+
+                const cachedValue =
+                    radioParentCache[key];
+
+                const currentValue =
+                    nodeset[key]
+                        ? nodeset[key].value
+                        : null;
+
+                // console.warn(
+                //     "RESTORING RADIO",
+                //     key,
+                //     cachedValue
+                // );
+
+                if (
+                    (currentValue === "" ||
+                        currentValue === null ||
+                        currentValue === undefined) &&
+                    cachedValue
+                ) {
+
+                    // Restore node state
+                    nodeset[key].value =
+                        cachedValue;
+
+                    // Restore actual radio button
+                    const $radio =
+                        $(`input[name='${key}'][value='${cachedValue}']`);
+
+                    if ($radio.length) {
+
+                        $(`input[name='${key}']`)
+                            .prop("checked", false)
+                            .removeAttr("checked");
+
+                        $radio
+                            .prop("checked", true)
+                            .attr("checked", "checked");
+
+                        $radio
+                            .closest(".rw-button")
+                            .addClass("btn-checked selected");
+
+                        $radio
+                            .closest(".rw-sliding-button")
+                            .addClass("selected btn-checked");
+
+                        $radio
+                            .closest(".color-button-container")
+                            .addClass("selected");
+                    }
+                }
+            });
+        }
 
         for (let i = 0; i < inputNodes.length; i++) {
 
@@ -196,7 +338,12 @@ function forceInitialValidationLM(configuratorid = "configurator") {
                     }
 
                     if (pending === 0) {
-                        resolve(completed ? 1 : 0);
+
+                        restoreRadioParents();
+
+                        resolve(
+                            completed ? 1 : 0
+                        );
                     }
 
                 })
@@ -211,18 +358,27 @@ function forceInitialValidationLM(configuratorid = "configurator") {
                     pending--;
 
                     if (pending === 0) {
-                        resolve(completed ? 1 : 0);
+
+                        restoreRadioParents();
+
+                        resolve(
+                            completed ? 1 : 0
+                        );
                     }
 
                 });
         }
 
         if (pending === 0) {
+
+            restoreRadioParents();
+
             resolve(0);
         }
 
     });
 }
+
 
 function getNode(id) {
     return nodeset[id];
@@ -242,7 +398,12 @@ function getSelected(id) {
 
     if (nodeset[id].type === "RADIO_PARENT")
         //This shouldn't reference the DOM for caching purposes
-        return nodeset[$(`input[name='${id}'][checked]`).attr("id")]; //Object.values(nodeset).filter(node => edgeset[node.id] && edgeset[node.id].indexOf(id) !== -1).find(node => node.value === getState(id) );
+
+        // return nodeset[$(`input[name='${id}'][checked]`).attr("id")];
+        return nodeset[$(`input[name='${id}']:checked`).attr("id")];
+
+
+    //Object.values(nodeset).filter(node => edgeset[node.id] && edgeset[node.id].indexOf(id) !== -1).find(node => node.value === getState(id) );
 
     if (nodeset[id].type === "SELECT") {
         const child = $(nodeset[id].element).find(`option:selected`);

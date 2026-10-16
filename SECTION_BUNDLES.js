@@ -6,7 +6,8 @@ const SECTION_DEPS = [
     "SHORTEST_SECTIONS_QTY",
     "TALLEST_SECTION",
     "TALLEST_SECTION_QTY",
-    "NUM_OF_SEC"
+    "NUM_OF_SEC",
+    "DOOR_MODEL"
 ];
 
 const DIMENSION_DEPS = [
@@ -27,7 +28,8 @@ const BUNDLE_DEPS = [
     "WINDOW_POSITION",
     "GLASS_SHAPE",
     "CUSTOM_WINDOWS",
-    "WINDOW_STATE"
+    "WINDOW_STATE",
+    "DOOR_MODEL"
 ];
 
 
@@ -104,7 +106,11 @@ function getColorValue() {
 }
 
 function getBundleQtyValue(bundleHeightField) {
-    return getState(bundleHeightField) === 0 ? 0 : 1;
+
+    const height =
+        Number(getState(bundleHeightField)) || 0;
+
+    return height > 0 ? 1 : 0;
 }
 
 function getSectionQtyValue(sectionHeightField) {
@@ -226,11 +232,49 @@ function registerSectionBundleLogic() {
         const qtyField = bundleField(bundleNo, "QTY");
         const heightField = bundleField(bundleNo, "HEIGHT");
 
+
         addLogic(spNumField, function () {
+            const qty = Number(getState(qtyField)) || 0;
+
+            if (qty <= 0) {
+                this.value = "None";
+                return;
+            }
+
+            const isRaynor =
+                getState("RAYNOR_DOOR") === "Y";
+
+            const doorModel = getState("DOOR_MODEL");
             const doorModelId = getDoorModelIdShort();
-            const qty = getState(qtyField);
-            this.value = qty > 0 ? `SB${doorModelId}0${bundleNo}` : "None";
-        }, ["DOOR_MODEL", "WIDTH", "HEIGHT", "NUM_OF_SEC", qtyField]);
+
+            if (isRaynor) {
+
+                this.value =
+                    `RL${doorModel}00${bundleNo}`;
+
+            } else {
+
+                if (doorModelId === '200GV') {
+                    this.value = `SBGRD0${bundleNo}`;
+                }
+                else this.value = `SB${doorModelId}0${bundleNo}`;
+            }
+
+            // console.log(
+            //     spNumField,
+            //     "qty=", qty,
+            //     "raynor=", getState("RAYNOR_DOOR"),
+            //     "doorModel=", getState("DOOR_MODEL")
+            // );
+            // console.log("spNumField", this.value);
+        }, [
+            "DOOR_MODEL",
+            "WIDTH",
+            "HEIGHT",
+            "NUM_OF_SEC",
+            qtyField,
+            "RAYNOR_DOOR"
+        ]);
 
         addLogic(descField, function () {
             const height = getState(heightField);
@@ -255,7 +299,10 @@ function registerSectionComponentLogic() {
                 const qty = getState(qtyField);
                 const index = getBundleIndex(bundleNo, s);
 
-                this.value = qty > 0 ? `SC${doorModelId}0${index}` : "None";
+                let newModelId = '';
+                newModelId = doorModelId === '200GV' ? 'GRD' : doorModelId;
+
+                this.value = qty > 0 ? `SC${newModelId}0${index}` : "None";
             }, ["DOOR_MODEL", qtyField, ...DIMENSION_DEPS]);
 
             addLogic(descField, function () {
@@ -462,10 +509,6 @@ function getEndCapsPartNum(section_height, door_model, end_caps) {
 }
 
 
-
-
-
-
 //function to get the section component desc
 function buildSCDescription(height, qty) {
 
@@ -570,8 +613,11 @@ function buildRPSPNum(height, suffix) {
         .getAttribute("id")
         .substring(1);
 
+    let newModelId = '';
+    newModelId = doorModelId === '200GV' ? 'GRD' : doorModelId;
+
     return height > 0
-        ? `SR${doorModelId}0${suffix}`
+        ? `SR${newModelId}0${suffix}`
         : "None";
 
 }

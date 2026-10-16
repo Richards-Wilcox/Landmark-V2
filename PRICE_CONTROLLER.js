@@ -130,26 +130,6 @@ function getPrice() {
     registerSectionCalculationLogic();
     registerGlazingCalculationLogic();
 
-    // addNode({
-    //     id: "PRICEBOOK",
-    //     value: "",
-    //     logic: function () {
-    //         let solutions;
-    //         try {
-    //             solutions = $.ajax({
-    //                 method: "POST",
-    //                 url: "/spr/custom/jpoc/json/1728612690"
-    //             });
-    //         } catch (err) {
-    //             console.log("Spring API failed to load price", err);
-    //             // Return a valid default object       
-    //         }
-    //         this.value = solutions;
-    //         //console.log("data pricebook", solutions);
-    //     }
-    // }, [""])
-
-
     //door face price - dummy
     addLogic("DOOR_FACE_PRICE", function () {
         const width = getState("WIDTH") / 12;
@@ -168,7 +148,7 @@ function getPrice() {
 
     }, ["DOOR_MODEL", "WIDTH", "HEIGHT"])
 
-    addLogic("GLAZING_PRICE", function () {        
+    addLogic("GLAZING_PRICE", function () {
         // const pricebookJson = getState("PRICEBOOK")?.responseJSON?.[0] || {};
         const pricebookJson = window.PRICEBOOK_CACHE || {};
         const face = getState("FACE");
@@ -385,34 +365,123 @@ function calculateScrewQtyPerSection(glassField) {
 
 function registerSectionCalculationLogic() {
     addLogic("SHORTEST_SECTION", function () {
-        const doorHeight = getState("HEIGHT");
-        const numOfSec = getState("NUM_OF_SEC");
 
-        this.value = Math.floor((doorHeight / numOfSec) / 3) * 3;
-    }, ["HEIGHT", "NUM_OF_SEC", "WIDTH"]);
+        const isGrandView =
+            getState("DOOR_MODEL") === "G";
+
+        const doorHeight =
+            isGrandView
+                ? Number(getState("HEIGHT")) - 24
+                : Number(getState("HEIGHT"));
+
+        const numOfSec =
+            isGrandView
+                ? Number(getState("NUM_OF_SEC")) - 1
+                : Number(getState("NUM_OF_SEC"));
+
+        this.value =
+            Math.floor((doorHeight / numOfSec) / 3) * 3;
+
+    }, [
+        "HEIGHT",
+        "NUM_OF_SEC",
+        "WIDTH",
+        "DOOR_MODEL"
+    ]);
 
     addLogic("SHORTEST_SECTIONS_QTY", function () {
-        const numOfSec = getState("NUM_OF_SEC");
-        const doorHeight = getState("HEIGHT");
-        const shortestSection = getState("SHORTEST_SECTION");
-        const diff = (doorHeight / numOfSec) - shortestSection;
 
-        this.value = Math.round((1 - (diff / 3)) * numOfSec);
-    }, ["HEIGHT", "NUM_OF_SEC", "SHORTEST_SECTION"]);
+        const isGrandView =
+            getState("DOOR_MODEL") === "G";
+
+        const doorHeight =
+            isGrandView
+                ? Number(getState("HEIGHT")) - 24
+                : Number(getState("HEIGHT"));
+
+        const numOfSec =
+            isGrandView
+                ? Number(getState("NUM_OF_SEC")) - 1
+                : Number(getState("NUM_OF_SEC"));
+
+        const shortestSection =
+            getState("SHORTEST_SECTION");
+
+        const diff =
+            (doorHeight / numOfSec) -
+            shortestSection;
+
+        this.value =
+            Math.round(
+                (1 - (diff / 3)) *
+                numOfSec
+            );
+
+    }, [
+        "HEIGHT",
+        "NUM_OF_SEC",
+        "SHORTEST_SECTION",
+        "DOOR_MODEL"
+    ]);
 
     addLogic("TALLEST_SECTION", function () {
-        const doorHeight = getState("HEIGHT");
-        const numOfSec = getState("NUM_OF_SEC");
 
-        this.value = Math.ceil((doorHeight / numOfSec) / 3) * 3;
-    }, ["HEIGHT", "NUM_OF_SEC"]);
+        const isGrandView =
+            getState("DOOR_MODEL") === "G";
+
+        const doorHeight =
+            isGrandView
+                ? Number(getState("HEIGHT")) - 24
+                : Number(getState("HEIGHT"));
+
+        const numOfSec =
+            isGrandView
+                ? Number(getState("NUM_OF_SEC")) - 1
+                : Number(getState("NUM_OF_SEC"));
+
+        this.value =
+            Math.ceil(
+                (doorHeight / numOfSec) / 3
+            ) * 3;
+
+    }, [
+        "HEIGHT",
+        "NUM_OF_SEC",
+        "DOOR_MODEL"
+    ]);
 
     addLogic("TALLEST_SECTION_QTY", function () {
-        const doorHeight = getState("HEIGHT");
-        const numOfSec = getState("NUM_OF_SEC");
 
-        this.value = Math.round((((doorHeight / numOfSec) - getState("SHORTEST_SECTION")) / 3) * numOfSec);
-    }, ["HEIGHT", "NUM_OF_SEC", "SHORTEST_SECTION"]);
+        const isGrandView =
+            getState("DOOR_MODEL") === "G";
+
+        const doorHeight =
+            isGrandView
+                ? Number(getState("HEIGHT")) - 24
+                : Number(getState("HEIGHT"));
+
+        const numOfSec =
+            isGrandView
+                ? Number(getState("NUM_OF_SEC")) - 1
+                : Number(getState("NUM_OF_SEC"));
+
+        this.value =
+            Math.round(
+                (
+                    (
+                        doorHeight / numOfSec
+                    ) -
+                    getState("SHORTEST_SECTION")
+                ) / 3 *
+                numOfSec
+            );
+
+    }, [
+        "HEIGHT",
+        "NUM_OF_SEC",
+        "SHORTEST_SECTION",
+        "DOOR_MODEL"
+    ]);
 }
 
 
@@ -426,10 +495,11 @@ function getBundles() {
         getState("WIDTH"),
         getState("HEIGHT"),
         getState("NUM_OF_SEC"),
-        getState("GLASS_SHAPE")
+        getState("GLASS_SHAPE"),
+        getState("DOOR_MODEL")
     ].join("|");
 
-    if (key === _bundleCacheKey) {        
+    if (key === _bundleCacheKey) {
         return _bundleCache;
     }
     _bundleCacheKey = key;
@@ -437,7 +507,7 @@ function getBundles() {
 
     return _bundleCache;
 }
-``
+
 
 function getBundle(bundleNo) {
     const bundles = getBundles();
@@ -450,17 +520,22 @@ function getBundle(bundleNo) {
 
 function getSectionBundle() {
 
-    const shortestQty =
+    const isGrandView =
+        getState("DOOR_MODEL") === "G";
+
+    let shortestQty =
         Math.ceil(Number(getState("SHORTEST_SECTIONS_QTY"))) || 0;
 
     const shortestSection =
         Number(getState("SHORTEST_SECTION")) || 0;
 
-    const tallestQty =
+    let tallestQty =
         Math.ceil(Number(getState("TALLEST_SECTION_QTY"))) || 0;
 
     const tallestSection =
         Number(getState("TALLEST_SECTION")) || 0;
+
+
 
     // Create sorted DESC array
     const sections = [
@@ -510,6 +585,10 @@ function getSectionBundle() {
         result[positions[index]] = section;
     });
 
+    if (isGrandView) {
+        result.push(24);
+    }
+    //console.log("result", result);
     return result;
 }
 
@@ -518,10 +597,10 @@ function getSectionBundle() {
 // BUNDLING
 // ======================================================
 
-function bundleByHeight() {    
+function bundleByHeight() {
     const width = Number(getState("WIDTH"));
     const sections = getSectionBundle();
-
+   // console.log("SECTIONS FOR BUNDLING", sections);
     const glass_shape = getState("GLASS_SHAPE");
 
     const isGlazed =
@@ -679,7 +758,7 @@ function calculateSectionShipWeight(sectionHeightInInches, isBottomSection = tru
 }
 
 
-function getGlassQtyByBundleSection(bundleIndex, sectionIndexInBundle, qtyFieldName) {    
+function getGlassQtyByBundleSection(bundleIndex, sectionIndexInBundle, qtyFieldName) {
     const bundle = getBundles()[bundleIndex];
     // const sections = getDoorInfo().sections.slice().reverse();
     const sections = getReversedSectionsCached();
@@ -850,7 +929,7 @@ function registerGlazingCalculationLogic() {
     // }, ["GLASS_SHAPE", "FRAME_COLOR", "DOOR_MODEL", "GLASS_TYPE", "GLASS_TEMPERED", "FACE", "DESIGN_CODE"]);
 
 
-    addLogic("WINDOW_1", function () {        
+    addLogic("WINDOW_1", function () {
         const door_model = getState("DOOR_MODEL");
         const glass_shape = getState("GLASS_SHAPE") || "";
         const glass_type = getState("GLASS_TYPE") || "";
@@ -967,7 +1046,7 @@ function registerGlazingCalculationLogic() {
     ]);
 
 
-    addLogic("WINDOW_2", function () {        
+    addLogic("WINDOW_2", function () {
         const door_model = getState("DOOR_MODEL");
         const glass_shape = getState("GLASS_SHAPE") || "";
         const glass_type = getState("GLASS_TYPE") || "";
@@ -1315,7 +1394,7 @@ function registerGlazingCalculationLogic() {
 
 
     GLASS_QTY_FIELDS.forEach(function (item) {
-        addLogic(item.field, function () {            
+        addLogic(item.field, function () {
             const isCustomSlim =
                 getState("WINDOW_POSITION") === "custom" &&
                 (getState("GLASS_SHAPE") || "").includes("slim");
@@ -1337,7 +1416,7 @@ function registerGlazingCalculationLogic() {
 
         }, GLASS_QTY_DEPS);
 
-        addLogic(item.field + "_TEMP_OR_MIXED", function () {            
+        addLogic(item.field + "_TEMP_OR_MIXED", function () {
             const isCustomSlim =
                 getState("WINDOW_POSITION") === "custom" &&
                 (getState("GLASS_SHAPE") || "").includes("slim");
@@ -1384,7 +1463,7 @@ function registerGlazingCalculationLogic() {
     }, ["GLASS_SHAPE", "DOOR_MODEL"]);
 
     SCREW_QTY_FIELDS.forEach(function (item) {
-        addLogic(item.field, function () {            
+        addLogic(item.field, function () {
             const face = getState("FACE");
             const glass_shape = getState("GLASS_SHAPE") || "";
 
@@ -1439,6 +1518,7 @@ function getDoorInfoCached() {
         face: getState("FACE"),
         custom: getState("CUSTOM_WINDOWS"),
         tempered: getState("GLASS_TEMPERED"),
+        doorModel: getState("DOOR_MODEL"),
 
         sections: (windowState?.sections || []).map(s => ({
             shape: s.shape,
@@ -1448,10 +1528,10 @@ function getDoorInfoCached() {
         }))
     });
 
-    if (key === _doorInfoCacheKey) {        
+    if (key === _doorInfoCacheKey) {
         return _doorInfoCache;
     }
-    
+
     _doorInfoCacheKey = key;
     _doorInfoCache = getDoorInfo();
 
@@ -1550,7 +1630,8 @@ function getSectionFlags() {
     const key = JSON.stringify({
         sections: getState("WINDOW_STATE")?.sections,
         custom: getState("CUSTOM_WINDOWS"),
-        position: getState("WINDOW_POSITION")
+        position: getState("WINDOW_POSITION"),
+        doorModel: getState("DOOR_MODEL")
     });
 
     if (key === _sectionFlagsCacheKey) {
@@ -1576,9 +1657,16 @@ function getSectionFlags() {
 
 function getReversedSectionsCached() {
 
-    const windowState = getState("WINDOW_STATE");
+    // const windowState = getState("WINDOW_STATE");
 
-    const key = JSON.stringify(windowState?.sections);
+    // const key = JSON.stringify(windowState?.sections);
+
+    const key = JSON.stringify({
+        sections: windowState?.sections,
+        doorModel: getState("DOOR_MODEL"),
+        numSections: getState("NUM_OF_SEC"),
+        height: getState("HEIGHT")
+    });
 
     if (key === _reversedSectionsKey) {
         return _reversedSectionsCache;
